@@ -70,7 +70,7 @@ const id = 'mc-' + Math.random().toString(36).slice(2, 8);
         </div>
 
         {[
-          { key: 'down', label: 'Down payment', min: 5, max: 50, step: 1, val: DEFAULTS.downPct, unit: '%' },
+          { key: 'down', label: 'Down payment', min: 0, max: 50, step: 1, val: DEFAULTS.downPct, unit: '%' },
           { key: 'rate', label: 'Interest rate', min: 3, max: 6, step: 0.05, val: DEFAULTS.rate, unit: '%' },
           { key: 'years', label: 'Loan tenure', min: 5, max: 35, step: 1, val: DEFAULTS.years, unit: ' yrs' },
         ].map((f) => (
