@@ -9,6 +9,7 @@ import GoldIcon from '../components/GoldIcon.astro';
 import VideoCard from '../components/VideoCard.astro';
 import AreaCard from '../components/AreaCard.astro';
 import CTASection from '../components/CTASection.astro';
+import MatchQuiz from '../components/MatchQuiz.astro';
 import StarRating from '../components/StarRating.astro';
 import { SERVICES } from '../data/services';
 import { SITE } from '../data/site';
@@ -59,7 +60,7 @@ const marqueeItems =
           src={url('/images/lawrence-portrait.jpg')}
           onerror={`this.onerror=null;this.src='${url('/images/placeholders/lawrence-portrait.svg')}'`}
           alt="Lawrence Law, New Property Specialist"
-          class="aspect-[4/5] w-full object-cover"
+          class="plx aspect-[4/5] w-full object-cover"
           fetchpriority="high"
         />
       </div>
@@ -139,6 +140,9 @@ const marqueeItems =
 
   {/* ===== Stats: white editorial ===== */}
   <TrustBar />
+
+  {/* ===== 30-second property match quiz ===== */}
+  <MatchQuiz />
 
   {/* ===== Self-introduction: pillars + first-deal story (shared with About) ===== */}
   <PillarsAndStory />

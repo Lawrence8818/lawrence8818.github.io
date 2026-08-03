@@ -74,7 +74,7 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
             src={url(d.image)}
             onerror={d.fallbackImage ? `this.onerror=null;this.src='${url(d.fallbackImage)}'` : undefined}
             alt={`${d.name} — building facade`}
-            class="aspect-[4/3] w-full object-cover object-top"
+            class="plx-cover aspect-[4/3] w-full object-cover object-top"
             fetchpriority="high"
           />
           {(d.penthouse || d.label || d.soldOut) && (

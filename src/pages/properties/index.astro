@@ -160,6 +160,7 @@ const PAGE_SIZE = 9;
               data-soldout={p.data.soldOut ? '1' : '0'}
               data-size-min={sz ? String(sz.min) : ''}
               data-size-max={sz ? String(sz.max) : ''}
+              data-price={(() => { const n = parseInt((p.data.priceFrom.match(/[\d,]+/)?.[0] ?? '').replace(/,/g, ''), 10); return Number.isFinite(n) && n > 0 ? String(n) : ''; })()}
             >
               <PropertyCard {...p.data} slug={p.id} />
             </div>
@@ -315,7 +316,19 @@ const PAGE_SIZE = 9;
     let soldOnly = false;
     let sizeLo = SIZE_MIN;
     let sizeHi = SIZE_MAX;
+    let priceLo = 0;
+    let priceHi = Infinity;
     let page = 1;
+
+    // Budget filter is URL-driven (the homepage match quiz links here with
+    // ?pmin/&pmax). Listings without a published price only show when no
+    // budget filter is active.
+    const priceOk = (el) => {
+      if (priceLo <= 0 && priceHi === Infinity) return true;
+      const p = +el.dataset.price;
+      if (!p) return false;
+      return p >= priceLo && p <= priceHi;
+    };
 
     // A listing passes the size filter if its own size span overlaps the chosen
     // [sizeLo, sizeHi] range. At the top of the track the upper bound is treated
@@ -332,6 +345,7 @@ const PAGE_SIZE = 9;
     const matches = () =>
       items.filter((el) => {
         if (!sizeOk(el)) return false;
+        if (!priceOk(el)) return false;
         // "Special" is a multi-select facet: with Penthouse and/or Fully Sold
         // active, show anything matching EITHER — live penthouses plus the
         // fully-sold projects — so both can be on at once.
@@ -517,6 +531,58 @@ const PAGE_SIZE = 9;
       } catch (e) {}
       setView(saved === 'text' ? 'text' : 'cards');
     }
+
+    // ===== Apply filters passed in the URL (homepage match quiz) =====
+    try {
+      const q = new URLSearchParams(location.search);
+      const reg = q.get('region');
+      if (reg) {
+        const btn = filterBtns.find((b) => b.dataset.region === reg);
+        if (btn) {
+          region = reg;
+          filterBtns.forEach((b) => b.removeAttribute('data-active'));
+          btn.setAttribute('data-active', '');
+        }
+      }
+      const pmin = parseInt(q.get('pmin') || '', 10);
+      const pmax = parseInt(q.get('pmax') || '', 10);
+      if (pmin > 0) priceLo = pmin;
+      if (pmax > 0) priceHi = pmax;
+      const smin = parseInt(q.get('smin') || '', 10);
+      const smax = parseInt(q.get('smax') || '', 10);
+      if (sLo && sHi && (smin > 0 || smax > 0)) {
+        if (smin > 0) sLo.value = Math.max(SIZE_MIN, Math.min(SIZE_MAX, smin));
+        if (smax > 0) sHi.value = Math.max(SIZE_MIN, Math.min(SIZE_MAX, smax));
+        sizeLo = Math.min(+sLo.value, +sHi.value);
+        sizeHi = Math.max(+sLo.value, +sHi.value);
+        paintSize();
+      }
+      // Removable "Budget" chip so the buyer can see and clear the filter
+      if (priceLo > 0 || priceHi !== Infinity) {
+        const fmtK = (n) => (n >= 1000000 ? 'RM' + n / 1000000 + 'M' : 'RM' + Math.round(n / 1000) + 'k');
+        const label =
+          priceLo > 0 && priceHi !== Infinity ? fmtK(priceLo) + ' – ' + fmtK(priceHi)
+          : priceLo > 0 ? 'Above ' + fmtK(priceLo)
+          : 'Under ' + fmtK(priceHi);
+        const bar = document.getElementById('prop-filters');
+        if (bar) {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className =
+            'label-sm inline-flex min-h-11 items-center gap-2 rounded-full border border-gold-500 bg-gold-500 px-4 py-2 text-navy-900';
+          chip.innerHTML = 'Budget: ' + label + ' <span aria-hidden="true">✕</span>';
+          chip.setAttribute('aria-label', 'Clear budget filter ' + label);
+          chip.addEventListener('click', () => {
+            priceLo = 0;
+            priceHi = Infinity;
+            chip.remove();
+            page = 1;
+            render();
+          });
+          bar.appendChild(chip);
+        }
+      }
+    } catch (e) {}
 
     render();
   })();

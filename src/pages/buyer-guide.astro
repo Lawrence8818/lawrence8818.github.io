@@ -30,12 +30,24 @@ const videos = (await getCollection('videos')).sort(
 
   <section class="bg-navy-900 pt-8 pb-14 sm:pt-10 sm:pb-28">
     <div class="container-site">
+      {/* Watch progress — filled in by the script below; hidden without JS */}
+      <div id="vg-progress" class="mb-8 hidden max-w-md">
+        <div class="mb-2 flex items-baseline justify-between">
+          <span class="label-sm text-navy-100/80">Your progress</span>
+          <span class="label-sm text-gold-500"><span id="vg-count">0</span> / {videos.length} watched</span>
+        </div>
+        <div class="h-1.5 overflow-hidden rounded-full bg-white/15">
+          <div id="vg-bar" class="h-full w-0 rounded-full bg-gold-500 transition-all duration-700"></div>
+        </div>
+      </div>
       <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {videos.map((v) => (
-          <figure class="vg-card flex flex-col overflow-hidden rounded-[4px] bg-white/10 backdrop-blur-sm">
+        {videos.map((v, i) => (
+          <figure class="vg-card relative flex flex-col overflow-hidden rounded-[4px] bg-white/10 backdrop-blur-sm" data-vid={v.data.videoId}>
+            <span class="vg-next label-sm absolute top-3 left-3 z-10 hidden rounded-full bg-gold-500 px-3 py-1 text-navy-900">Up Next</span>
+            <span class="vg-done label-sm absolute top-3 right-3 z-10 hidden rounded-full bg-navy-950/85 px-3 py-1 text-gold-500">✓ Watched</span>
             <div class="aspect-[9/16] w-full flex-none bg-navy-950">
               <iframe
-                src={`https://www.youtube.com/embed/${v.data.videoId}`}
+                src={`https://www.youtube.com/embed/${v.data.videoId}?enablejsapi=1`}
                 title={v.data.title}
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -44,7 +56,7 @@ const videos = (await getCollection('videos')).sort(
               ></iframe>
             </div>
             <figcaption class="flex flex-1 flex-col p-5">
-              <span class="label-sm text-gold-500">{v.data.category}</span>
+              <span class="label-sm text-gold-500">Part {i + 1} · {v.data.category}</span>
               <p class="mt-2 text-[17px] leading-snug font-bold text-white">{v.data.title}</p>
               {v.data.titleZh && (
                 <p class="mt-1 text-sm text-navy-100">{v.data.titleZh}</p>
@@ -94,4 +106,76 @@ const videos = (await getCollection('videos')).sort(
     sub="Message me directly — real person, real reply, no pressure."
     waMessage="Hi Lawrence, I watched your Buyer Guide videos and have a question about buying property."
   />
+
+  <script is:inline>
+    (function () {
+      // Continuous watching: the YouTube embeds report state changes via
+      // postMessage (enablejsapi=1). When a video ends we mark it watched
+      // (persisted), update the progress bar, and guide the eye to the next
+      // unwatched one with an "Up Next" badge + gentle scroll.
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.vg-card[data-vid]'));
+      if (!cards.length) return;
+      var KEY = 'llp-bg-watched';
+      var watched;
+      try { watched = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { watched = []; }
+
+      var bar = document.getElementById('vg-bar');
+      var count = document.getElementById('vg-count');
+      var wrap = document.getElementById('vg-progress');
+      if (wrap) wrap.classList.remove('hidden');
+
+      function refresh(scrollToNext) {
+        var next = null;
+        cards.forEach(function (c) {
+          var done = watched.indexOf(c.dataset.vid) !== -1;
+          c.querySelector('.vg-done').classList.toggle('hidden', !done);
+          if (!done && !next) next = c;
+        });
+        cards.forEach(function (c) {
+          c.querySelector('.vg-next').classList.toggle('hidden', c !== next || watched.length === 0);
+        });
+        if (count) count.textContent = String(watched.length);
+        if (bar) bar.style.width = Math.round((watched.length / cards.length) * 100) + '%';
+        if (scrollToNext && next && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      function markWatched(vid) {
+        if (watched.indexOf(vid) === -1) {
+          watched.push(vid);
+          try { localStorage.setItem(KEY, JSON.stringify(watched)); } catch (e) {}
+          refresh(true);
+        }
+      }
+
+      // handshake so each player starts posting events
+      cards.forEach(function (c) {
+        var f = c.querySelector('iframe');
+        var hello = function () {
+          try {
+            f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: c.dataset.vid, channel: 'widget' }), '*');
+          } catch (e) {}
+        };
+        f.addEventListener('load', hello);
+        hello();
+      });
+
+      window.addEventListener('message', function (e) {
+        if (typeof e.data !== 'string' || e.origin.indexOf('youtube.com') === -1) return;
+        var d;
+        try { d = JSON.parse(e.data); } catch (err) { return; }
+        var state =
+          d.event === 'onStateChange' ? d.info :
+          d.event === 'infoDelivery' && d.info && typeof d.info.playerState === 'number' ? d.info.playerState : null;
+        if (state !== 0) return; // 0 = ended
+        var card = cards.find
+          ? cards.find(function (c) { return c.querySelector('iframe').contentWindow === e.source; })
+          : null;
+        if (card) markWatched(card.dataset.vid);
+      });
+
+      refresh(false);
+    })();
+  </script>
 </BaseLayout>

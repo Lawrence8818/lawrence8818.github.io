@@ -1,0 +1,152 @@
+---
+// 30-second property match quiz — 3 taps (budget / area / size) build a
+// pre-filtered All Properties link. Pure inline JS, qiai-safe; with JS off
+// the fallback button still goes to the full list.
+const ALLPROPS = 'https://lawrencelawproperty.com/allproperties';
+
+const STEPS = [
+  {
+    key: 'budget',
+    q: 'What is your budget?',
+    opts: [
+      { label: 'Under RM500k', v: 'pmax=500000' },
+      { label: 'RM500k – 800k', v: 'pmin=500000&pmax=800000' },
+      { label: 'RM800k – 1.5M', v: 'pmin=800000&pmax=1500000' },
+      { label: 'Above RM1.5M', v: 'pmin=1500000' },
+      { label: 'Flexible', v: '' },
+    ],
+  },
+  {
+    key: 'area',
+    q: 'Where do you want to live?',
+    opts: [
+      { label: 'Kuala Lumpur', v: 'region=kuala-lumpur' },
+      { label: 'KLCC', v: 'region=klcc' },
+      { label: 'Petaling Jaya', v: 'region=petaling-jaya' },
+      { label: 'Selangor', v: 'region=selangor' },
+      { label: 'Anywhere', v: '' },
+    ],
+  },
+  {
+    key: 'size',
+    q: 'How much space do you need?',
+    opts: [
+      { label: 'Cosy · 2 rooms', v: 'smax=900' },
+      { label: 'Family · 3 rooms', v: 'smin=900&smax=1250' },
+      { label: 'Spacious · 4+ rooms', v: 'smin=1250' },
+      { label: 'Not sure yet', v: '' },
+    ],
+  },
+];
+---
+
+<section id="match-quiz" class="border-y border-gold-500/25 bg-navy-950 py-14 text-white sm:py-20">
+  <div class="container-site">
+    <p class="label-sm mb-3 text-gold-500">Property Match</p>
+    <h2 class="section-heading text-white">Find Your Match in 30 Seconds</h2>
+    <div class="gold-rule"></div>
+    <p class="mb-8 max-w-2xl text-[17px] leading-[1.8] text-navy-100">
+      Three quick taps — budget, area, space — and I’ll show you only the projects that fit.
+    </p>
+
+    <div class="mq max-w-3xl rounded-[6px] border border-white/15 bg-white/[0.04] p-6 sm:p-8">
+      {STEPS.map((s, i) => (
+        <div class="mq-step" data-step={i} style={i > 0 ? 'display:none' : undefined}>
+          <div class="mb-4 flex items-baseline justify-between gap-3">
+            <p class="text-[19px] font-bold text-white sm:text-[22px]">{s.q}</p>
+            <span class="label-sm flex-none text-navy-100/70">{i + 1} / {STEPS.length}</span>
+          </div>
+          <div class="flex flex-wrap gap-2.5">
+            {s.opts.map((o) => (
+              <button
+                type="button"
+                class="mq-opt label-sm inline-flex min-h-11 items-center rounded-full border border-white/40 px-5 py-2 text-white transition hover:border-gold-500 hover:text-gold-500"
+                data-v={o.v}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+          {i > 0 && (
+            <button type="button" class="mq-back mt-5 inline-flex min-h-11 items-center text-sm text-navy-100/70 hover:text-gold-500">
+              ← Back
+            </button>
+          )}
+        </div>
+      ))}
+
+      {/* result step */}
+      <div class="mq-step" data-step="3" style="display:none">
+        <p class="text-[19px] font-bold text-white sm:text-[22px]">Done — your shortlist is ready.</p>
+        <p class="mt-2 text-[15px] text-navy-100">
+          I’ve filtered all our projects down to the ones that match what you picked.
+        </p>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a class="mq-go btn-gold" href={ALLPROPS} data-base={ALLPROPS}>See My Matches</a>
+          <button type="button" class="mq-restart btn-gold-outline text-white">Start Over</button>
+        </div>
+      </div>
+
+      {/* no-JS fallback keeps the section useful */}
+      <noscript>
+        <a class="btn-gold mt-4" href={ALLPROPS}>Browse All Properties</a>
+      </noscript>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById('match-quiz');
+    if (!root) return;
+    var steps = Array.prototype.slice.call(root.querySelectorAll('.mq-step'));
+    var picks = [];
+    var cur = 0;
+
+    function show(i) {
+      cur = i;
+      steps.forEach(function (s) {
+        s.style.display = +s.dataset.step === i ? '' : 'none';
+      });
+    }
+
+    function buildLink() {
+      var qs = picks.filter(Boolean).join('&');
+      var go = root.querySelector('.mq-go');
+      go.href = go.dataset.base + (qs ? '?' + qs : '');
+    }
+
+    steps.forEach(function (s, idx) {
+      s.querySelectorAll('.mq-opt').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          picks[idx] = btn.dataset.v;
+          // highlight the chosen chip for when the buyer comes Back
+          s.querySelectorAll('.mq-opt').forEach(function (b) {
+            b.classList.toggle('mq-on', b === btn);
+          });
+          buildLink();
+          show(idx + 1);
+        });
+      });
+      var back = s.querySelector('.mq-back');
+      if (back) back.addEventListener('click', function () { show(idx - 1); });
+    });
+
+    var restart = root.querySelector('.mq-restart');
+    if (restart)
+      restart.addEventListener('click', function () {
+        picks = [];
+        root.querySelectorAll('.mq-opt').forEach(function (b) { b.classList.remove('mq-on'); });
+        buildLink();
+        show(0);
+      });
+  })();
+</script>
+
+<style>
+  .mq-opt.mq-on {
+    border-color: #c9a227;
+    background: #c9a227;
+    color: #0a2540;
+  }
+</style>

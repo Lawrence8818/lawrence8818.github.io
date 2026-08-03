@@ -286,6 +286,35 @@
         animation-timeline: view();
         animation-range: entry 0% entry 45%;
       }
+      /* Scroll-scrubbed parallax drift for feature images. .plx = free-standing
+         image, gentle drift only; .plx-cover = image inside an overflow-hidden
+         frame, so it can over-scale and drift further without showing edges. */
+      .plx {
+        animation: plx-drift linear both;
+        animation-timeline: view();
+        animation-range: cover 0% cover 100%;
+      }
+      .plx-cover {
+        animation: plx-cover-drift linear both;
+        animation-timeline: view();
+        animation-range: cover 0% cover 100%;
+      }
+    }
+  }
+  @keyframes plx-drift {
+    from {
+      transform: translateY(14px);
+    }
+    to {
+      transform: translateY(-14px);
+    }
+  }
+  @keyframes plx-cover-drift {
+    from {
+      transform: scale(1.1) translateY(3%);
+    }
+    to {
+      transform: scale(1.1) translateY(-3%);
     }
   }
 
