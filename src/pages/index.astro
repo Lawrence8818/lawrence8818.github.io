@@ -1,0 +1,335 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TrustBar from '../components/TrustBar.astro';
+import PillarsAndStory from '../components/PillarsAndStory.astro';
+import ComebackStory from '../components/ComebackStory.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import GoldIcon from '../components/GoldIcon.astro';
+import VideoCard from '../components/VideoCard.astro';
+import AreaCard from '../components/AreaCard.astro';
+import CTASection from '../components/CTASection.astro';
+import StarRating from '../components/StarRating.astro';
+import { SERVICES } from '../data/services';
+import { SITE } from '../data/site';
+import { url } from '../lib/url';
+import { waLink, waContextMessage } from '../lib/whatsapp';
+
+const videos = (await getCollection('videos'))
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+const featuredVideos = [...videos.filter((v) => v.data.featured), ...videos]
+  .filter((v, i, arr) => arr.indexOf(v) === i)
+  .slice(0, 3);
+
+const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
+
+const properties = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
+// Home rail shows a short curated set only; the full paginated list lives at /properties/.
+const featuredProperties = [...properties.filter((p) => p.data.featured), ...properties]
+  .filter((p, i, arr) => arr.indexOf(p) === i)
+  .slice(0, 6);
+
+const testimonials = (await getCollection('testimonials')).slice(0, 6);
+
+const marqueeItems =
+  'KUALA LUMPUR · SELANGOR · JOHOR · PENANG · A DECADE OF EXPERIENCE · TOP 47 NATIONWIDE · PRIMARY MARKET 2025 · TRUSTED BY 2,000+ BUYERS · 1,500+ HOMEOWNERS SERVED · SINCE 2015 · ';
+---
+
+<BaseLayout
+  title={`${SITE.name} | New Property Specialist with Subsales Expertise — KL, Selangor, Johor & Penang`}
+  description="Full coverage of every new launch in KL & Selangor, plus Johor and Penang. 10 years in real estate, 2,000+ happy buyers. Honest, no-pressure advice — free consultation on WhatsApp."
+  noTitleTemplate
+>
+  {/* ===== Hero: editorial, oversized type ===== */}
+  <section class="bg-navy-900 text-white">
+    <div class="hero-grid container-site py-14 sm:py-20">
+      <div class="hero-top">
+        <p class="label-sm mb-6 text-gold-500">
+          {SITE.renNumber} · KL / PJ / SELANGOR / JOHOR / PENANG
+        </p>
+        <h1 class="text-[clamp(2.6rem,8vw,5.5rem)] leading-[1.02] tracking-tight text-white uppercase">
+          Lawrence<br />Law <span class="text-gold-500">刘智权</span>
+        </h1>
+        <p class="mt-6 text-sm font-bold tracking-[3px] text-white uppercase sm:text-base">
+          New Property Specialist <span class="text-gold-500">/</span> Subsales Expertise
+        </p>
+      </div>
+      <div class="hero-photo mx-auto w-full max-w-xs lg:max-w-sm">
+        <img
+          src={url('/images/lawrence-portrait.jpg')}
+          onerror={`this.onerror=null;this.src='${url('/images/placeholders/lawrence-portrait.svg')}'`}
+          alt="Lawrence Law, New Property Specialist"
+          class="aspect-[4/5] w-full object-cover"
+          fetchpriority="high"
+        />
+      </div>
+      <div class="hero-body">
+        <div class="max-w-xl space-y-4 text-navy-100">
+          <p>
+            From subsales to new property — a decade of hands-on experience you can count on.
+            Guiding young couples and families toward the right home
+            <strong class="font-bold text-white">since 2015</strong>.
+          </p>
+          <p>
+            My real estate journey began at university, where I started out in the subsales market —
+            helping clients buy, sell and rent with confidence. Over my first four years, I built the
+            trust of a growing community of <strong class="font-bold text-white">1,500+ homeowners</strong>.
+          </p>
+          <p>
+            In 2019, I moved into new property sales, combining hands-on subsales experience with
+            in-depth project knowledge — bringing my journey to a full decade in the industry.
+          </p>
+          <p>
+            Today, trusted by <strong class="font-bold text-white">2,000+ buyers</strong> over the
+            years, I specialise in helping families upgrade, first-time homebuyers choose the right
+            location, and busy professionals find practical, future-ready homes.
+          </p>
+          <p>
+            Most recently ranked <strong class="font-bold text-white">Top 47 nationwide</strong> (Primary
+            Market, 2025) and a <strong class="font-bold text-white">Million Dollar Achiever Club —
+            Diamond</strong> member at the IQI Prestige Awards.
+          </p>
+          <p class="text-white">
+            If you’re looking for honest, no-pressure advice to make the right property move — let’s talk.
+          </p>
+        </div>
+        <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+          <a href={waLink()} target="_blank" rel="noopener" class="btn-gold" data-track="whatsapp_hero">
+            Let’s Talk
+          </a>
+          <a href={waLink(SITE.leadMagnetMessage)} target="_blank" rel="noopener" class="btn-gold-outline text-white" data-track="whatsapp_hero_leadmagnet">
+            Free Buyer’s Guide
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    /* Hero layout: stacked on mobile (name → photo → intro → buttons),
+       side-by-side on desktop (text left, portrait right, vertically centred). */
+    .hero-grid {
+      display: grid;
+      gap: 2.5rem;
+      grid-template-areas: 'top' 'photo' 'body';
+    }
+    .hero-top { grid-area: top; }
+    .hero-photo { grid-area: photo; }
+    .hero-body { grid-area: body; }
+    @media (min-width: 1024px) {
+      .hero-grid {
+        grid-template-columns: 3fr 2fr;
+        column-gap: 2.5rem;
+        row-gap: 1.5rem;
+        align-items: center;
+        grid-template-areas:
+          'top   photo'
+          'body  photo';
+      }
+      .hero-photo { align-self: center; }
+    }
+  </style>
+
+  {/* ===== Marquee strip ===== */}
+  <div class="marquee border-y border-gold-500/30 bg-navy-950 py-3" aria-hidden="true">
+    <div class="marquee-track label-sm text-gold-500">
+      <span>{marqueeItems}</span><span>{marqueeItems}</span>
+    </div>
+  </div>
+
+  {/* ===== Stats: white editorial ===== */}
+  <TrustBar />
+
+  {/* ===== Self-introduction: pillars + first-deal story (shared with About) ===== */}
+  <PillarsAndStory />
+
+  <ComebackStory showStoryLink />
+
+  {/* ===== Featured Properties: auto-playing card marquee =====
+      Pure CSS (same technique as the text strip) so it runs even on
+      platforms that strip JS. Pauses on hover / touch-hold / focus. */}
+  <section class="section-pad bg-white">
+    <div class="container-site">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <SectionHeading title="Featured Properties" sub="Premium Developments · Kuala Lumpur & Selangor" />
+        <a href="https://lawrencelawproperty.com/allproperties" class="btn-gold-outline mb-8 hidden text-navy-900 sm:inline-flex">
+          View ALL Properties
+        </a>
+      </div>
+    </div>
+    <div class="card-marquee pb-4">
+      <div class="card-marquee-track" style="--cm-dur: 72s">
+        {[0, 1, 2].map((copy) => (
+          <div class="flex gap-6 pr-6 pl-0" aria-hidden={copy > 0 ? 'true' : undefined}>
+            {featuredProperties.map((p) => (
+              <div class="group w-[280px] sm:w-[340px] lg:w-[400px]">
+                <a href={url(`/properties/${p.id}/`)} class="block" tabindex={copy > 0 ? -1 : undefined}>
+                  <div class="relative aspect-[4/3] overflow-hidden bg-navy-900">
+                    <img
+                      src={url(p.data.image)}
+                      onerror={p.data.fallbackImage ? `this.onerror=null;this.src='${url(p.data.fallbackImage)}'` : undefined}
+                      alt={p.data.name}
+                      loading="lazy"
+                      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                    {p.data.label && (
+                      <span class="label-sm absolute top-3 left-3 bg-gold-500 px-3 py-1 text-navy-900">
+                        {p.data.label}
+                      </span>
+                    )}
+                    {p.data.placeholder && (
+                      <span class="absolute top-3 right-3 rounded bg-navy-900/85 px-2 py-0.5 text-xs text-white">
+                        等待 · Photo pending
+                      </span>
+                    )}
+                  </div>
+                </a>
+                <div class="mt-4 flex items-baseline justify-between gap-4 border-b border-border pb-4">
+                  <div class="min-w-0">
+                    <p class="truncate font-extrabold tracking-tight text-navy-900 uppercase">{p.data.name}</p>
+                    <p class="text-sm text-ink/60">{p.data.location}</p>
+                  </div>
+                  <p class="flex-none font-bold text-navy-900">
+                    From {p.data.priceFrom} <span class="text-gold-500">→</span>
+                  </p>
+                </div>
+                <div class="mt-1 flex gap-5 text-sm">
+                  <a href={waLink(waContextMessage(p.data.name))} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4" data-track="whatsapp_property" tabindex={copy > 0 ? -1 : undefined}>
+                    Contact Us
+                  </a>
+                  <a href={url(`/properties/${p.id}/`)} class="inline-flex min-h-11 items-center font-semibold text-ink/60 hover:text-navy-900" tabindex={copy > 0 ? -1 : undefined}>
+                    Details
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="container-site mt-8 text-center sm:hidden">
+      <a href="https://lawrencelawproperty.com/allproperties" class="btn-gold-outline text-navy-900">View ALL Properties</a>
+    </div>
+  </section>
+
+  {/* ===== Services ===== */}
+  <section class="section-pad border-t border-border bg-white">
+    <div class="container-site">
+      <SectionHeading title="How I Can Help" sub="Services" />
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {SERVICES.map((s) => (
+          <div class="card">
+            <span class="text-gold-500"><GoldIcon name={s.icon} size={32} /></span>
+            <h3 class="mt-4 text-lg tracking-tight uppercase">{s.title}</h3>
+            <p class="mt-2 text-[15px] text-ink/80">{s.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* ===== Videos ===== */}
+  <section id="videos" class="section-pad scroll-mt-20 border-t border-border bg-white">
+    <div class="container-site">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <SectionHeading title="Watch First, Buy Smarter" sub="Videos" />
+        <a href={url('/videos/')} class="mb-8 hidden min-h-11 items-center text-sm font-semibold text-gold-600 hover:underline sm:inline-flex">
+          All videos →
+        </a>
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {featuredVideos.map((v) => (
+          <VideoCard
+            slug={v.id}
+            title={v.data.title}
+            titleZh={v.data.titleZh}
+            category={v.data.category}
+            platform={v.data.platform}
+            thumbnail={v.data.thumbnail}
+            videoId={v.data.videoId}
+            longform={v.data.longform}
+          />
+        ))}
+      </div>
+      <a href={url('/videos/')} class="mt-6 inline-flex min-h-11 w-full items-center justify-center text-center text-sm font-semibold text-gold-600 hover:underline sm:hidden">
+        All videos →
+      </a>
+    </div>
+  </section>
+
+  {/* ===== Testimonials: navy band =====
+      Prev/next arrows mirror the Featured Properties rail: without JS they are
+      anchor links that scroll the rail card by card via :target + :has()
+      (works on platforms that strip scripts); with JS they upgrade to smooth
+      scroll buttons plus a gentle auto-advance that pauses on interaction. */}
+  <section id="testimonials" class="section-pad scroll-mt-20 bg-navy-900">
+    <div class="container-site">
+      <SectionHeading title="What others are saying" sub="Testimonials" tone="light" />
+      <p class="-mt-4 max-w-2xl text-navy-100">
+        The 222 Blueprint is my structured home-buying advisory method — helping buyers clarify
+        needs, budget and location before they commit.
+      </p>
+    </div>
+
+    <div class="card-marquee mt-8 pb-4">
+      <div class="card-marquee-track cm-reverse" style="--cm-dur: 88s">
+        {[0, 1, 2].map((copy) => (
+          <div class="flex gap-6 pr-6" aria-hidden={copy > 0 ? 'true' : undefined}>
+            {testimonials.map((t) => (
+              <figure class="flex w-[280px] flex-col overflow-hidden rounded-[4px] bg-white/10 backdrop-blur-sm sm:w-[340px] lg:w-[368px]">
+                <div class="relative aspect-[4/3] flex-none overflow-hidden bg-navy-950">
+                  <img
+                    src={url(t.data.image)}
+                    onerror={t.data.fallbackImage ? `this.onerror=null;this.src='${url(t.data.fallbackImage)}'` : undefined}
+                    alt={`${t.data.name} — happy buyer`}
+                    loading="lazy"
+                    class="h-full w-full object-cover"
+                  />
+                  {t.data.placeholder && (
+                    <span class="absolute top-2 right-2 rounded bg-navy-900/85 px-2 py-0.5 text-xs text-white">
+                      等待 · Photo pending
+                    </span>
+                  )}
+                </div>
+                <div class="flex flex-1 flex-col p-6 pt-5">
+                  <p class="text-[17px] leading-snug font-bold text-white">“{t.data.title}”</p>
+                  <blockquote class="mt-2 line-clamp-6 flex-1 text-[15px] leading-relaxed text-navy-100">
+                    {t.data.quote}
+                  </blockquote>
+                  <figcaption class="mt-4">
+                    <span class="label-sm text-gold-500">{t.data.name}{t.data.role && ` · ${t.data.role}`}</span>
+                    <StarRating size={14} class="mt-1" />
+                  </figcaption>
+                </div>
+              </figure>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="container-site mt-6 text-center">
+      <a href="https://lawrencelawproperty.com/spasignings" class="btn-gold-outline text-white">More Client Stories</a>
+    </div>
+  </section>
+
+  {/* ===== Areas ===== */}
+  <section id="areas" class="section-pad scroll-mt-20 bg-white">
+    <div class="container-site">
+      <SectionHeading title="Areas I Serve" sub="Coverage" />
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {areas.map((a) => (
+          <AreaCard
+            slug={a.id}
+            name={a.data.name}
+            nameEn={a.data.nameEn}
+            intro={a.data.intro}
+            heroImage={a.data.heroImage}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTASection />
+</BaseLayout>

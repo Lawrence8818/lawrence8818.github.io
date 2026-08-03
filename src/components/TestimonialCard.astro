@@ -1,0 +1,39 @@
+---
+import { url } from '../lib/url';
+import StarRating from './StarRating.astro';
+
+interface Props {
+  title: string;
+  quote: string;
+  name: string;
+  role?: string;
+  image: string;
+  fallbackImage?: string;
+  placeholder?: boolean;
+}
+const { title, quote, name, role = '', image, fallbackImage, placeholder = false } = Astro.props;
+---
+
+<figure class="card flex h-full flex-col gap-4">
+  <div class="relative aspect-[4/3] overflow-hidden rounded-lg bg-cream">
+    <img
+      src={url(image)}
+      onerror={fallbackImage ? `this.onerror=null;this.src='${url(fallbackImage)}'` : undefined}
+      alt={`${name} — client photo`}
+      loading="lazy"
+      class="h-full w-full object-cover"
+    />
+    {placeholder && (
+      <span class="absolute top-2 right-2 rounded bg-navy-900/85 px-2 py-0.5 text-xs text-white">
+        等待 · Photo pending
+      </span>
+    )}
+  </div>
+  <p class="font-sans text-lg leading-snug font-semibold text-navy-900">“{title}”</p>
+  <blockquote class="flex-1 text-[15px] leading-relaxed text-ink/85">{quote}</blockquote>
+  <figcaption class="border-t border-border pt-3 text-sm">
+    <span class="font-semibold text-navy-900">{name}</span>
+    {role && <span class="text-ink/60"> · {role}</span>}
+    <StarRating size={14} class="mt-1" />
+  </figcaption>
+</figure>

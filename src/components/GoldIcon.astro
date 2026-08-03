@@ -1,0 +1,57 @@
+---
+/**
+ * Gold line icons — replaces emoji site-wide per the design spec.
+ * Stroke inherits currentColor; wrap in a text-gold-500 element.
+ */
+interface Props {
+  name:
+    | 'building'
+    | 'bank'
+    | 'key'
+    | 'handshake'
+    | 'blend'
+    | 'family'
+    | 'shield'
+    | 'quote'
+    | 'phone'
+    | 'mail'
+    | 'pin';
+  size?: number;
+  class?: string;
+}
+const { name, size = 28, class: className = '' } = Astro.props;
+
+const paths: Record<string, string> = {
+  building:
+    'M3 21h18M5 21V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v16M14 9h4a1 1 0 0 1 1 1v11M8 8h2M8 12h2M8 16h2',
+  bank: 'M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M3 8l9-5 9 5H3Z',
+  key: 'M15.5 8.5a4.5 4.5 0 1 1-8.06 2.77L3 15.7V19h3.3l1.06-1.06h2.12v-2.12l1.29-1.29A4.5 4.5 0 0 1 15.5 8.5ZM15 9l.01-.01',
+  handshake:
+    'M2 9l4-3 5 1 5-1 6 3M8 12l3.5 3.5a1.4 1.4 0 0 0 2-2L10 10M6 8v7l2 2M18 8v7l-3 2.5',
+  blend: 'M12 3a6 6 0 1 0 0 12A6 6 0 0 0 12 3ZM12 9a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z',
+  family:
+    'M9 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM17 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3 21v-2a6 6 0 0 1 6-6 6 6 0 0 1 5.2 3M14 21v-1.5a4.5 4.5 0 0 1 7-3.74',
+  shield: 'M12 3l8 3v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3ZM9 12l2 2 4-4',
+  quote:
+    'M7 7h4v6a4 4 0 0 1-4 4H6M17 7h4v6a4 4 0 0 1-4 4h-1',
+  phone:
+    'M4 5a2 2 0 0 1 2-2h2l2 5-2 1.5a12 12 0 0 0 5.5 5.5L15 13l5 2v2a2 2 0 0 1-2 2C9.8 19 5 14.2 4 5Z',
+  mail: 'M3 6h18v12H3V6Zm0 1 9 6 9-6',
+  pin: 'M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
+};
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  class={className}
+>
+  <path d={paths[name]}></path>
+</svg>

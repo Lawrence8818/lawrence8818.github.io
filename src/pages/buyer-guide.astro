@@ -1,0 +1,97 @@
+---
+// Buyer Guide — every YouTube short embedded directly. Plain <iframe> embeds
+// (no click-to-load script) so the players survive platforms that strip JS.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CTASection from '../components/CTASection.astro';
+import MortgageCalculator from '../components/MortgageCalculator.astro';
+
+const videos = (await getCollection('videos')).sort(
+  (a, b) =>
+    Number(b.data.featured) - Number(a.data.featured) ||
+    b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+);
+---
+
+<BaseLayout
+  title="Buyer Guide: Watch First, Buy Smarter"
+  description="Short, honest videos on buying property in Malaysia — bank approval vs affordability, RPGT, walkability, density and more. Watch first, buy smarter."
+>
+  <section class="bg-navy-900 pt-14 pb-4 text-white sm:pt-20 sm:pb-6">
+    <div class="container-site">
+      <h1 class="mb-4 text-[32px] leading-tight text-white sm:text-5xl">Buyer Guide</h1>
+      <div class="mb-5 h-px w-16 bg-gold-500"></div>
+      <p class="max-w-2xl text-[17px] leading-[1.8] text-navy-100">
+        Watch first, buy smarter. Short, honest videos on the questions Malaysian homebuyers ask me
+        most, so you can avoid the common pitfalls before you commit.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-navy-900 pt-8 pb-14 sm:pt-10 sm:pb-28">
+    <div class="container-site">
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {videos.map((v) => (
+          <figure class="vg-card flex flex-col overflow-hidden rounded-[4px] bg-white/10 backdrop-blur-sm">
+            <div class="aspect-[9/16] w-full flex-none bg-navy-950">
+              <iframe
+                src={`https://www.youtube.com/embed/${v.data.videoId}`}
+                title={v.data.title}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                class="h-full w-full border-0"
+              ></iframe>
+            </div>
+            <figcaption class="flex flex-1 flex-col p-5">
+              <span class="label-sm text-gold-500">{v.data.category}</span>
+              <p class="mt-2 text-[17px] leading-snug font-bold text-white">{v.data.title}</p>
+              {v.data.titleZh && (
+                <p class="mt-1 text-sm text-navy-100">{v.data.titleZh}</p>
+              )}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    /* Video cards: quiet motion only — hover lift on desktop, scroll-in fade
+       where the browser supports it. The players themselves stay still. */
+    .vg-card {
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background-color 0.3s ease;
+    }
+    .vg-card:hover {
+      transform: translateY(-4px);
+      background-color: rgb(255 255 255 / 0.14);
+      box-shadow: 0 14px 34px rgb(0 0 0 / 0.35);
+    }
+    @supports (animation-timeline: view()) {
+      @media (prefers-reduced-motion: no-preference) {
+        .vg-card {
+          animation: rise linear both;
+          animation-timeline: view();
+          animation-range: entry 0% entry 38%;
+        }
+        .vg-card:nth-child(3n + 2) {
+          animation-range: entry 6% entry 44%;
+        }
+        .vg-card:nth-child(3n) {
+          animation-range: entry 12% entry 50%;
+        }
+      }
+    }
+  </style>
+
+  <MortgageCalculator tone="light" />
+
+  <CTASection
+    heading="A question these videos didn’t answer?"
+    sub="Message me directly — real person, real reply, no pressure."
+    waMessage="Hi Lawrence, I watched your Buyer Guide videos and have a question about buying property."
+  />
+</BaseLayout>

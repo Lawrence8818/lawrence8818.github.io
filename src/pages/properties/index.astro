@@ -1,0 +1,523 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PropertyCard from '../../components/PropertyCard.astro';
+import CTASection from '../../components/CTASection.astro';
+
+// Real projects (order 1–99) come first, sample/demo entries (order 100+) after.
+const properties = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
+
+// Fully-sold projects are hidden from the region/All/Penthouse views and only
+// appear behind the "Fully Sold" button, so every count below excludes them.
+const liveProps = properties.filter((p) => !p.data.soldOut);
+
+const countFor = (key: string) =>
+  key === 'all' ? liveProps.length : liveProps.filter((p) => p.data.region === key).length;
+
+// Regions with zero listings are hidden automatically — the button reappears
+// as soon as a project in that region is added.
+const REGIONS = [
+  { key: 'all', label: 'All' },
+  { key: 'kuala-lumpur', label: 'Kuala Lumpur' },
+  { key: 'klcc', label: 'KLCC' },
+  { key: 'petaling-jaya', label: 'Petaling Jaya' },
+  { key: 'selangor', label: 'Selangor' },
+  { key: 'johor', label: 'Johor' },
+  { key: 'penang', label: 'Penang' },
+].filter((r) => countFor(r.key) > 0);
+
+// Special filters
+const penthouseCount = liveProps.filter((p) => p.data.penthouse).length;
+const soldOutCount = properties.filter((p) => p.data.soldOut).length;
+
+// Layout-size range slider. Each listing's `layoutSize` (e.g. "690–1,035 sf")
+// yields a min/max in sq ft; the slider's lower bound is the smallest listing,
+// and the top is capped at 5,000 so a couple of very large penthouses/villas
+// don't flatten the scale — the top handle then means "5,000 sq ft and above".
+const parseSize = (s?: string) => {
+  const nums = ((s || '').match(/[\d,]+/g) || [])
+    .map((n) => parseInt(n.replace(/,/g, ''), 10))
+    .filter((n) => n > 0);
+  return nums.length ? { min: Math.min(...nums), max: Math.max(...nums) } : null;
+};
+const allSizes = properties.map((p) => parseSize(p.data.layoutSize)).filter(Boolean) as {
+  min: number;
+  max: number;
+}[];
+const SIZE_MIN = allSizes.length ? Math.floor(Math.min(...allSizes.map((s) => s.min)) / 50) * 50 : 0;
+const SIZE_MAX = 5000;
+const SIZE_STEP = 50;
+
+const PAGE_SIZE = 9;
+---
+
+<BaseLayout
+  title="Featured Properties: Curated New Launches in KL, Selangor, Johor & Penang"
+  description="Browse new-launch projects Lawrence recommends across Kuala Lumpur, Selangor, Johor and Penang — filter by region and page through the full list. Every listing personally vetted."
+>
+  <section class="bg-navy-900 pt-14 pb-4 text-white sm:pt-20 sm:pb-6">
+    <div class="container-site">
+      <div class="flex items-start justify-between gap-4">
+        <h1 class="mb-4 text-[32px] leading-tight text-white sm:text-5xl">Featured Properties</h1>
+        <button
+          id="view-toggle"
+          type="button"
+          aria-pressed="false"
+          class="label-sm mt-1 inline-flex min-h-11 flex-none items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-white transition hover:border-gold-500 hover:text-gold-500"
+        >
+          <span id="view-toggle-icon" class="flex-none" aria-hidden="true"></span>
+          <span id="view-toggle-label">Text view</span>
+        </button>
+      </div>
+      <div class="mb-5 h-px w-16 bg-gold-500"></div>
+      <p class="max-w-2xl text-[17px] leading-[1.8] text-navy-100">
+        Premium developments across Kuala Lumpur, Petaling Jaya, Selangor, Johor & Penang, every
+        project here has passed my own developer background check before I show it to buyers.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-navy-900 pt-8 pb-14 sm:pt-10 sm:pb-28">
+    <div class="container-site">
+      {/* ===== Region filter bar — white text on the navy band ===== */}
+      <div id="prop-filters" class="mb-8 flex flex-wrap gap-2.5">
+        {REGIONS.map((r) => (
+          <button
+            type="button"
+            class="prop-filter label-sm inline-flex min-h-11 items-center rounded-full border border-white/40 px-4 py-2 text-white transition hover:border-gold-500 hover:text-gold-500 data-[active]:border-gold-500 data-[active]:bg-gold-500 data-[active]:text-navy-900"
+            data-region={r.key}
+            data-active={r.key === 'all' ? '' : undefined}
+          >
+            {r.label} <span class="opacity-70">({countFor(r.key)})</span>
+          </button>
+        ))}
+        {(penthouseCount > 0 || soldOutCount > 0) && (
+          <span class="flex flex-wrap items-center gap-2.5 border-l border-white/25 pl-2.5">
+            <span class="label-sm text-navy-100/70">Special</span>
+            {penthouseCount > 0 && (
+              <button
+                type="button"
+                id="prop-penthouse"
+                class="label-sm inline-flex min-h-11 items-center rounded-full border border-gold-500/60 px-4 py-2 text-gold-500 transition hover:border-gold-500 data-[active]:border-gold-500 data-[active]:bg-gold-500 data-[active]:text-navy-900"
+              >
+                Penthouse <span class="opacity-70">({penthouseCount})</span>
+              </button>
+            )}
+            {soldOutCount > 0 && (
+              <button
+                type="button"
+                id="prop-soldout"
+                class="label-sm inline-flex min-h-11 items-center rounded-full border border-white/40 px-4 py-2 text-navy-100 transition hover:border-white data-[active]:border-white data-[active]:bg-white/90 data-[active]:text-navy-900"
+              >
+                Fully Sold <span class="opacity-70">({soldOutCount})</span>
+              </button>
+            )}
+          </span>
+        )}
+      </div>
+
+      {/* ===== Layout-size range slider — drag either handle ===== */}
+      <div id="prop-size" class="mb-8 max-w-md">
+        <div class="mb-2.5 flex items-baseline justify-between">
+          <span class="label-sm text-navy-100/70">Layout size (sq ft)</span>
+          <span class="label-sm text-gold-500" id="prop-size-readout"></span>
+        </div>
+        <div class="prop-range">
+          <div class="prop-range-rail"></div>
+          <div class="prop-range-fill" id="prop-size-fill"></div>
+          <input
+            type="range"
+            id="prop-size-lo"
+            min={SIZE_MIN}
+            max={SIZE_MAX}
+            step={SIZE_STEP}
+            value={SIZE_MIN}
+            aria-label="Minimum layout size"
+          />
+          <input
+            type="range"
+            id="prop-size-hi"
+            min={SIZE_MIN}
+            max={SIZE_MAX}
+            step={SIZE_STEP}
+            value={SIZE_MAX}
+            aria-label="Maximum layout size"
+          />
+        </div>
+      </div>
+
+      <p id="prop-count" class="mb-6 text-sm text-navy-100/80"></p>
+
+      {/* ===== Grid: every card rendered once; JS filters + paginates ===== */}
+      <div id="prop-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {properties.map((p) => {
+          const sz = parseSize(p.data.layoutSize);
+          return (
+            <div
+              class="prop-item"
+              data-region={p.data.region ?? 'other'}
+              data-penthouse={p.data.penthouse ? '1' : '0'}
+              data-soldout={p.data.soldOut ? '1' : '0'}
+              data-size-min={sz ? String(sz.min) : ''}
+              data-size-max={sz ? String(sz.max) : ''}
+            >
+              <PropertyCard {...p.data} slug={p.id} />
+            </div>
+          );
+        })}
+      </div>
+
+      <p id="prop-empty" class="hidden py-12 text-center text-navy-100">
+        No projects in this region yet — message me on WhatsApp and I’ll send you what’s launching.
+      </p>
+
+      {/* ===== Pagination controls (built by JS) ===== */}
+      <nav id="prop-pagination" class="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="Property pages"></nav>
+
+      <p class="mt-10 text-center text-sm text-navy-100/80">
+        Don’t see what you’re looking for? These are highlights only — I cover every new launch in
+        the Klang Valley, Johor and Penang.
+      </p>
+    </div>
+  </section>
+
+  <CTASection
+    heading="Want a shortlist matched to your budget?"
+    sub="Tell me your budget and preferred area — I’ll compare the options side by side and send you a personal shortlist."
+  />
+</BaseLayout>
+
+<style is:global>
+  /* Text-only view: drop every listing photo and stack the cards into a single
+     narrow column so the grid reads like a plain text list. Filters/pagination
+     are untouched — they only toggle each card's display, which this respects. */
+  #prop-grid.is-text {
+    grid-template-columns: 1fr;
+    max-width: 44rem;
+    gap: 0.75rem;
+  }
+  #prop-grid.is-text .pc-media {
+    display: none;
+  }
+</style>
+
+<style>
+  /* Cards fade in when the grid re-renders (filter / page / size / view). */
+  @keyframes prop-fade {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .prop-item.prop-in {
+    animation: prop-fade 150ms ease-out both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .prop-item.prop-in {
+      animation: none;
+    }
+  }
+
+  .prop-range {
+    position: relative;
+    height: 36px;
+  }
+  .prop-range-rail,
+  .prop-range-fill {
+    position: absolute;
+    top: 50%;
+    height: 5px;
+    border-radius: 999px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .prop-range-rail {
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.22);
+  }
+  .prop-range-fill {
+    left: 0;
+    right: 0;
+    background: #c9a227;
+  }
+  .prop-range input[type='range'] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 36px;
+    margin: 0;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: none;
+  }
+  .prop-range input[type='range']::-webkit-slider-runnable-track {
+    background: transparent;
+    border: 0;
+  }
+  .prop-range input[type='range']::-moz-range-track {
+    background: transparent;
+    border: 0;
+  }
+  .prop-range input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: auto;
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    background: #c9a227;
+    border: 3px solid #0a2540;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+    cursor: grab;
+  }
+  .prop-range input[type='range']::-webkit-slider-thumb:active {
+    cursor: grabbing;
+  }
+  .prop-range input[type='range']::-moz-range-thumb {
+    pointer-events: auto;
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    background: #c9a227;
+    border: 3px solid #0a2540;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+    cursor: grab;
+  }
+  .prop-range input[type='range']:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .prop-range input[type='range']:focus-visible::-moz-range-thumb {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+</style>
+
+<script is:inline define:vars={{ PAGE_SIZE, SIZE_MIN, SIZE_MAX }}>
+  (function () {
+    const grid = document.getElementById('prop-grid');
+    if (!grid) return;
+    const items = Array.from(grid.querySelectorAll('.prop-item'));
+    const filterBtns = Array.from(document.querySelectorAll('.prop-filter'));
+    const pager = document.getElementById('prop-pagination');
+    const countEl = document.getElementById('prop-count');
+    const emptyEl = document.getElementById('prop-empty');
+
+    let region = 'all';
+    let penthouse = false;
+    let soldOnly = false;
+    let sizeLo = SIZE_MIN;
+    let sizeHi = SIZE_MAX;
+    let page = 1;
+
+    // A listing passes the size filter if its own size span overlaps the chosen
+    // [sizeLo, sizeHi] range. At the top of the track the upper bound is treated
+    // as unlimited, so units larger than the cap still appear.
+    const sizeOk = (el) => {
+      const mn = el.dataset.sizeMin;
+      const mx = el.dataset.sizeMax;
+      if (mn === '' || mx === '') return true;
+      const hi = sizeHi >= SIZE_MAX ? Infinity : sizeHi;
+      const lo = sizeLo <= SIZE_MIN ? 0 : sizeLo;
+      return +mx >= lo && +mn <= hi;
+    };
+
+    const matches = () =>
+      items.filter((el) => {
+        if (!sizeOk(el)) return false;
+        // "Special" is a multi-select facet: with Penthouse and/or Fully Sold
+        // active, show anything matching EITHER — live penthouses plus the
+        // fully-sold projects — so both can be on at once.
+        if (penthouse || soldOnly) {
+          if (penthouse && el.dataset.penthouse === '1' && el.dataset.soldout === '0') return true;
+          if (soldOnly && el.dataset.soldout === '1') return true;
+          return false;
+        }
+        // Default region/All view hides sold-out projects.
+        if (el.dataset.soldout === '1') return false;
+        return region === 'all' || el.dataset.region === region;
+      });
+
+    function render() {
+      const visible = matches();
+      const pages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+      if (page > pages) page = pages;
+      const start = (page - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+
+      items.forEach((el) => {
+        el.style.display = 'none';
+        el.classList.remove('prop-in');
+      });
+      const shown = visible.slice(start, end);
+      shown.forEach((el) => (el.style.display = ''));
+      // restart the fade-in animation on the freshly shown cards
+      void grid.offsetWidth;
+      shown.forEach((el) => el.classList.add('prop-in'));
+
+      emptyEl.classList.toggle('hidden', visible.length !== 0);
+      if (countEl) {
+        countEl.textContent = visible.length
+          ? `Showing ${start + 1}–${Math.min(end, visible.length)} of ${visible.length} projects`
+          : '';
+      }
+      buildPager(pages);
+    }
+
+    function pageBtn(label, target, opts) {
+      opts = opts || {};
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = label;
+      b.className =
+        'inline-flex min-h-11 min-w-11 items-center justify-center rounded-[4px] border border-white/40 px-3 py-2 text-sm transition hover:border-gold-500 disabled:cursor-not-allowed disabled:opacity-40' +
+        (opts.active ? ' border-gold-500 bg-gold-500 text-navy-900' : ' text-white');
+      if (opts.disabled) b.disabled = true;
+      b.addEventListener('click', () => {
+        page = target;
+        render();
+        grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return b;
+    }
+
+    function buildPager(pages) {
+      pager.innerHTML = '';
+      if (pages <= 1) return;
+      pager.appendChild(pageBtn('‹ Prev', page - 1, { disabled: page === 1 }));
+      for (let i = 1; i <= pages; i++) {
+        pager.appendChild(pageBtn(String(i), i, { active: i === page }));
+      }
+      pager.appendChild(pageBtn('Next ›', page + 1, { disabled: page === pages }));
+    }
+
+    // The region buttons are single-select; the two Special toggles (Penthouse,
+    // Fully Sold) are independent and can both be on at once. Whenever a Special
+    // toggle is active it takes over from the region view, so no region chip is
+    // highlighted until both Specials are off again.
+    const penthouseBtn = document.getElementById('prop-penthouse');
+    const soldOutBtn = document.getElementById('prop-soldout');
+
+    function highlightAllRegion() {
+      filterBtns.forEach((b) => b.removeAttribute('data-active'));
+      if (!penthouse && !soldOnly) {
+        const allBtn = filterBtns.find((b) => b.dataset.region === 'all');
+        if (allBtn) allBtn.setAttribute('data-active', '');
+      }
+    }
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        region = btn.dataset.region;
+        penthouse = false;
+        soldOnly = false;
+        page = 1;
+        filterBtns.forEach((b) => b.removeAttribute('data-active'));
+        btn.setAttribute('data-active', '');
+        if (penthouseBtn) penthouseBtn.removeAttribute('data-active');
+        if (soldOutBtn) soldOutBtn.removeAttribute('data-active');
+        render();
+      });
+    });
+
+    if (penthouseBtn) {
+      penthouseBtn.addEventListener('click', () => {
+        penthouse = !penthouse;
+        region = 'all';
+        page = 1;
+        highlightAllRegion();
+        penthouseBtn.toggleAttribute('data-active', penthouse);
+        render();
+      });
+    }
+
+    if (soldOutBtn) {
+      soldOutBtn.addEventListener('click', () => {
+        soldOnly = !soldOnly;
+        region = 'all';
+        page = 1;
+        highlightAllRegion();
+        soldOutBtn.toggleAttribute('data-active', soldOnly);
+        render();
+      });
+    }
+
+    // ===== Layout-size range slider (two draggable handles) =====
+    const sLo = document.getElementById('prop-size-lo');
+    const sHi = document.getElementById('prop-size-hi');
+    const sFill = document.getElementById('prop-size-fill');
+    const sOut = document.getElementById('prop-size-readout');
+    const span = SIZE_MAX - SIZE_MIN || 1;
+    const fmt = (n) => n.toLocaleString('en-US');
+
+    function paintSize() {
+      const p1 = ((sizeLo - SIZE_MIN) / span) * 100;
+      const p2 = ((sizeHi - SIZE_MIN) / span) * 100;
+      if (sFill) {
+        sFill.style.left = p1 + '%';
+        sFill.style.right = 100 - p2 + '%';
+      }
+      if (sOut) {
+        sOut.textContent =
+          fmt(sizeLo) + ' – ' + (sizeHi >= SIZE_MAX ? fmt(SIZE_MAX) + '+' : fmt(sizeHi)) + ' sf';
+      }
+    }
+
+    function onSize() {
+      // Either handle can be dragged past the other — read them as a min/max
+      // pair so the range stays valid without a handle getting stuck.
+      sizeLo = Math.min(+sLo.value, +sHi.value);
+      sizeHi = Math.max(+sLo.value, +sHi.value);
+      page = 1;
+      paintSize();
+      render();
+    }
+
+    if (sLo && sHi) {
+      sLo.addEventListener('input', onSize);
+      sHi.addEventListener('input', onSize);
+      paintSize();
+    }
+
+    // ===== Top-right view toggle: photo cards <-> text-only list =====
+    const viewToggle = document.getElementById('view-toggle');
+    const vLabel = document.getElementById('view-toggle-label');
+    const vIcon = document.getElementById('view-toggle-icon');
+    // SVG icons (no glyph-as-icon): a list icon when the button will switch TO
+    // the text view, a grid icon when it will switch back to photos.
+    const LIST_SVG =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>';
+    const GRID_SVG =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
+    function setView(mode) {
+      const text = mode === 'text';
+      grid.classList.toggle('is-text', text);
+      if (viewToggle) viewToggle.setAttribute('aria-pressed', text ? 'true' : 'false');
+      // The button always names the view it will switch TO.
+      if (vLabel) vLabel.textContent = text ? 'Photo view' : 'Text view';
+      if (vIcon) vIcon.innerHTML = text ? GRID_SVG : LIST_SVG;
+      try {
+        localStorage.setItem('llp-prop-view', mode);
+      } catch (e) {}
+    }
+    if (viewToggle) {
+      viewToggle.addEventListener('click', () =>
+        setView(grid.classList.contains('is-text') ? 'cards' : 'text')
+      );
+      let saved = null;
+      try {
+        saved = localStorage.getItem('llp-prop-view');
+      } catch (e) {}
+      setView(saved === 'text' ? 'text' : 'cards');
+    }
+
+    render();
+  })();
+</script>

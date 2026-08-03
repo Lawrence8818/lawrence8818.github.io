@@ -1,0 +1,98 @@
+---
+import { SITE } from '../data/site';
+
+/**
+ * Contact form — fields mirror the official lawrencelawproperty.com form:
+ * Preferred Name / Email Address / Phone Number / Inquiry Reason / Your Location / Subject / Message.
+ *
+ * Submission:
+ * - If SITE.formspreeEndpoint is set → normal POST to Formspree (email inbox).
+ * - If empty (current state)      → submit composes the answers into a WhatsApp
+ *   message and opens wa.me — zero backend needed, no lead lost.
+ *
+ * 等待: the exact "Inquiry Reason" dropdown options on the official site are
+ * unconfirmed — update the <option> list once Lawrence provides them.
+ */
+const inputClass =
+  'w-full rounded-md border border-border bg-white px-4 py-2.5 text-[15px] focus:border-gold-500 focus:outline-none';
+const hasEndpoint = Boolean(SITE.formspreeEndpoint);
+---
+
+<form
+  id="contact-form"
+  action={hasEndpoint ? SITE.formspreeEndpoint : undefined}
+  method={hasEndpoint ? 'POST' : undefined}
+  data-wa-number={hasEndpoint ? undefined : SITE.whatsappNumber}
+  class="card space-y-4"
+>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <label for="f-name" class="mb-1 block text-sm font-medium text-navy-900">Preferred Name <span class="text-gold-600">*</span></label>
+      <input id="f-name" type="text" name="name" required class={inputClass} placeholder="e.g. Mr Tan" />
+    </div>
+    <div>
+      <label for="f-email" class="mb-1 block text-sm font-medium text-navy-900">Email Address <span class="text-gold-600">*</span></label>
+      <input id="f-email" type="email" name="email" required class={inputClass} placeholder="you@email.com" />
+    </div>
+    <div>
+      <label for="f-phone" class="mb-1 block text-sm font-medium text-navy-900">Phone Number <span class="text-gold-600">*</span></label>
+      <input id="f-phone" type="tel" name="phone" required class={inputClass} placeholder="e.g. 012-3456789" />
+    </div>
+    <div>
+      <label for="f-reason" class="mb-1 block text-sm font-medium text-navy-900">Inquiry Reason <span class="text-gold-600">*</span></label>
+      <select id="f-reason" name="inquiryReason" required class={inputClass}>
+        <option value="">Please select…</option>
+        <option>Buying a new project</option>
+        <option>Buying subsale</option>
+        <option>Selling</option>
+        <option>Renting</option>
+        <option>Others</option>
+      </select>
+    </div>
+    <div>
+      <label for="f-location" class="mb-1 block text-sm font-medium text-navy-900">Your Location <span class="text-gold-600">*</span></label>
+      <input id="f-location" type="text" name="location" required class={inputClass} placeholder="e.g. Puchong / Bukit Jalil" />
+    </div>
+    <div>
+      <label for="f-subject" class="mb-1 block text-sm font-medium text-navy-900">Subject</label>
+      <input id="f-subject" type="text" name="subject" class={inputClass} placeholder="What is this about?" />
+    </div>
+  </div>
+  <div>
+    <label for="f-msg" class="mb-1 block text-sm font-medium text-navy-900">Message</label>
+    <textarea id="f-msg" name="message" rows="4" class={inputClass} placeholder="e.g. Budget around RM500k, looking for a new project near Puchong"></textarea>
+  </div>
+  <div class="pt-1 text-center">
+    <button type="submit" class="btn-gold min-w-[220px]" data-track="form_submit">SUBMIT</button>
+  </div>
+  <p class="text-center text-xs text-ink/60">
+    {hasEndpoint
+      ? 'By submitting, you agree to let Lawrence contact you.'
+      : 'Submitting opens WhatsApp with your details pre-filled — just press send.'}
+  </p>
+</form>
+
+{!hasEndpoint && (
+  <script is:inline>
+    (function () {
+      var form = document.getElementById('contact-form');
+      if (!form || !form.dataset.waNumber) return;
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el && el.value ? el.value.trim() : ''; };
+        var lines = [
+          'Hi Lawrence, enquiry from your website:',
+          'Name: ' + v('name'),
+          'Email: ' + v('email'),
+          'Phone: ' + v('phone'),
+          'Inquiry Reason: ' + v('inquiryReason'),
+          'Location: ' + v('location'),
+        ];
+        if (v('subject')) lines.push('Subject: ' + v('subject'));
+        if (v('message')) lines.push('Message: ' + v('message'));
+        var link = 'https://wa.me/' + form.dataset.waNumber + '?text=' + encodeURIComponent(lines.join('\n'));
+        window.open(link, '_blank', 'noopener');
+      });
+    })();
+  </script>
+)}

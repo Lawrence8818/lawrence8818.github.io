@@ -1,0 +1,82 @@
+---
+import { url } from '../lib/url';
+
+/**
+ * 视频嵌入组件(懒加载 facade):
+ * - YouTube:先显示缩略图 + 播放按钮,点击才注入 youtube-nocookie iframe(不拖慢首屏)
+ * - TikTok / Instagram / Facebook:官方嵌入脚本太重,改用样式化外链卡片跳转原平台
+ */
+interface Props {
+  platform: 'youtube' | 'tiktok' | 'instagram' | 'facebook';
+  videoId?: string;
+  videoUrl: string;
+  title: string;
+  thumbnail?: string;
+}
+const { platform, videoId, videoUrl, title, thumbnail } = Astro.props;
+
+const platformLabel: Record<string, string> = {
+  tiktok: 'TikTok',
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+};
+
+// videoId 还是 TODO 占位时按"无 ID"处理:不做站内嵌入、不请求 YouTube 缩略图
+const isYoutube = platform === 'youtube' && videoId && !videoId.includes('TODO');
+const thumbSrc = thumbnail && !thumbnail.startsWith('/images/placeholders/')
+  ? url(thumbnail)
+  : isYoutube
+    ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+    : url(thumbnail ?? '/images/placeholders/video-thumb-default.svg');
+---
+
+{isYoutube ? (
+  <div
+    class="yt-facade group relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl bg-navy-950"
+    data-video-id={videoId}
+    role="button"
+    tabindex="0"
+    aria-label={`Play video: ${title}`}
+  >
+    <img src={thumbSrc} alt={title} loading="lazy" class="h-full w-full object-cover opacity-80" />
+    <div class="absolute inset-0 flex items-center justify-center">
+      <span class="flex h-16 w-16 items-center justify-center rounded-full bg-gold-500 shadow-lg transition-transform group-hover:scale-110">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#0b1e33" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+    </div>
+  </div>
+) : (
+  <a
+    href={videoUrl}
+    target="_blank"
+    rel="noopener"
+    class="group relative block aspect-video w-full overflow-hidden rounded-xl bg-navy-950"
+  >
+    <img src={thumbSrc} alt={title} loading="lazy" class="h-full w-full object-cover opacity-80 transition-opacity group-hover:opacity-60" />
+    <div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
+      <span class="flex h-14 w-14 items-center justify-center rounded-full bg-gold-500 shadow-lg">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#0b1e33" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white">
+        Watch on {platformLabel[platform]} ↗
+      </span>
+    </div>
+  </a>
+)}
+
+<script is:inline>
+  document.addEventListener('click', function (e) {
+    var facade = e.target && e.target.closest ? e.target.closest('.yt-facade') : null;
+    if (!facade || facade.dataset.loaded) return;
+    facade.dataset.loaded = '1';
+    var id = facade.getAttribute('data-video-id');
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1';
+    iframe.title = facade.getAttribute('aria-label') || 'YouTube video';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.className = 'absolute inset-0 h-full w-full';
+    facade.innerHTML = '';
+    facade.appendChild(iframe);
+  });
+</script>

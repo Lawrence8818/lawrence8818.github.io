@@ -1,0 +1,68 @@
+[
+  {
+    "id": "t1",
+    "title": "I Cancelled My Own Company’s Project",
+    "quote": "I work in the sales division of a well-known developer, and I had already booked a unit from my own company — with staff discounts, no less. But after a deeper comparison, I cancelled it and booked a different project that truly fit my needs. More discounts don’t always mean the better choice. A home is a lifetime decision, and I’d rather get it right than regret it forever.",
+    "name": "Chia",
+    "role": "Developer Sales Professional",
+    "image": "/images/testimonial-chia.jpg",
+    "featured": true,
+    "placeholder": false,
+    "fallbackImage": "/images/placeholders/signing-01.svg"
+  },
+  {
+    "id": "t2",
+    "title": "I Did My Own Due Diligence. Everything Checked Out.",
+    "quote": "Finding an agent who is both professional and service-oriented is genuinely rare. I had viewed many decent projects, but no one could convince me with proper data — until the 222 Blueprint. Being who I am, I still ran my own due diligence afterwards. Every number and every claim matched exactly what was presented. That’s when I committed to this unit — a property my children will benefit from in the years ahead.",
+    "name": "Dr. Ran",
+    "role": "Medical Specialist",
+    "image": "/images/testimonial-dr-ran.jpg",
+    "featured": true,
+    "placeholder": false,
+    "fallbackImage": "/images/placeholders/signing-02.svg"
+  },
+  {
+    "id": "t3",
+    "title": "A Pet-Friendly Penthouse With A Golf Course View",
+    "quote": "After viewing many projects, nothing satisfied them — especially since pet-friendly options were nearly impossible to find. Working with Lawrence, they analysed the whole market and found exactly that: a pet-friendly development, with a nearly 2,000 sf penthouse overlooking the golf course. Lawrence even made special arrangements for them to walk through the actual unit while still under construction — something most buyers never get to do.",
+    "name": "Cheah",
+    "role": "Retiree",
+    "image": "/images/testimonial-cheah.jpg",
+    "featured": true,
+    "placeholder": false,
+    "fallbackImage": "/images/placeholders/signing-03.svg"
+  },
+  {
+    "id": "t4",
+    "title": "Came To Browse. Bought. Then Sent His Friends.",
+    "quote": "A well-travelled, down-to-earth businessman, Tan only planned to “take a look” that day. He liked what he saw enough to secure his retirement home on the spot. But what turned him into a true supporter came after: Lawrence answered every question before and after signing, even helped assess the value of his existing sub-sale properties and worked out how to sell them. Soon after, Tan started referring his friends. That says everything.",
+    "name": "Tan",
+    "role": "Hardware Business Owner",
+    "image": "/images/testimonial-tan.jpg",
+    "featured": false,
+    "placeholder": false,
+    "fallbackImage": "/images/placeholders/signing-04.svg"
+  },
+  {
+    "id": "t5",
+    "title": "The Service Didn’t Stop After Signing",
+    "quote": "What surprised me most wasn’t buying my 2-bedroom unit — it was everything after. From SPA to loan documents to the lawyer’s office, Lawrence followed up on every single step so I never had to chase anyone. Months after signing, I still message him with random questions, and he still replies like it’s day one. That’s when you know you picked the right person, not just the right property.",
+    "name": "Zol",
+    "role": "HR Manager",
+    "image": "/images/testimonial-zol.jpg",
+    "featured": false,
+    "placeholder": false,
+    "fallbackImage": "/images/placeholders/signing-05.svg"
+  },
+  {
+    "id": "t6",
+    "title": "Finally, An Agent Who Shows You The Real Thing",
+    "quote": "Coming from up north to buy my first home, I wasted so many weekends on listings that turned out to be fake — the photos and the actual units were completely different. It was exhausting. Working with Lawrence was the opposite: every detail he shared matched what I saw on site. I ended up with a 3+1 unit right in the area I already knew and loved — just in time as I plan for marriage.",
+    "name": "Kevin",
+    "role": "IT Programmer",
+    "image": "/images/testimonial-kevin.jpg",
+    "featured": false,
+    "placeholder": false,
+    "fallbackImage": "/images/placeholders/signing-06.svg"
+  }
+]

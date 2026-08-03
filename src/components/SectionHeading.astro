@@ -1,0 +1,24 @@
+---
+import PendingNotice from './PendingNotice.astro';
+
+interface Props {
+  title: string;
+  /** eyebrow micro-label shown ABOVE the title (Serhant editorial pattern) */
+  sub?: string;
+  /** 深色底 section 用 light */
+  tone?: 'dark' | 'light';
+  center?: boolean;
+  /** true = section content not yet on the official site; shows 等待 chip */
+  pending?: boolean;
+}
+const { title, sub, tone = 'dark', center = false, pending = false } = Astro.props;
+---
+
+<div class={center ? 'text-center' : ''}>
+  {sub && <p class="label-sm mb-3 text-gold-500">{sub}</p>}
+  <h2 class={`section-heading ${tone === 'light' ? 'text-white' : ''}`}>
+    {title}
+    {pending && <span class="ml-3 inline-block align-middle"><PendingNotice variant="chip" /></span>}
+  </h2>
+  <div class={`gold-rule ${center ? 'mx-auto' : ''}`}></div>
+</div>

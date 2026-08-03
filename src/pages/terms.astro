@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../data/site';
+
+const updated = 'July 2026';
+---
+
+<BaseLayout
+  title="Terms of Service"
+  description="The terms governing your use of the Lawrence Law Property website and its property information."
+>
+  <section class="section-pad">
+    <div class="container-site max-w-3xl">
+      <h1 class="text-3xl sm:text-4xl">Terms of Service</h1>
+      <p class="label-sm mt-3 text-ink/50">Last updated: {updated}</p>
+      <div class="gold-rule mt-4"></div>
+
+      <div class="prose-zh">
+        <p>
+          By using this website (“the Site”), you agree to the terms below. If you do not agree,
+          please do not use the Site.
+        </p>
+
+        <h2>1. Who we are</h2>
+        <p>
+          This Site is the personal website of <strong>Lawrence Law</strong>, a registered estate
+          negotiator ({SITE.renNumber}) practising in Malaysia under the oversight of the Board of
+          Valuers, Appraisers, Estate Agents and Property Managers (BOVAEA). Services for property
+          buyers are provided at no charge to the buyer; remuneration is received from developers
+          or as otherwise provided by law and industry practice.
+        </p>
+
+        <h2>2. Information, not advice</h2>
+        <ul>
+          <li>All content on this Site — including articles, videos, area guides and property listings — is provided for <strong>general information only</strong>. It is not financial, investment or legal advice.</li>
+          <li>Property purchase involves significant financial commitment. Always verify current facts (prices, loan terms, government policies, taxes and exemptions) with the relevant bank, lawyer, developer or authority before making decisions.</li>
+          <li>Market commentary reflects personal views at the time of writing and may become outdated.</li>
+        </ul>
+
+        <h2>3. Property listings</h2>
+        <ul>
+          <li>Prices shown (e.g. “From RM …”), maintenance rates, estimated monthly instalments, land sizes and completion dates are <strong>indicative</strong>, provided by developers, and subject to change or withdrawal without notice;</li>
+          <li>Estimated monthly instalments are illustrations only and do not constitute a loan offer; actual financing depends on bank approval and your personal circumstances;</li>
+          <li>Images may include artist's impressions. The Sale and Purchase Agreement and its schedules are the only binding description of any property.</li>
+        </ul>
+
+        <h2>4. No client relationship by browsing</h2>
+        <p>
+          Browsing this Site or reading its content does not create an agent–client engagement.
+          An engagement arises only when both parties expressly agree to work together on a
+          specific transaction.
+        </p>
+
+        <h2>5. Intellectual property</h2>
+        <p>
+          Unless otherwise stated, the content of this Site (text, articles, graphics and the
+          Lawrence Law Property™ name and logo) belongs to Lawrence Law Property. You may share
+          links to this Site freely; do not reproduce substantial parts of its content for
+          commercial use without permission.
+        </p>
+
+        <h2>6. Third-party services</h2>
+        <p>
+          The Site links to third-party platforms (WhatsApp, social media, developer pages). We are
+          not responsible for their content, availability or practices.
+        </p>
+
+        <h2>7. Limitation of liability</h2>
+        <p>
+          To the fullest extent permitted by law, Lawrence Law Property shall not be liable for any
+          loss arising from reliance on the Site's content or from the use of, or inability to use,
+          the Site. Nothing in these terms excludes liability that cannot be excluded under
+          Malaysian law.
+        </p>
+
+        <h2>8. Changes</h2>
+        <p>
+          We may update these terms from time to time; the latest version on this page applies.
+          Continued use of the Site after changes means you accept the updated terms.
+        </p>
+
+        <h2>9. Governing law</h2>
+        <p>These terms are governed by the laws of Malaysia.</p>
+
+        <h2>10. Contact</h2>
+        <p>
+          Lawrence Law ({SITE.renNumber})
+          <br />WhatsApp: +6019-9939 860
+          <br />Email: {SITE.email}
+          <br />Address: {SITE.address}
+        </p>
+      </div>
+
+      <p class="mt-10 text-xs text-ink/50">
+        These terms were drafted for Lawrence Law Property's website. They are general information,
+        not legal advice — have a lawyer review them before relying on them.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

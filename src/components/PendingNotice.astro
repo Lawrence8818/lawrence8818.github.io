@@ -1,0 +1,26 @@
+---
+/**
+ * "等待 Pending" marker — flags content that does NOT yet exist on the
+ * official lawrencelawproperty.com site. Remove each usage once Lawrence
+ * supplies / approves the real content for that section.
+ */
+interface Props {
+  /** banner = full-width notice; chip = small inline tag */
+  variant?: 'banner' | 'chip';
+  note?: string;
+}
+const { variant = 'banner', note } = Astro.props;
+---
+
+{variant === 'chip' ? (
+  <span class="label-sm inline-flex items-center gap-1 rounded-full border border-gold-500/60 bg-gold-100 px-2.5 py-0.5 text-gold-600">
+    等待 · Pending
+  </span>
+) : (
+  <div class="border-y border-gold-500/40 bg-gold-100/70">
+    <div class="container-site py-2.5 text-sm text-navy-900">
+      <strong class="font-bold">等待 · Pending</strong> — this section is new and not yet on
+      lawrencelawproperty.com. {note ?? 'Content shown is a draft awaiting Lawrence’s confirmation.'}
+    </div>
+  </div>
+)}

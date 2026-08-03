@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import VideoCard from '../../components/VideoCard.astro';
+import CTASection from '../../components/CTASection.astro';
+
+const videos = (await getCollection('videos'))
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+const longform = videos.filter((v) => v.data.longform);
+const categories = ['Pitfalls', 'Loans', 'Process', 'Projects', 'Q&A'] as const;
+const byCategory = categories
+  .map((cat) => ({ cat, items: videos.filter((v) => v.data.category === cat && !v.data.longform) }))
+  .filter((c) => c.items.length > 0);
+---
+
+<BaseLayout
+  title="Videos: Property Know-How Shorts & In-Depth Long-Form"
+  description="Lawrence's property video library: pitfalls, loans, process and project analysis. 3-minute shorts to get you started, in-depth long-form for the full playbook."
+>
+  <section class="bg-navy-900 py-12 text-white">
+    <div class="container-site">
+      <h1 class="text-3xl sm:text-4xl text-white">Videos</h1>
+      <p class="mt-3 max-w-2xl text-navy-100">
+        Each video tackles one real question. Watch the video to get the concept, read the matching
+        article for the detail, then come to me with your questions.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-12">
+    <div class="container-site space-y-14">
+      {longform.length > 0 && (
+        <div>
+          <SectionHeading title="In-depth long-form" sub="One video covers a whole topic, with full written notes" />
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {longform.map((v) => (
+              <VideoCard
+                slug={v.id}
+                title={v.data.title}
+                titleZh={v.data.titleZh}
+                category={v.data.category}
+                platform={v.data.platform}
+                thumbnail={v.data.thumbnail}
+                videoId={v.data.videoId}
+                longform
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {byCategory.map(({ cat, items }) => (
+        <div>
+          <SectionHeading title={`${cat} series`} />
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((v) => (
+              <VideoCard
+                slug={v.id}
+                title={v.data.title}
+                titleZh={v.data.titleZh}
+                category={v.data.category}
+                platform={v.data.platform}
+                thumbnail={v.data.thumbnail}
+                videoId={v.data.videoId}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <CTASection
+    heading="Want me to cover a topic?"
+    sub="WhatsApp me the property question you’re wrestling with — the next video might be made just for you."
+  />
+</BaseLayout>

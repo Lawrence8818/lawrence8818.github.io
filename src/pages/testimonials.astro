@@ -1,0 +1,579 @@
+---
+// Client Stories — the final 30 testimonials, in an intentional display
+// order (strongest social proof first, loan stories spread out, emotional
+// close at the end). No project names or locations on any card.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CTASection from '../components/CTASection.astro';
+import StarRating from '../components/StarRating.astro';
+import { url } from '../lib/url';
+
+interface Story {
+  title: string;
+  body: string;
+  name: string;
+  role: string;
+  /** photo under public/images; omitted = text-only card */
+  image?: string;
+}
+
+const STORIES: Story[] = [
+  {
+    title: '“I Cancelled My Own Company’s Project”',
+    body: 'I work in the sales division of a well-known developer, and I had already booked a unit from my own company — with staff discounts, no less. But after a deeper comparison, I cancelled it and booked a different project that truly fit my needs. More discounts don’t always mean the better choice. A home is a lifetime decision, and I’d rather get it right than regret it forever.',
+    name: 'Chia',
+    role: 'Developer Sales Professional',
+    image: '/images/testimonial-chia.jpg',
+  },
+  {
+    title: '“I Did My Own Due Diligence. Everything Checked Out.”',
+    body: 'Finding an agent who is both professional and service-oriented is genuinely rare. I had viewed many decent projects, but no one could convince me with proper data — until the 222 Blueprint. Being who I am, I still ran my own due diligence afterwards. Every number and every claim matched exactly what was presented. That’s when I committed to this unit — a property my children will benefit from in the years ahead.',
+    name: 'Dr. Ran',
+    role: 'Medical Specialist',
+    image: '/images/testimonial-dr-ran.jpg',
+  },
+  {
+    title: '“A Pet-Friendly Penthouse With A Golf Course View”',
+    body: 'After viewing many projects, nothing satisfied them — especially since pet-friendly options were nearly impossible to find. Working with Lawrence, they analysed the whole market and found exactly that: a pet-friendly development, with a nearly 2,000 sf penthouse overlooking the golf course. Lawrence even made special arrangements for them to walk through the actual unit while still under construction — something most buyers never get to do.',
+    name: 'Cheah',
+    role: 'Retiree',
+    image: '/images/testimonial-cheah.jpg',
+  },
+  {
+    title: '“Came To Browse. Bought. Then Sent His Friends.”',
+    body: 'A well-travelled, down-to-earth businessman, Tan only planned to “take a look” that day. He liked what he saw enough to secure his retirement home on the spot. But what turned him into a true supporter came after: Lawrence answered every question before and after signing, even helped assess the value of his existing sub-sale properties and worked out how to sell them. Soon after, Tan started referring his friends. That says everything.',
+    name: 'Tan',
+    role: 'Hardware Business Owner',
+    image: '/images/testimonial-tan.jpg',
+  },
+  {
+    title: '“The Service Didn’t Stop After Signing”',
+    body: 'What surprised me most wasn’t buying my 2-bedroom unit — it was everything after. From SPA to loan documents to the lawyer’s office, Lawrence followed up on every single step so I never had to chase anyone. Months after signing, I still message him with random questions, and he still replies like it’s day one. That’s when you know you picked the right person, not just the right property.',
+    name: 'Zol',
+    role: 'HR Manager',
+    image: '/images/testimonial-zol.jpg',
+  },
+  {
+    title: '“He Came As A Friend’s Plus-One. He Left As A Buyer.”',
+    body: 'Brian wasn’t even supposed to be there — he just tagged along when his friend came for a viewing. But sitting in on the session, he kept hearing things that matched exactly what he’d been casually looking for: market data and insights you simply can’t find online, plus real cases of buyers in the same situation as his. His friend didn’t buy that day. Brian did. When the information is real, it speaks for itself.',
+    name: 'Brian',
+    role: 'Senior Manager',
+    image: '/images/testimonial-brian.jpg',
+  },
+  {
+    title: '“Finally, An Agent Who Shows You The Real Thing”',
+    body: 'Coming from up north to buy my first home, I wasted so many weekends on listings that turned out to be fake — the photos and the actual units were completely different. It was exhausting. Working with Lawrence was the opposite: every detail he shared matched what I saw on site. I ended up with a 3+1 unit right in the area I already knew and loved — just in time as I plan for marriage.',
+    name: 'Kevin',
+    role: 'IT Programmer',
+    image: '/images/testimonial-kevin.jpg',
+  },
+  {
+    title: '“From Renting to Truly Settling Down”',
+    body: 'After more than a year of viewing properties, I still couldn’t commit. I was renting, working away from my hometown, and everything changed when our baby arrived — we needed a real home, not another lease. The 222 Blueprint helped me cut through the noise and define what truly mattered: space, stability, and a place to raise our child. We finally secured a spacious 3-bedroom unit, and it feels like home.',
+    name: 'Ye',
+    role: 'Sales Manager',
+    image: '/images/testimonial-ye.jpg',
+  },
+  {
+    title: '“A First Home Built for Three Generations”',
+    body: 'Buying my first property, I wasn’t just thinking about myself. My parents were living in another state, and I’ve always wanted to bring them closer. After comparing layouts and planning the space we’d actually need, I went with a 4-bedroom unit — enough room for all of us under one roof. Best decision I’ve made.',
+    name: 'Ram',
+    role: 'CEO',
+    image: '/images/testimonial-ram.jpg',
+  },
+  {
+    title: '“I Work In Credit. My Own Loan Still Needed Work.”',
+    body: 'Here’s the irony: I assess loans for a living, and when it came to my own first home, my file wasn’t pretty either — young, first-time buyer, the usual red flags. What made the difference was how we prepared the application: presenting my profile the right way before it ever reached the bank. Approved. Sometimes it’s not about whether you qualify — it’s about how your case is presented.',
+    name: 'Edwin',
+    role: 'Loan Officer',
+    image: '/images/testimonial-edwin.jpg',
+  },
+  {
+    title: '“After 20 Projects, Clarity At Last”',
+    body: 'She wasn’t even planning to move — until she saw what a better environment could mean for her daughter. But choosing was the hard part: she viewed over 20 new projects and still couldn’t decide. What broke the deadlock was the 222 Blueprint — a side-by-side breakdown of every project’s pros and cons across the market, narrowed down to the one that truly fit her family. A 3-bedroom home in a safer, greener neighbourhood.',
+    name: 'Lee',
+    role: 'Wellness Therapist',
+    image: '/images/testimonial-lee-wt.jpg',
+  },
+  {
+    title: '“A Retirement Home With A KL View”',
+    body: 'Searching for the perfect retirement home, Fook already loved this area. He originally considered a 2 or 4-bedroom, but ended up choosing a 3-bedroom facing the KL skyline — the best view in the block. What sealed it was the convenience: shops right downstairs, food within walking distance, daily errands settled without even driving. Retirement, exactly as it should be.',
+    name: 'Fook',
+    role: 'Senior Corporate Manager',
+    image: '/images/testimonial-fook.jpg',
+  },
+  {
+    title: '“17 Projects Later, The Answer Was Clear”',
+    body: 'I viewed 17 projects and still couldn’t find the right one. Ironically, my final choice — number 18 — was one I had seen before. What changed? This time, the 222 Blueprint put it side by side against all 17 others: data, layouts, long-term planning, every angle compared properly. Knowing what I wanted was half the battle — seeing the full comparison won the other half.',
+    name: 'Cindy',
+    role: 'Nail Salon Owner',
+    image: '/images/testimonial-cindy.jpg',
+  },
+  {
+    title: '“Buy From Someone You Actually Know”',
+    body: 'I viewed so many projects and ads — most of them anonymous. No idea who was behind them, and when I asked questions, the answers were far from professional. For the biggest purchase of my life, I decided to find someone credible instead. Working with Lawrence, I not only secured the unit I wanted, but walked away with a much clearer plan for my future. That’s the difference the right person makes.',
+    name: 'Ely',
+    role: 'Executive Director',
+    image: '/images/testimonial-ely.jpg',
+  },
+  {
+    title: '“Early 20s, First Home, Zero Downpayment”',
+    body: 'At his age, most people are still saving for a downpayment — Zhen Yang assumed homeownership was still years away. Running a seafood export business in his early 20s, his income was real but his profile was unconventional. The breakthrough came from planning, not luck: Lawrence structured the purchase around the right package, and he secured his unit without a single sen upfront. His first property, years ahead of schedule.',
+    name: 'Zhen Yang',
+    role: 'Seafood Export Business Owner',
+    image: '/images/testimonial-zhen-yang.jpg',
+  },
+  {
+    title: '“An Engineer’s Standard of Trust”',
+    body: 'As a civil engineer specialising in grounding and foundation work, Yap approaches property the same way he approaches his projects — nothing gets approved without solid data. He surveyed multiple developments on his own, but when it came to the final decision, he came back to the 222 Blueprint to verify the numbers and select his unit. A 3-bedroom home, chosen with an engineer’s precision.',
+    name: 'Yap',
+    role: 'Civil Engineer',
+    image: '/images/testimonial-yap.jpg',
+  },
+  {
+    title: '“A Father’s Decision, For His Child’s Future”',
+    body: 'Coming from another state, Wong’s reason for buying was simple: his talented child’s training and competitions are based here, and the family needed a proper base. He had viewed many properties before, but the flood of messy, inaccurate information left him more confused than confident. One proper discussion changed that — needs laid out, options compared honestly — and the decision came quickly. A 3-bedroom home, for the family’s next chapter.',
+    name: 'Wong',
+    role: 'Public-Listed Company Executive',
+    image: '/images/testimonial-wong.jpg',
+  },
+  {
+    title: '“30 Projects, Multiple Areas, One Decision”',
+    body: 'We viewed more than 30 projects across different regions — and honestly, the more we saw, the more confused we became. Sell or rent when we exit? Which location balances everything? Which one is actually right for us to live in? What we needed wasn’t more viewings, but a proper framework to clear our thinking. Once our needs were truly defined, the answer became obvious. This is the one.',
+    name: 'Darshini & Nicholas',
+    role: 'Managers',
+    image: '/images/testimonial-darshini.jpg',
+  },
+  {
+    title: '“Same Borrower. Different Bank. Different Answer.”',
+    body: 'My case looked tight, and forcing it through the wrong bank would have killed the deal. What Lawrence did differently was matchmaking — studying my profile first, then bringing it to the bank most likely to say yes. Not only did the approval come through, the interest rate turned out better than I expected, and the completion timeline fit exactly what I needed. Right bank, right outcome.',
+    name: 'Mah',
+    role: 'Brand Distributor',
+    image: '/images/testimonial-mah.jpg',
+  },
+  {
+    title: '“Planning Retirement 10 Years Early”',
+    body: 'Already owning several properties, Eric wasn’t looking for a home — he was building his retirement fund early. His challenge? He had seen too many projects and couldn’t decide where to place his next bet. After weighing the factors with Lawrence, he settled on a practical 2-bedroom unit in a well-connected location — an investment that fits neatly into his long-term plan.',
+    name: 'Eric',
+    role: 'Manufacturing Business Owner',
+    image: '/images/testimonial-eric.jpg',
+  },
+  {
+    title: '“I Cancelled. Then I Came Back.”',
+    body: 'I viewed many projects, booked this one, then cancelled — I just wasn’t sure. What brought me back was the bigger picture: the area’s growth trend, backed by real data. And one simple realisation — I’m already paying rent every month, so why not pay towards a home that’s actually mine? Planning to settle down and start a family, this 3-bedroom is now ours for the long run.',
+    name: 'James',
+    role: 'Marketing Strategist',
+    image: '/images/testimonial-james.jpg',
+  },
+  {
+    title: '“Referred By A Friend, For Good Reason”',
+    body: 'Ong had already viewed plenty of projects — including the one he eventually bought. What changed everything was a referral: a previous client told him, “if you’re still buying, talk to Lawrence first.” That conversation turned months of browsing into a confident decision on a 4-bedroom unit. When clients start sending their friends over, it usually means the first experience was done right.',
+    name: 'Ong',
+    role: 'Brand Sales Manager',
+    image: '/images/testimonial-ong.jpg',
+  },
+  {
+    title: '“Quality You Can Live With For Decades”',
+    body: 'Moving out of my old neighbourhood, I knew exactly what I wanted this time: solid construction quality and a location where daily life is easy — because this home is for the long term. Through the 222 Blueprint, we first screened the market by developer track record and workmanship before even comparing units. That filter led me to my 2-bedroom home, in a place truly built to last.',
+    name: 'Low',
+    role: 'Retiree',
+    image: '/images/testimonial-low.jpg',
+  },
+  {
+    title: '“Direction First, Decision Second”',
+    body: 'Like many young buyers, Pit’s real challenge wasn’t money — it was clarity. He couldn’t decide where to buy because he hadn’t yet defined what he truly wanted. Everything changed after one proper session mapping out the market’s direction and the new projects worth considering. With the picture clear, he confidently secured his 2+1 unit — a decision his parents fully stood behind.',
+    name: 'Pit',
+    role: 'Civil Engineer',
+    image: '/images/testimonial-pit.jpg',
+  },
+  {
+    title: '“My Documents Kept Getting Rejected”',
+    body: 'Nobody warns you about this part of buying your first home: the paperwork. My documents kept falling short of what the banks required — wrong formats, missing items, one issue after another. Instead of letting the application die, we fixed it piece by piece until everything finally met the bank’s standard. Approval came through, and my life plans are back on schedule. The unit was the easy part.',
+    name: 'Yang Er',
+    role: 'IT Professional',
+    image: '/images/testimonial-yang-er.jpg',
+  },
+  {
+    title: '“Clarity After All The Noise”',
+    body: 'Preparing for marriage, this driven young professional started his home search early — but after speaking to too many agents, all he had was a pile of conflicting and inaccurate information. What changed things was sitting down with Lawrence to lay everything out properly: real numbers, real comparisons, no noise. With a clear picture at last, he confidently secured his 3+1 unit.',
+    name: 'Lucas',
+    role: 'HR Manager',
+    image: '/images/testimonial-lucas.jpg',
+  },
+  {
+    title: '“The Data Convinced Me”',
+    body: 'I already hold multiple investment properties with decent rental returns, so I don’t buy on feeling — I buy on numbers. After reviewing many projects, this one stood out through the 222 Blueprint analysis: current rental rates benchmarked against historical records, plus the surrounding data all pointing the same way. That’s what closed my decision on this 2-bedroom unit.',
+    name: 'David',
+    role: 'Investor',
+    image: '/images/testimonial-david.jpg',
+  },
+  {
+    title: '“A Retirement Home, Chosen Without Regret”',
+    body: 'Their search was full of challenges — locations that didn’t fit, layouts that didn’t work, and needs that were never clearly defined to begin with. What changed everything was working through the 222 Blueprint: session by session, their true priorities took shape. With clarity came confidence, and they finally secured their 3+1 unit — the home they’ll retire in. For a decision this permanent, clarity was everything.',
+    name: 'Ling',
+    role: 'Retiree',
+    image: '/images/testimonial-ling.jpg',
+  },
+  {
+    title: '“His First Home, At 50-Plus”',
+    body: 'Alan never planned to buy — until his landlord decided to sell, and caring for his family meant he needed a place of his own. At an age when most people are winding down, he was starting his homeownership journey from zero. The process took patience, but the day everything was confirmed, he said the words that stayed with us: “I never thought I’d finally have a home of my own.” Some homes are worth waiting fifty years for.',
+    name: 'Alan',
+    role: 'IT Company Owner',
+    image: '/images/testimonial-alan.jpg',
+  },
+  {
+    title: '“The process was efficient and instilled confidence”',
+    body: 'I recently purchased a property through 222 Blueprint and couldn\'t be happier with the experience. I found my ideal home with a nearly 1,600 sf spacious home. The process helped me clearly define my needs, such as the right location, family-friendly space, and a suitable neighbourhood. With Lawrence\'s market analysis and negotiation advice, I secured the property at a reasonable price and obtained a competitive bank interest rate. This framework made the entire home-buying journey efficient and confident, leaving me excited about my future home.',
+    name: 'Adrian',
+    role: 'Founder & Media Executive',
+    image: '/images/testimonial-adrian.jpg',
+  },
+  {
+    title: '“Highly recommend 222 Blueprint”',
+    body: 'Previously, I had booked a property, but later discovered significant discrepancies in the developer\'s past projects, which led me to cancel and lose confidence in purchasing a home. However, after attending the 222 Blueprint session, I gained a more comprehensive perspective and found a project truly worth trusting. The 222 Blueprint helped me redefine my priorities, shifting focus from eye-catching perks to the developer\'s credibility and construction quality. I learned how to conduct thorough background checks, evaluate track records, and assess the developer\'s commitments and delivery capabilities. Now, I eagerly look forward to receiving my keys and seeing a home that matches the showroom, all thanks to the 222 Blueprint\'s systematic guidance.',
+    name: 'Hoong Tat',
+    role: 'Fintech Leader',
+    image: '/images/testimonial-hoong-tat.jpg',
+  },
+  {
+    title: '“From Dreams to Reality”',
+    body: 'Finding the perfect home isn\'t easy, but with the 222 Blueprint, we clarified our needs, budget, and ideal neighbourhood. Through property visits and market analysis, we secured a 3+1 bedroom layout in a prime location at a great price. This systematic approach made the process efficient and gave us confidence. Now, we have a cosy home and the joy of achieving our goal!',
+    name: 'Sook Fun',
+    role: 'Standard Chartered Accountant',
+    image: '/images/testimonial-sook-fun.jpg',
+  },
+  {
+    title: '“Achieving the Perfect Balance”',
+    body: 'As a KLCC homeowner, I\'ve always prioritised the construction quality of developers and dreamed of a space that lets me unwind after a busy day, ideally surrounded by a golf course view or preserved forest. This natural energy is especially meaningful when my family visits. With guidance from the 222 Blueprint, I systematically analysed my needs, from location to community planning, and identified the most suitable property step by step. During the strategic phase, I focused heavily on the developer\'s reputation and the project\'s overall design, ensuring a future living experience that is both comfortable and reliable.',
+    name: 'Lily Yong',
+    role: 'Medical Doctor',
+    image: '/images/testimonial-lily-yong.jpg',
+  },
+  {
+    title: '“Finally Found What I Truly Want!”',
+    body: 'Happiness is a choice you make from within, and Kavita embodies this perfectly. After working for 7 years, she has finally found her first home, a spacious property with 3 big rooms. Her journey wasn\'t without struggles, but by trusting her inner decisions, she turned her dream into reality. Congratulations, Kavita, on your beautiful new home!',
+    name: 'Kavita',
+    role: 'Entrepreneur',
+    image: '/images/testimonial-kavita.jpg',
+  },
+  {
+    title: '“Highly recommend this”',
+    body: 'At early 20, this young actuary has already achieved an incredible milestone, purchasing her first home! With the approval of her parents, she secured a well-located 3+1 low-density condominium, limited to only 500 exclusive units. Her determination and foresight have set a strong foundation for her future. Congratulations on this remarkable achievement!',
+    name: 'Lee',
+    role: 'Actuary',
+    image: '/images/testimonial-lee.jpg',
+  },
+];
+
+// Auto-scrolling filmstrip shows every signing photo, tripled for a seamless
+// loop that stays full across the whole width.
+const FILMSTRIP = STORIES.filter((s) => s.image);
+
+// Split into masonry blocks with a gold pull-quote band between them
+// One continuous masonry (no section breaks) keeps the columns balanced so
+// there are no misleading white gaps mid-scroll. Gold quote tiles are woven
+// into the same flow at intervals for rhythm.
+const QUOTES = [
+  '“Knowing what I wanted was half the battle — seeing the full comparison won the other half.”',
+  '“Some homes are worth waiting fifty years for.”',
+  '“Sometimes it’s not about whether you qualify — it’s about how your case is presented.”',
+];
+const QUOTE_AFTER: Record<number, string> = { 8: QUOTES[0], 17: QUOTES[1], 26: QUOTES[2] };
+const ITEMS: Array<{ kind: 'story'; data: (typeof STORIES)[number] } | { kind: 'quote'; text: string }> = [];
+STORIES.forEach((s, i) => {
+  ITEMS.push({ kind: 'story', data: s });
+  if (QUOTE_AFTER[i]) ITEMS.push({ kind: 'quote', text: QUOTE_AFTER[i] });
+});
+---
+
+<BaseLayout
+  title="Client Stories: Real Buyers, Real Decisions"
+  description="Real stories from Lawrence's buyers — first-time owners, upgraders, retirees and investors. See how the 222 Blueprint helped each of them buy right."
+>
+  <section class="bg-navy-900 pt-14 pb-8 text-white sm:pt-20 sm:pb-10">
+    <div class="container-site">
+      <h1 class="mb-4 text-[32px] leading-tight text-white sm:text-5xl">Client Stories</h1>
+      <div class="mb-5 h-px w-16 bg-gold-500"></div>
+      <p class="max-w-2xl text-[17px] leading-[1.8] text-navy-100">
+        Real stories from real buyers — every one of them a journey from first chat to keys in
+        hand. The 222 Blueprint is my structured home-buying advisory method — helping buyers
+        clarify needs, budget and location before they commit.
+      </p>
+
+      {/* Count-up social proof — numbers tick up on scroll (1.6s), final
+          values are in the markup so they still show without JavaScript. */}
+      <div class="mt-9 flex flex-wrap gap-x-12 gap-y-6">
+        <div>
+          <p class="text-[34px] leading-none font-extrabold text-white sm:text-[44px]">
+            <span class="ts-count" data-count="2000">2,000</span>+
+          </p>
+          <p class="label-sm mt-2 text-gold-500">Buyers Trusted Over the Years</p>
+        </div>
+        <div>
+          <p class="text-[34px] leading-none font-extrabold text-white sm:text-[44px]">
+            <span class="ts-count" data-count="1500">1,500</span>+
+          </p>
+          <p class="label-sm mt-2 text-gold-500">Homeowners Served</p>
+        </div>
+        <div>
+          <StarRating size={30} class="justify-center sm:gap-1 [&_svg]:h-[30px] [&_svg]:w-[30px] sm:[&_svg]:h-11 sm:[&_svg]:w-11" />
+          <p class="label-sm mt-2 text-gold-500">Every Story, Five Stars</p>
+        </div>
+      </div>
+    </div>
+
+    {/* Auto-scrolling filmstrip of real signing photos — pure-CSS marquee,
+        pauses on hover/touch, hand-swipeable. Decorative (aria-hidden). */}
+    <div class="card-marquee mt-10" aria-hidden="true">
+      <div class="card-marquee-track" style="--cm-dur: 42s">
+        {[0, 1, 2].map(() => (
+          <div class="flex gap-3 pr-3">
+            {FILMSTRIP.map((s) => (
+              <img
+                src={url(s.image)}
+                alt=""
+                loading="lazy"
+                class="h-16 w-16 flex-none rounded-[3px] object-cover opacity-90 ring-1 ring-white/15 sm:h-20 sm:w-20"
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white py-12 sm:py-16">
+    <div class="container-site">
+      <div id="ts-wall" class="ts-wall">
+        {ITEMS.map((item) =>
+          item.kind === 'story' ? (
+            <figure class="ts-card mb-4 break-inside-avoid overflow-hidden rounded-[4px] border border-border bg-white sm:mb-6">
+              {item.data.image && (
+                <button
+                  type="button"
+                  class="ts-photo group block w-full cursor-zoom-in overflow-hidden bg-navy-900"
+                  data-full={url(item.data.image)}
+                  aria-label={`Enlarge ${item.data.name}’s signing photo`}
+                >
+                  <img
+                    src={url(item.data.image)}
+                    alt={`${item.data.name} — signing story`}
+                    loading="lazy"
+                    class="w-full transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+                  />
+                </button>
+              )}
+              <figcaption class="p-4 sm:p-6">
+                <p class="text-[15px] leading-snug font-bold text-navy-900 sm:text-lg">{item.data.title}</p>
+                <p class="mt-2.5 text-[13px] leading-[1.6] text-ink sm:mt-3 sm:text-[15.5px] sm:leading-[1.75]">{item.data.body}</p>
+                <div class="mt-4 border-t border-border pt-3.5 sm:mt-5 sm:pt-4">
+                  <p class="label-sm text-gold-600">{item.data.name} · {item.data.role}</p>
+                  <StarRating size={15} class="mt-1.5" />
+                </div>
+              </figcaption>
+            </figure>
+          ) : (
+            <figure class="ts-card mb-4 flex break-inside-avoid items-center rounded-[4px] bg-navy-900 p-6 sm:mb-6 sm:p-7">
+              <p class="text-[19px] leading-snug font-bold text-gold-500 sm:text-[22px]">{item.text}</p>
+            </figure>
+          )
+        )}
+      </div>
+    </div>
+  </section>
+
+  {/* Lightbox — click any photo to enlarge. Hidden and inert without JS. */}
+  <div id="ts-lightbox" class="ts-lightbox" hidden>
+    <img id="ts-lightbox-img" src="" alt="Signing photo enlarged" />
+  </div>
+
+  <style is:global>
+    /* Balanced masonry: the script packs each card into the shortest column so
+       there are never white gaps mid-page. Without JavaScript the wall falls
+       back to a single full-width column — still gap-free, just not staggered. */
+    .ts-wall {
+      display: flex;
+      flex-direction: column;
+    }
+    .ts-wall.ts-cols {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    @media (min-width: 640px) {
+      .ts-wall.ts-cols {
+        gap: 1.5rem;
+      }
+    }
+    .ts-wall .ts-col {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    /* Photos reveal by cascading up as they scroll in — the .ts-ready flag is
+       only added by the script below, so without JS the cards stay visible. */
+    .ts-ready .ts-card {
+      opacity: 0;
+      transform: translateY(26px) scale(0.96);
+      transition:
+        opacity 0.55s ease,
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .ts-ready .ts-card.is-in {
+      opacity: 1;
+      transform: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ts-ready .ts-card {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+    /* Lightbox overlay */
+    .ts-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgb(7 26 48 / 0.92);
+      cursor: zoom-out;
+    }
+    .ts-lightbox[hidden] {
+      display: none;
+    }
+    .ts-lightbox img {
+      max-height: 90vh;
+      max-width: 92vw;
+      border-radius: 4px;
+      box-shadow: 0 24px 70px rgb(0 0 0 / 0.5);
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      // Balanced masonry — place each card into the currently shortest column
+      // so the wall packs tight with no white gaps. Re-runs after images load
+      // and on resize. Without this the CSS falls back to one column.
+      var wall = document.getElementById('ts-wall');
+      if (wall) {
+        var cards = Array.prototype.slice.call(wall.querySelectorAll('.ts-card'));
+        var layout = function () {
+          var n = window.matchMedia('(min-width: 1024px)').matches ? 3 : 2;
+          wall.classList.add('ts-cols');
+          wall.innerHTML = '';
+          var cols = [];
+          for (var i = 0; i < n; i++) {
+            var d = document.createElement('div');
+            d.className = 'ts-col';
+            wall.appendChild(d);
+            cols.push(d);
+          }
+          cards.forEach(function (card) {
+            var min = 0;
+            for (var j = 1; j < n; j++) {
+              if (cols[j].offsetHeight < cols[min].offsetHeight) min = j;
+            }
+            cols[min].appendChild(card);
+          });
+        };
+        layout();
+        window.addEventListener('load', layout);
+        var rzt;
+        var lastW = window.innerWidth;
+        window.addEventListener('resize', function () {
+          // Mobile browsers fire `resize` whenever the address bar shows or
+          // hides while scrolling — that's a height-only change. Rebuilding the
+          // masonry on those events collapses the wall for a frame and yanks the
+          // page back to the top mid-scroll, so only relayout on a real WIDTH
+          // change (orientation flip, desktop window resize).
+          if (window.innerWidth === lastW) return;
+          lastW = window.innerWidth;
+          clearTimeout(rzt);
+          rzt = setTimeout(layout, 200);
+        });
+      }
+
+      // Count-up stats (1.6s, ease-out) — same technique as the homepage bar.
+      var nums = document.querySelectorAll('.ts-count[data-count]');
+      if (nums.length && 'IntersectionObserver' in window) {
+        nums.forEach(function (el) {
+          el.textContent = '0';
+        });
+        var cio = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (en) {
+              if (!en.isIntersecting) return;
+              var el = en.target;
+              cio.unobserve(el);
+              var target = parseInt(el.getAttribute('data-count'), 10);
+              var dur = 1600;
+              var start = performance.now();
+              var tick = function (now) {
+                var p = Math.min((now - start) / dur, 1);
+                el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString('en-US');
+                if (p < 1) requestAnimationFrame(tick);
+              };
+              requestAnimationFrame(tick);
+            });
+          },
+          { threshold: 0.6 }
+        );
+        nums.forEach(function (el) {
+          cio.observe(el);
+        });
+      }
+
+      // Staggered card reveal on scroll.
+      if ('IntersectionObserver' in window) {
+        document.documentElement.classList.add('ts-ready');
+        var rio = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-in');
+                rio.unobserve(e.target);
+              }
+            });
+          },
+          // Reveal well before a card enters view so it is never blank on screen
+          { threshold: 0, rootMargin: '0px 0px 320px 0px' }
+        );
+        document.querySelectorAll('.ts-card').forEach(function (c) {
+          rio.observe(c);
+        });
+      }
+
+      // Lightbox — enlarge a signing photo on click.
+      var lb = document.getElementById('ts-lightbox');
+      var lbImg = document.getElementById('ts-lightbox-img');
+      if (lb && lbImg) {
+        document.querySelectorAll('.ts-photo').forEach(function (b) {
+          b.addEventListener('click', function () {
+            lbImg.src = b.getAttribute('data-full');
+            lb.hidden = false;
+            document.body.style.overflow = 'hidden';
+          });
+        });
+        var closeLb = function () {
+          lb.hidden = true;
+          lbImg.src = '';
+          document.body.style.overflow = '';
+        };
+        lb.addEventListener('click', closeLb);
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && !lb.hidden) closeLb();
+        });
+      }
+    })();
+  </script>
+
+  <CTASection
+    heading="The next signing story could be yours"
+    sub="Wherever you are — just starting to look, comparing projects, or ready to sign — let’s have a chat first."
+    waMessage="Hi Lawrence, I read your client stories and would like to chat about buying a property."
+  />
+</BaseLayout>

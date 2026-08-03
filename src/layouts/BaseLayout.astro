@@ -1,0 +1,84 @@
+---
+import '../styles/global.css';
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { agentSchema } from '../lib/schema';
+import { SITE } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  ogType?: string;
+  /** Page-level prefilled message for the floating WhatsApp button */
+  waMessage?: string;
+  noTitleTemplate?: boolean;
+}
+
+const { title, description, ogImage, ogType, waMessage, noTitleTemplate } = Astro.props;
+
+const siteUrl = Astro.site?.href ?? 'https://lawrencelawproperty.com';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL.replace(/\/+$/, '')}/favicon.svg`} />
+    <meta name="generator" content={Astro.generator} />
+    <SEO
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      ogType={ogType}
+      noTitleTemplate={noTitleTemplate}
+    />
+    <JsonLd data={agentSchema(siteUrl)} />
+    <slot name="head" />
+
+    {/* GA4 — only rendered when ga4Id is set in src/data/site.ts */}
+    {SITE.ga4Id && (
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${SITE.ga4Id}`} is:inline></script>
+    )}
+    {SITE.ga4Id && (
+      <script
+        is:inline
+        set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${SITE.ga4Id}');`}
+      />
+    )}
+    {/* Meta Pixel — only rendered when metaPixelId is set */}
+    {SITE.metaPixelId && (
+      <script
+        is:inline
+        set:html={`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${SITE.metaPixelId}');fbq('track','PageView');`}
+      />
+    )}
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+    <WhatsAppButton message={waMessage} />
+
+    {/* WhatsApp click tracking: only reports if GA4 / Pixel are present */}
+    <script is:inline>
+      document.addEventListener('click', function (e) {
+        var el = e.target && e.target.closest ? e.target.closest('[data-track]') : null;
+        if (!el) return;
+        var name = el.getAttribute('data-track');
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'whatsapp_click', { source: name });
+        }
+        if (typeof window.fbq === 'function') {
+          window.fbq('track', 'Contact', { source: name });
+        }
+      });
+    </script>
+  </body>
+</html>

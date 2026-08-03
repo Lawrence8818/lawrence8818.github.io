@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TrustBar from '../components/TrustBar.astro';
+import CTASection from '../components/CTASection.astro';
+import PillarsAndStory from '../components/PillarsAndStory.astro';
+import ComebackStory from '../components/ComebackStory.astro';
+import { AWARDS } from '../data/awards';
+import { SITE } from '../data/site';
+import { url } from '../lib/url';
+
+---
+
+<BaseLayout
+  title="About Lawrence Law — New Property Specialist with Subsales Expertise"
+  description="From subsales to new property, a decade of hands-on experience you can count on. Trusted by 2,000+ buyers over the years, since 2015. Registered estate negotiator (REN 26610) serving KL, Selangor, Johor and Penang."
+>
+  {/* ===== Intro: photo + story on navy ===== */}
+  <section class="bg-navy-900 py-14 text-white sm:py-20">
+    <div class="container-site grid items-center gap-10 lg:grid-cols-[2fr_3fr]">
+      <div class="mx-auto w-full max-w-sm">
+        <img
+          src={url('/images/lawrence-portrait.jpg')}
+          onerror={`this.onerror=null;this.src='${url('/images/placeholders/lawrence-about.svg')}'`}
+          alt="Lawrence Law, New Property Specialist"
+          class="aspect-[4/5] w-full rounded-lg border border-gold-500/50 object-cover shadow-card"
+        />
+      </div>
+      <div>
+        <h1 class="text-[32px] text-white sm:text-[52px]">Hi! I’m Lawrence Law</h1>
+        <p class="mt-2 font-display text-[22px] font-semibold text-gold-500 sm:text-[30px]">{SITE.tagline}</p>
+        <div class="gold-rule mt-5"></div>
+        <div class="space-y-4 text-navy-100">
+          <p>
+            From subsales to new property — a decade of hands-on experience you can count on.
+            Guiding young couples and families toward the right home
+            <strong class="font-bold text-gold-500">since 2015</strong>.
+          </p>
+          <p>
+            My real estate journey began at university, where I started out in the subsales market —
+            helping clients buy, sell and rent with confidence. Over my first four years, I built the
+            trust of a growing community of <strong class="font-bold text-gold-500">1,500+ homeowners</strong>.
+          </p>
+          <p>
+            In 2019, I moved into new property sales, combining hands-on subsales experience with
+            in-depth project knowledge — bringing my journey to a full decade in the industry.
+          </p>
+          <p>
+            Today, trusted by <strong class="font-bold text-gold-500">2,000+ buyers</strong> over the
+            years, I specialise in helping families upgrade, first-time homebuyers choose the right
+            location, and busy professionals find practical, future-ready homes.
+          </p>
+          <p>
+            Most recently ranked <strong class="font-bold text-gold-500">Top 47 nationwide</strong> (Primary
+            Market, 2025) and a <strong class="font-bold text-gold-500">Million Dollar Achiever Club —
+            Diamond</strong> member at the IQI Prestige Awards.
+          </p>
+          <p class="text-white">
+            If you’re looking for honest, no-pressure advice to make the right property move — let’s talk.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <TrustBar />
+
+  <PillarsAndStory />
+
+  <ComebackStory />
+
+  {/* ===== Awards ===== */}
+  <section class="section-pad bg-cream">
+    <div class="container-site">
+      <h2 class="section-heading">Awards & Recognition</h2>
+      <div class="gold-rule"></div>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {AWARDS.map((a) => (
+          <figure class="card">
+            <div class="relative aspect-[4/3] overflow-hidden rounded-lg bg-navy-900">
+              {a.image ? (
+                <img
+                  src={url(a.image)}
+                  onerror={a.fallbackImage ? `this.onerror=null;this.src='${url(a.fallbackImage)}'` : undefined}
+                  alt={a.title}
+                  loading="lazy"
+                  class="h-full w-full object-cover"
+                />
+              ) : (
+                <div class="flex h-full w-full items-center justify-center">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M8 21h8"></path>
+                    <path d="M12 17v4"></path>
+                    <path d="M7 4h10v4a5 5 0 0 1-10 0V4Z"></path>
+                    <path d="M7 5H4v2a3 3 0 0 0 3 3"></path>
+                    <path d="M17 5h3v2a3 3 0 0 1-3 3"></path>
+                  </svg>
+                </div>
+              )}
+            </div>
+            <figcaption class="mt-3">
+              <p class="font-semibold text-navy-900">{a.title}</p>
+              <p class="text-sm text-ink/60">{a.org} · {a.year}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    heading="Looking for honest, no-pressure advice?"
+    sub="Tell me your budget and your plans — whether to buy, when to buy, where to buy is always your call."
+    waMessage="Hi Lawrence, I read your story on the website and would like some advice on my property plans."
+  />
+</BaseLayout>

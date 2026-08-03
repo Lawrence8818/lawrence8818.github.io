@@ -1,0 +1,19 @@
+---
+import { url } from '../lib/url';
+
+interface Props {
+  slug: string;
+  name: string;
+  nameEn: string;
+  intro: string;
+  /** kept for compatibility; the card is text-only by request */
+  heroImage?: string;
+}
+const { slug, name, nameEn, intro } = Astro.props;
+---
+
+<a href={url(`/areas/${slug}/`)} class="card group block transition-colors hover:border-gold-500">
+  <p class="text-xl font-bold tracking-tight text-navy-900 uppercase group-hover:text-gold-600">{name}</p>
+  <div class="gold-rule mt-3 mb-4 !w-10"></div>
+  <p class="text-sm leading-relaxed text-ink/80">{intro}</p>
+</a>

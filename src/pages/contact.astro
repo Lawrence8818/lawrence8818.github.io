@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LeadMagnetForm from '../components/LeadMagnetForm.astro';
+import FAQ from '../components/FAQ.astro';
+import { SITE } from '../data/site';
+import { waLink } from '../lib/whatsapp';
+
+const contactFaqs = [
+  {
+    question: 'Do you charge for consultation?',
+    answer:
+      'No. Early consultation, loan pre-assessment and project comparison are all free. My income comes from developer commission — buyers don’t pay me anything.',
+  },
+  {
+    question: 'Will you keep pushing me to buy?',
+    answer:
+      'No. My approach is to give you the information and analysis; whether and when to buy is your decision. Buyers who are genuinely ready come back on their own — a sale forced out never lasts.',
+  },
+  {
+    question: 'I’m out of state / overseas — can we consult remotely?',
+    answer:
+      'Yes. Video-call project briefings, remote comparisons and arranging viewings on your behalf all work — many of my Johor and Penang clients, and those based in Singapore, work with me this way.',
+  },
+];
+---
+
+<BaseLayout
+  title="Contact Lawrence — Free Consultation on WhatsApp"
+  description="Free advice on buying property: chat directly on WhatsApp, or leave your details for Lawrence to reply. Covering KL, Selangor, Johor and Penang."
+>
+  <section class="bg-navy-900 py-12 text-white">
+    <div class="container-site">
+      <h1 class="text-3xl sm:text-4xl text-white">Contact me</h1>
+      <p class="mt-3 max-w-2xl text-navy-100">
+        Ask whenever you have a question — no need to wait until you feel “ready.” The earlier you ask,
+        the fewer detours you take.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-14">
+    <div class="container-site grid gap-10 lg:grid-cols-2">
+      <div>
+        <h2 class="text-2xl">Fastest way: WhatsApp</h2>
+        <div class="gold-rule mt-3"></div>
+        <p class="text-ink/80">
+          Just tap the button below and tell me three things:
+          <strong>your budget, the area you’re interested in, and own-stay or investment</strong>.
+          I reply personally — no bots — usually within 5 minutes.
+        </p>
+        <a href={waLink()} target="_blank" rel="noopener" class="btn-gold mt-6" data-track="whatsapp_contact_page">
+          Open WhatsApp chat
+        </a>
+        <p class="mt-4 text-sm text-ink/70">
+          Prefer email? <a href={`mailto:${SITE.email}`} class="font-semibold text-gold-600 hover:underline">{SITE.email}</a>
+        </p>
+        <p class="mt-2 text-sm text-ink/60">
+          Or grab the free Buyer’s Guide first:
+          <a href={waLink(SITE.leadMagnetMessage)} target="_blank" rel="noopener" class="font-semibold text-gold-600 hover:underline" data-track="whatsapp_contact_leadmagnet">
+            get it here →
+          </a>
+        </p>
+
+        <div class="mt-10">
+          <FAQ faqs={contactFaqs} heading="Before you reach out" />
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-2xl">Or leave your details</h2>
+        <div class="gold-rule mt-3"></div>
+        <LeadMagnetForm />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

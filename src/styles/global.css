@@ -1,0 +1,333 @@
+@import 'tailwindcss';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/inter/800.css';
+/* Playfair Display — elegant serif for large display headings only */
+@import '@fontsource/playfair-display/600.css';
+@import '@fontsource/playfair-display/700.css';
+
+@theme {
+  /* ------------------------------------------------------------------
+   * Serhant-inspired editorial palette: deep navy + white dominant.
+   * Gold survives only as a micro-accent (labels, rules, CTA fill).
+   * WhatsApp green is reserved solely for the floating button.
+   * ------------------------------------------------------------------ */
+  --color-navy-950: #071a30;
+  --color-navy-900: #0a2540; /* Lawrence's brand navy */
+  --color-navy-800: #123458;
+  --color-navy-100: #d8dce3; /* light text on dark */
+  --color-border: #e2e2e2;
+  --color-gold-600: #b08d1e;
+  --color-gold-500: #c9a227;
+  --color-gold-100: #f6efdc;
+  --color-cream: #ffffff; /* pages are white now (token kept for compatibility) */
+  --color-ink: #3a3a3a;
+  --color-wa: #25d366;
+
+  /* Inter carries body + UI; Playfair Display gives large headings a
+     luxury-property serif accent (the pairing the design DB recommends). */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+
+  --shadow-card: 0 2px 12px rgb(0 0 0 / 0.06);
+}
+
+/* ============ Buttons: rectangular, uppercase, letter-spaced ============ */
+@utility btn-gold {
+  /* Primary CTA — gold fill reads on both navy and white grounds.
+     min-h-11 (44px) keeps every CTA at the accessible tap-target floor. */
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-gold-500 px-8 py-3.5 text-sm font-bold tracking-[1.5px] text-navy-900 uppercase transition-colors hover:bg-gold-600;
+}
+@utility btn-gold-outline {
+  /* Secondary — hairline outline in the current text colour, gold on hover */
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] border border-current px-8 py-3.5 text-sm font-semibold tracking-[1.5px] uppercase transition-colors hover:border-gold-500 hover:bg-gold-500 hover:text-navy-900;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #123458 transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #123458;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #c9a227;
+  }
+  body {
+    @apply bg-white font-sans text-ink;
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (min-width: 640px) {
+    body {
+      font-size: 18px;
+    }
+  }
+  /* Large display headings get the Playfair serif; smaller headings (h3 card
+     titles, h4) stay in Inter so UI and card text read clean. */
+  h1,
+  h2 {
+    @apply font-display font-bold text-navy-900;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  h3 {
+    @apply font-sans font-extrabold text-navy-900;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  h4 {
+    @apply font-sans font-semibold text-navy-900;
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-[1200px] px-4 sm:px-6;
+  }
+  /* Editorial breathing room */
+  .section-pad {
+    @apply py-14 sm:py-28;
+  }
+  /* Section titles: big, uppercase, tight — Serhant editorial voice */
+  .section-heading {
+    @apply mb-3 text-[28px] uppercase sm:text-5xl;
+  }
+  .gold-rule {
+    @apply mb-8 h-px w-16 bg-gold-500;
+  }
+  .card {
+    @apply rounded-[4px] border border-border bg-white p-6;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgb(201 162 39 / 0.45);
+    box-shadow: 0 12px 32px rgb(10 37 64 / 0.1);
+  }
+  /* Micro label: small caps, wide tracking */
+  .label-sm {
+    @apply text-[12px] font-semibold tracking-[2px] uppercase;
+  }
+  /* Marquee strip — flex + max-content track is the most reliable technique
+     across mobile browsers. Runs regardless of reduced-motion (it's a small
+     decorative brand ticker); some phones/battery-saver otherwise freeze it. */
+  .marquee {
+    @apply overflow-hidden;
+  }
+  /* Card marquee — pure-CSS auto-play that stays hand-swipeable. The
+     container is a real horizontal scroller (scrollbar hidden) while the
+     animation pushes the track underneath, so a finger swipe always works
+     and the marquee simply carries on afterwards. Content is tripled and
+     the loop shifts by exactly one copy (-33.333%) so both the loop jump
+     and a deep manual swipe stay seamless. Runs even where JS is stripped;
+     pauses on hover / touch-hold / keyboard focus. */
+  .card-marquee {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .card-marquee::-webkit-scrollbar {
+    display: none;
+  }
+  .card-marquee-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: marquee-third var(--cm-dur, 60s) linear infinite;
+  }
+  .card-marquee-track > * {
+    flex: 0 0 auto;
+  }
+  .card-marquee-track.cm-reverse {
+    animation-direction: reverse;
+  }
+  .card-marquee:hover .card-marquee-track,
+  .card-marquee:focus-within .card-marquee-track,
+  .card-marquee:active .card-marquee-track {
+    animation-play-state: paused;
+  }
+  @keyframes marquee-third {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-33.333%);
+    }
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    flex-wrap: nowrap;
+    will-change: transform;
+    animation: marquee 44s linear infinite;
+  }
+  .marquee-track > span {
+    display: block;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  /* Buttons get a gentle lift to pair with their colour change */
+  .btn-gold,
+  .btn-gold-outline {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .btn-gold:hover,
+  .btn-gold-outline:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgb(201 162 39 / 0.28);
+  }
+
+  /* Floating WhatsApp button: soft expanding ring to draw the eye */
+  .wa-pulse {
+    position: relative;
+  }
+  .wa-pulse::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    box-shadow: 0 0 0 0 rgb(37 211 102 / 0.5);
+    /* Pulse a few times to catch the eye on load, then settle (was infinite). */
+    animation: wa-ring 2.6s ease-out 3;
+    pointer-events: none;
+  }
+  @keyframes wa-ring {
+    to {
+      box-shadow: 0 0 0 16px rgb(37 211 102 / 0);
+    }
+  }
+
+  /* Respect Reduce Motion for the decorative WhatsApp pulse only.
+     The marquees are deliberately KEPT running even under reduce-motion: many
+     phones force prefers-reduced-motion in Low Power / battery-saver mode, and
+     gating the tickers there froze them on mobile. A slow horizontal ticker is
+     low motion-sickness risk and the rows stay hand-swipeable regardless. */
+  @media (prefers-reduced-motion: reduce) {
+    .wa-pulse::after {
+      animation: none;
+    }
+  }
+
+  /* Stat count-up — the numbers are real text, counted up by the inline
+     rAF/IntersectionObserver script in TrustBar (the same technique as the
+     Vividz landing page, which works on every phone browser). While a
+     number is counting it glows gold, then settles back into navy. */
+  .stat-num.counting {
+    color: #c9a227;
+  }
+  .stat-num {
+    transition: color 0.5s ease;
+  }
+
+  /* Shared entrance keyframe (hero stagger + scroll reveals) */
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* Hero: three-step fade-up on load (skipped for reduced-motion users —
+     content stays fully visible either way) */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-top {
+      animation: rise 0.45s ease-out both;
+    }
+    .hero-photo {
+      animation: rise 0.45s ease-out 0.1s both;
+    }
+    .hero-body {
+      animation: rise 0.45s ease-out 0.2s both;
+    }
+  }
+  /* Scroll-linked reveal for section headings — progressive enhancement:
+     browsers without animation-timeline simply show everything static. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .section-heading,
+      .gold-rule {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+      }
+    }
+  }
+
+  .prose-zh {
+    @apply max-w-none leading-[1.7];
+  }
+  .prose-zh h2 {
+    @apply mt-10 mb-4 text-[22px] sm:text-3xl;
+  }
+  .prose-zh h3 {
+    @apply mt-8 mb-3 text-xl sm:text-2xl;
+  }
+  .prose-zh p {
+    @apply mb-5;
+  }
+  .prose-zh ul,
+  .prose-zh ol {
+    @apply mb-5 space-y-2 pl-6;
+  }
+  .prose-zh ul {
+    list-style: disc;
+  }
+  .prose-zh ol {
+    list-style: decimal;
+  }
+  .prose-zh strong {
+    @apply font-bold text-navy-900;
+  }
+  .prose-zh a {
+    @apply text-navy-800 underline decoration-gold-500 decoration-2 underline-offset-4;
+  }
+  .prose-zh blockquote {
+    @apply my-6 border-l-2 border-gold-500 bg-gold-100/40 px-5 py-3 text-navy-900;
+  }
+  .prose-zh table {
+    @apply my-6 w-full border-collapse text-sm;
+  }
+  .prose-zh th,
+  .prose-zh td {
+    @apply border border-border px-3 py-2 text-left;
+  }
+  .prose-zh th {
+    @apply bg-navy-900 text-white;
+  }
+}

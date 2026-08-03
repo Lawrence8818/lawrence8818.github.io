@@ -1,0 +1,120 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import VideoEmbed from '../../components/VideoEmbed.astro';
+import VideoCard from '../../components/VideoCard.astro';
+import CTASection from '../../components/CTASection.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { videoSchema, breadcrumbSchema } from '../../lib/schema';
+import { url } from '../../lib/url';
+import { waContextMessage } from '../../lib/whatsapp';
+
+export async function getStaticPaths() {
+  const videos = await getCollection('videos');
+  return videos.map((v) => ({ params: { slug: v.id }, props: { video: v } }));
+}
+
+const { video } = Astro.props;
+const { Content, headings } = await render(video);
+const hasNotes = video.body && video.body.replace(/<!--[\s\S]*?-->/g, '').trim().length > 0;
+
+const all = (await getCollection('videos'))
+  .filter((v) => v.id !== video.id && v.data.category === video.data.category)
+  .slice(0, 3);
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const realYtId =
+  video.data.platform === 'youtube' && video.data.videoId && !video.data.videoId.includes('TODO')
+    ? video.data.videoId
+    : null;
+const thumbAbs = new URL(
+  realYtId && video.data.thumbnail.startsWith('/images/placeholders/')
+    ? `https://i.ytimg.com/vi/${realYtId}/hqdefault.jpg`
+    : url(video.data.thumbnail),
+  Astro.site,
+).href;
+
+const dateFmt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' });
+---
+
+<BaseLayout
+  title={video.data.title}
+  description={video.data.description || `${video.data.title} — a Lawrence Law property know-how video, ${video.data.category} series.`}
+  ogType="video.other"
+  waMessage={waContextMessage(video.data.title)}
+>
+  <JsonLd
+    slot="head"
+    data={videoSchema({
+      name: video.data.title,
+      description: video.data.description || video.data.title,
+      thumbnailUrl: thumbAbs,
+      uploadDate: video.data.publishDate,
+      embedUrl: realYtId ? `https://www.youtube-nocookie.com/embed/${realYtId}` : undefined,
+      contentUrl: video.data.videoUrl,
+    })}
+  />
+  <JsonLd
+    slot="head"
+    data={breadcrumbSchema([
+      { name: 'Home', url: new URL(url('/'), Astro.site).href },
+      { name: 'Videos', url: new URL(url('/videos/'), Astro.site).href },
+      { name: video.data.title, url: canonical },
+    ])}
+  />
+
+  <article class="container-site max-w-3xl py-10 sm:py-14">
+    <nav class="mb-6 text-sm text-ink/60" aria-label="Breadcrumb">
+      <a href={url('/videos/')} class="hover:text-gold-600">Videos</a>
+      <span class="mx-2">/</span>
+      <span>{video.data.category} series</span>
+    </nav>
+
+    <h1 class="mb-1 text-2xl sm:text-3xl">{video.data.title}</h1>
+    {video.data.titleZh && <p class="mb-4 text-base text-ink/55">{video.data.titleZh}</p>}
+    <p class="mb-6 text-sm text-ink/50">
+      Published {dateFmt.format(video.data.publishDate)}
+      {video.data.longform && ' · In-depth long-form'}
+    </p>
+
+    <VideoEmbed
+      platform={video.data.platform}
+      videoId={video.data.videoId}
+      videoUrl={video.data.videoUrl}
+      title={video.data.title}
+      thumbnail={video.data.thumbnail}
+    />
+
+    {hasNotes && (
+      <div class="prose-zh mt-10">
+        <Content />
+      </div>
+    )}
+
+    {!hasNotes && video.data.description && (
+      <p class="mt-8 text-lg text-ink/80">{video.data.description}</p>
+    )}
+
+    {all.length > 0 && (
+      <div class="mt-14">
+        <h2 class="mb-5 text-xl">More in this series</h2>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {all.map((v) => (
+            <VideoCard
+              slug={v.id}
+              title={v.data.title}
+              titleZh={v.data.titleZh}
+              category={v.data.category}
+              platform={v.data.platform}
+              thumbnail={v.data.thumbnail}
+              videoId={v.data.videoId}
+              longform={v.data.longform}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+  </article>
+
+  <CTASection waMessage={waContextMessage(video.data.title)} />
+</BaseLayout>

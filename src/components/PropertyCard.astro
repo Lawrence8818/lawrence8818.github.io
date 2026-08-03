@@ -1,0 +1,152 @@
+---
+import { url } from '../lib/url';
+import { waLink, waContextMessage } from '../lib/whatsapp';
+
+interface Props {
+  name: string;
+  label?: string;
+  priceFrom: string;
+  location: string;
+  type?: string;
+  tenure: string;
+  landSize: string;
+  layoutSize?: string;
+  maintenance?: string;
+  monthly?: string;
+  completion: string;
+  image: string;
+  fallbackImage?: string;
+  listingUrl?: string;
+  placeholder?: boolean;
+  soldOut?: boolean;
+  penthouse?: boolean;
+  /** content id — when present the card links through to /properties/<slug>/ */
+  slug?: string;
+}
+const {
+  name,
+  label,
+  priceFrom,
+  location,
+  type,
+  tenure,
+  landSize,
+  layoutSize,
+  monthly,
+  completion,
+  image,
+  fallbackImage,
+  listingUrl,
+  placeholder = false,
+  soldOut = false,
+  penthouse = false,
+  slug,
+} = Astro.props;
+
+const detailHref = slug ? url(`/properties/${slug}/`) : undefined;
+
+const specs = [
+  { k: 'Land Tenure', v: tenure },
+  { k: 'Land Size', v: landSize },
+  ...(layoutSize ? [{ k: 'Layout Size', v: layoutSize }] : []),
+  ...(monthly ? [{ k: 'Monthly', v: `${monthly}+` }] : []),
+  { k: 'Completion', v: completion },
+];
+const contactMsg = waContextMessage(name);
+// Numeric prices read as "From RM …"; a non-RM placeholder (e.g. "Price on
+// request") is shown on its own so it never renders "From Price on request".
+const priceLabel = /^RM/.test(priceFrom) ? `From ${priceFrom}` : priceFrom;
+---
+
+<article
+  class:list={[
+    'flex h-full flex-col overflow-hidden rounded-[4px] border',
+    soldOut ? 'border-neutral-300 bg-neutral-100 grayscale' : 'border-border bg-white',
+  ]}
+>
+  <div class="pc-media relative aspect-[3/2] overflow-hidden bg-navy-900">
+    {detailHref ? (
+      <a href={detailHref} aria-label={`View ${name} details`} class="block h-full w-full">
+        <img
+          src={url(image)}
+          onerror={fallbackImage ? `this.onerror=null;this.src='${url(fallbackImage)}'` : undefined}
+          alt={name}
+          loading="lazy"
+          class="h-full w-full object-cover object-top transition-transform duration-500 hover:scale-[1.04]"
+        />
+      </a>
+    ) : (
+      <img
+        src={url(image)}
+        onerror={fallbackImage ? `this.onerror=null;this.src='${url(fallbackImage)}'` : undefined}
+        alt={name}
+        loading="lazy"
+        class="h-full w-full object-cover object-top"
+      />
+    )}
+    {(label || penthouse) && (
+      <span class="absolute top-3 left-3 flex flex-wrap gap-2">
+        {penthouse && (
+          <span class="label-sm rounded-full border border-gold-500 bg-navy-900/90 px-3 py-1 text-gold-500">
+            Penthouse
+          </span>
+        )}
+        {label && (
+          <span class="label-sm rounded-full bg-gold-500 px-3 py-1 text-navy-900">{label}</span>
+        )}
+      </span>
+    )}
+    {placeholder && (
+      <span class="absolute top-3 right-3 rounded bg-navy-900/85 px-2 py-0.5 text-xs text-white">
+        等待 · Photo pending
+      </span>
+    )}
+    {soldOut && (
+      <span class="label-sm absolute top-3 right-3 rounded bg-navy-900/90 px-3 py-1 text-white">
+        Sold Out
+      </span>
+    )}
+  </div>
+
+  <div class="flex flex-1 flex-col gap-4 p-5">
+    <div>
+      <h3 class="font-sans text-lg leading-snug font-semibold text-navy-900">
+        {detailHref ? (
+          <a href={detailHref} class="transition-colors hover:text-gold-600">{name}</a>
+        ) : (
+          name
+        )}
+      </h3>
+      <p class="mt-0.5 text-sm text-ink/70">{location}{type && ` · ${type}`}</p>
+    </div>
+
+    <p class="text-[22px] font-bold text-navy-900">{priceLabel}</p>
+
+    <dl class="grid grid-cols-2 gap-x-4 gap-y-2.5 border-t border-border pt-4">
+      {specs.map((s) => (
+        <div>
+          <dt class="label-sm text-ink/50">{s.k}</dt>
+          <dd class="mt-0.5 text-[15px] font-medium text-navy-900">{s.v}</dd>
+        </div>
+      ))}
+    </dl>
+
+    <div class="mt-auto grid grid-cols-2 gap-3 pt-2">
+      <a href={waLink(contactMsg)} target="_blank" rel="noopener" class="btn-gold !px-4 !py-2.5 !text-sm" data-track="whatsapp_property">
+        Contact Us
+      </a>
+      {detailHref ? (
+        <a href={detailHref} class="btn-gold-outline !px-4 !py-2.5 !text-sm">View Details</a>
+      ) : (
+        <a
+          href={listingUrl || waLink(contactMsg)}
+          target="_blank"
+          rel="noopener"
+          class="btn-gold-outline !px-4 !py-2.5 !text-sm"
+        >
+          View Listing
+        </a>
+      )}
+    </div>
+  </div>
+</article>

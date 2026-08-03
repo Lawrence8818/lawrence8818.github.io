@@ -1,0 +1,89 @@
+---
+// Self-introduction block shared by the home page and the About page:
+// three expertise pillars + the first-deal story with the certificate photo.
+import GoldIcon from './GoldIcon.astro';
+import { url } from '../lib/url';
+
+// The 2015 certificate lives here, independent of the awards roster.
+const firstDealAward = {
+  image: '/images/certificate-first-deal.jpg',
+  fallbackImage: '/images/placeholders/award-01.svg',
+};
+
+const pillars = [
+  {
+    icon: 'blend',
+    title: 'Blending Subsales Experience with New Property Expertise',
+    body: 'With around four years in subsales and six in new property sales — a full decade in total — I bring a perspective most agents don’t have. My clients gain insight from both sides of the market. I focus on well-located, family-friendly homes from reputable developers — chosen for liveability, quality and long-term suitability rather than short-term speculation.',
+  },
+  {
+    icon: 'family',
+    title: 'Tailored Solutions for Families & Long-Term Homeowners',
+    body: 'Whether you’re a young couple buying your first home or a family looking to upgrade to a larger space, I guide you through every step, from finding the right property to financial planning.',
+  },
+  {
+    icon: 'shield',
+    title: 'Commitment to Quality',
+    body: 'I prioritise properties by reputable developers with proven track records, so my clients can choose homes built with integrity and reliability, while avoiding the risks of abandoned projects.',
+  },
+] as const;
+---
+
+{/* ===== Three pillars ===== */}
+<section class="section-pad bg-cream">
+  <div class="container-site">
+    <div class="grid gap-6 lg:grid-cols-3">
+      {pillars.map((p) => (
+        <div class="card">
+          <span class="text-gold-500"><GoldIcon name={p.icon} size={32} /></span>
+          <h2 class="mt-4 font-sans text-xl leading-snug font-semibold sm:text-2xl">{p.title}</h2>
+          <div class="gold-rule mt-3 mb-4 !w-10"></div>
+          <p class="text-[15px] leading-relaxed text-ink sm:text-[17px]">{p.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+{/* ===== First-deal story: navy ground, gold-framed certificate ===== */}
+<section class="section-pad bg-navy-900 text-white">
+  <div class="container-site grid items-center gap-10 lg:grid-cols-[2fr_3fr]">
+    <figure class="mx-auto w-full max-w-sm">
+      <img
+        src={url(firstDealAward.image)}
+        onerror={firstDealAward.fallbackImage ? `this.onerror=null;this.src='${url(firstDealAward.fallbackImage)}'` : undefined}
+        alt="First Sales Achievement Award — Top Sales July 2015"
+        loading="lazy"
+        class="w-full rounded-lg border border-gold-500/60 shadow-card"
+      />
+      <figcaption class="label-sm mt-3 text-center text-navy-100/80">
+        First Sales Achievement Award · Top Sales (July 2015)
+      </figcaption>
+    </figure>
+    <div>
+      <h2 class="text-[26px] text-gold-500 sm:text-4xl">The Story Behind My First Deal</h2>
+      <div class="gold-rule mt-4"></div>
+      <div class="space-y-4 text-navy-100">
+        <p>
+          In July 2015, during my early days in real estate, I closed my first property sale — a
+          penthouse at Quadro Residence KLCC worth over
+          <strong class="font-bold text-gold-500">RM2 million</strong>, to a cash buyer from
+          China. It was a turning point in my career, but it didn’t come easy.
+        </p>
+        <p>
+          As a young agent in my early 20s, I faced an undercut incident where a co-broke agent
+          tried to take my buyer’s contact right in front of me — likely underestimating me
+          because of my age. Despite the challenge, I stayed professional and focused on
+          delivering exceptional service.
+        </p>
+        <p>
+          In the end, the buyer chose to work with me because of my attitude and dedication —
+          earning me not only my first paycheque but also the
+          <strong class="font-bold text-gold-500">First Sales Achievement Award</strong>. That
+          experience taught me that trust, integrity and resilience are the keys to success in
+          real estate.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

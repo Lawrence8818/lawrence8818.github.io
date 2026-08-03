@@ -1,0 +1,97 @@
+---
+import PendingNotice from '../../components/PendingNotice.astro';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FAQ from '../../components/FAQ.astro';
+import CTASection from '../../components/CTASection.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { breadcrumbSchema } from '../../lib/schema';
+import { url } from '../../lib/url';
+import { waContextMessage } from '../../lib/whatsapp';
+
+export async function getStaticPaths() {
+  const areas = await getCollection('areas');
+  return areas.map((a) => ({ params: { slug: a.id }, props: { area: a } }));
+}
+
+const { area } = Astro.props;
+const { Content } = await render(area);
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const waMsg = waContextMessage(`buying property in ${area.data.name}`);
+---
+
+<BaseLayout
+  title={`Buying Property in ${area.data.name} — New-Launch Advice`}
+  description={area.data.intro}
+  waMessage={waMsg}
+>
+  <PendingNotice note="Area guide draft — awaiting Lawrence’s review." />
+  <JsonLd
+    slot="head"
+    data={breadcrumbSchema([
+      { name: 'Home', url: new URL(url('/'), Astro.site).href },
+      { name: 'Areas', url: new URL(url('/areas/'), Astro.site).href },
+      { name: area.data.name, url: canonical },
+    ])}
+  />
+
+  <section class="relative bg-navy-950 text-white">
+    <img
+      src={url(area.data.heroImage)}
+      alt={`${area.data.name} property`}
+      class="absolute inset-0 h-full w-full object-cover opacity-30"
+    />
+    <div class="container-site relative py-16 sm:py-20">
+      <nav class="mb-4 text-sm text-navy-100/80" aria-label="Breadcrumb">
+        <a href={url('/areas/')} class="hover:text-gold-500">Areas</a>
+        <span class="mx-2">/</span>
+        <span>{area.data.name}</span>
+      </nav>
+      <p class="font-display text-sm tracking-widest text-gold-500 uppercase">Coverage</p>
+      <h1 class="mt-1 text-3xl text-white sm:text-4xl">Buying in {area.data.name}? Talk to Lawrence</h1>
+      <p class="mt-4 max-w-2xl text-lg text-navy-100">{area.data.intro}</p>
+      <ul class="mt-6 flex flex-wrap gap-2">
+        {area.data.highlights.map((h) => (
+          <li class="rounded-full border border-gold-500/50 px-3 py-1 text-sm text-gold-100">{h}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="py-12">
+    <div class="container-site max-w-3xl">
+      <div class="prose-zh">
+        <Content />
+      </div>
+
+      {area.data.hotProjects && area.data.hotProjects.length > 0 && (
+        <div class="mt-12">
+          <h2 class="mb-5 text-xl sm:text-2xl">Projects worth watching</h2>
+          <div class="space-y-3">
+            {area.data.hotProjects.map((p) => (
+              <div class="card flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <p class="font-semibold text-navy-900">{p.name}</p>
+                  <p class="text-sm text-ink/70">{p.type}{p.note && ` · ${p.note}`}</p>
+                </div>
+                {p.priceFrom && <p class="text-sm font-semibold text-gold-600">From {p.priceFrom}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {area.data.faqs && (
+        <div class="mt-12">
+          <FAQ faqs={area.data.faqs} heading={`Common questions about buying in ${area.data.name}`} />
+        </div>
+      )}
+    </div>
+  </section>
+
+  <CTASection
+    heading={`Want to see projects in ${area.data.name}?`}
+    sub="Tell me your budget and needs, and I’ll pull together the projects worth viewing here, then arrange a focused day of viewings."
+    waMessage={waMsg}
+  />
+</BaseLayout>

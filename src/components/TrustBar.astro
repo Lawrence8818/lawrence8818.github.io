@@ -1,0 +1,77 @@
+---
+import { TRUST_STATS } from '../data/awards';
+import { SITE } from '../data/site';
+---
+
+<section class="stat-section border-y border-border bg-white">
+  <div class="container-site grid grid-cols-2 sm:grid-cols-4">
+    {TRUST_STATS.map((stat, i) => (
+      <div class={`px-4 py-10 text-center sm:py-14 ${i > 0 ? 'sm:border-l sm:border-border' : ''}`}>
+        <p class="text-[40px] leading-none font-extrabold tracking-tight text-navy-900 sm:text-[64px]">
+          {stat.prefix}<span class="stat-num" data-count={stat.num}>{stat.num.toLocaleString('en-US')}</span>{stat.suffix}
+        </p>
+        <p class="label-sm mt-3 text-gold-600">{stat.label}</p>
+      </div>
+    ))}
+  </div>
+  <div class="label-sm border-t border-border py-3 text-center text-ink/50">
+    {SITE.renNumber} · {SITE.agencyName} · BOVAEA Malaysia
+  </div>
+</section>
+
+{/* Count-up runs through two redundant entry points guarded by window.__llpc:
+   the normal <script> below, plus this broken image's inline onerror — which
+   survives platforms that strip <script> tags from their mobile rendering
+   (inline image handlers are kept there, as the card photo fallbacks prove).
+   Whichever runs first wins; the logic is identical to the Vividz page:
+   zero the real-text numbers, then rAF-count 0→target on scroll into view. */}
+<img
+  src="data:,"
+  alt=""
+  aria-hidden="true"
+  style="display:none"
+  onerror="if(window.__llpc)return;window.__llpc=1;var ns=document.querySelectorAll('.stat-num[data-count]');if(!ns.length||!('IntersectionObserver' in window))return;ns.forEach(function(e){e.textContent='0'});var io=new IntersectionObserver(function(es){es.forEach(function(en){if(!en.isIntersecting)return;var el=en.target;io.unobserve(el);var t=parseInt(el.getAttribute('data-count'),10);var d=1600;var s=performance.now();el.classList.add('counting');var k=function(n){var p=Math.min((n-s)/d,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3))).toLocaleString('en-US');if(p<1){requestAnimationFrame(k)}else{el.classList.remove('counting')}};requestAnimationFrame(k)})},{threshold:0.6});ns.forEach(function(e){io.observe(e)})"
+/>
+
+<script is:inline>
+  // Count-up stats — same rAF/IntersectionObserver technique and 1.6s
+  // duration as the proven Vividz landing page. Intentionally NOT gated on
+  // prefers-reduced-motion (phones often ship with Reduce Motion on).
+  (function () {
+    if (window.__llpc) return;
+    window.__llpc = 1;
+    var nums = document.querySelectorAll('.stat-num[data-count]');
+    if (!nums.length || !('IntersectionObserver' in window)) return;
+    nums.forEach(function (el) {
+      el.textContent = '0';
+    });
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var el = entry.target;
+          io.unobserve(el);
+          var target = parseInt(el.getAttribute('data-count'), 10);
+          var dur = 1600;
+          var start = performance.now();
+          el.classList.add('counting');
+          var tick = function (now) {
+            var p = Math.min((now - start) / dur, 1);
+            var eased = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.round(target * eased).toLocaleString('en-US');
+            if (p < 1) {
+              requestAnimationFrame(tick);
+            } else {
+              el.classList.remove('counting');
+            }
+          };
+          requestAnimationFrame(tick);
+        });
+      },
+      { threshold: 0.6 }
+    );
+    nums.forEach(function (el) {
+      io.observe(el);
+    });
+  })();
+</script>

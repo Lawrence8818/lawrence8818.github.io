@@ -1,0 +1,177 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MortgageCalculator from '../../components/MortgageCalculator.astro';
+import PropertyCard from '../../components/PropertyCard.astro';
+import CTASection from '../../components/CTASection.astro';
+import { url } from '../../lib/url';
+import { waLink } from '../../lib/whatsapp';
+
+export async function getStaticPaths() {
+  const all = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
+  return all.map((p) => ({
+    params: { slug: p.id },
+    props: { p, all },
+  }));
+}
+
+const { p, all } = Astro.props;
+const d = p.data;
+
+const REGION_LABEL: Record<string, string> = {
+  'kuala-lumpur': 'Kuala Lumpur',
+  klcc: 'KLCC',
+  'petaling-jaya': 'Petaling Jaya',
+  selangor: 'Selangor',
+  johor: 'Johor',
+  penang: 'Penang',
+};
+
+// "RM 626,000" → 626000 so the calculator opens on this project's own price
+const priceNum = parseInt((d.priceFrom.match(/[\d,]+/)?.[0] ?? '').replace(/,/g, ''), 10);
+const hasPrice = Number.isFinite(priceNum) && priceNum > 0;
+
+const specs = [
+  { k: 'Land Tenure', v: d.tenure },
+  { k: 'Land Size', v: d.landSize },
+  ...(d.layoutSize ? [{ k: 'Layout Size', v: d.layoutSize }] : []),
+  ...(d.monthly ? [{ k: 'Monthly From', v: `${d.monthly}+` }] : []),
+  ...(d.maintenance && d.maintenance !== '-' ? [{ k: 'Maintenance', v: d.maintenance }] : []),
+  { k: 'Completion', v: d.completion },
+];
+
+// Same-region projects give the buyer somewhere to go next instead of leaving
+const related = all
+  .filter((x) => x.id !== p.id && x.data.region === d.region && !x.data.soldOut)
+  .slice(0, 3);
+
+const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could you send me the layouts, price list and availability?`;
+---
+
+<BaseLayout
+  title={`${d.name}, ${d.location} — Price, Layouts & Completion`}
+  description={`${d.name} in ${d.location}. From ${d.priceFrom}${d.layoutSize ? `, layouts ${d.layoutSize}` : ''}, ${d.tenure}, completion ${d.completion}. Personally vetted by Lawrence Law — ask me anything on WhatsApp.`}
+  waMessage={waMsg}
+>
+  {/* ===== Hero ===== */}
+  <section class="bg-navy-900 pt-10 pb-14 text-white sm:pt-14 sm:pb-20">
+    <div class="container-site">
+      <nav class="mb-6 text-[13px] text-navy-100/80" aria-label="Breadcrumb">
+        <a href={url('/properties/')} class="inline-flex min-h-11 items-center hover:text-gold-500">
+          ← All Properties
+        </a>
+        {d.region && (
+          <>
+            <span class="mx-2 opacity-40">/</span>
+            <span>{REGION_LABEL[d.region]}</span>
+          </>
+        )}
+      </nav>
+
+      <div class="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+        <div class="relative overflow-hidden rounded-[4px] bg-navy-950">
+          <img
+            src={url(d.image)}
+            onerror={d.fallbackImage ? `this.onerror=null;this.src='${url(d.fallbackImage)}'` : undefined}
+            alt={`${d.name} — building facade`}
+            class="aspect-[4/3] w-full object-cover object-top"
+            fetchpriority="high"
+          />
+          {(d.penthouse || d.label || d.soldOut) && (
+            <span class="absolute top-4 left-4 flex flex-wrap gap-2">
+              {d.penthouse && (
+                <span class="label-sm rounded-full border border-gold-500 bg-navy-900/90 px-3 py-1 text-gold-500">
+                  Penthouse
+                </span>
+              )}
+              {d.label && (
+                <span class="label-sm rounded-full bg-gold-500 px-3 py-1 text-navy-900">{d.label}</span>
+              )}
+              {d.soldOut && (
+                <span class="label-sm rounded-full bg-white/90 px-3 py-1 text-navy-900">Fully Sold</span>
+              )}
+            </span>
+          )}
+        </div>
+
+        <div>
+          <p class="label-sm mb-3 text-gold-500">{d.location}</p>
+          <h1 class="text-[34px] leading-tight text-white sm:text-5xl">{d.name}</h1>
+          <div class="my-5 h-px w-16 bg-gold-500"></div>
+
+          <p class="text-[15px] text-navy-100">{/^RM/.test(d.priceFrom) ? 'From' : ''}</p>
+          <p class="text-[34px] leading-none font-extrabold text-white sm:text-[44px]">
+            {d.priceFrom}
+          </p>
+
+          <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-white/15 pt-6">
+            {specs.map((s) => (
+              <div>
+                <dt class="label-sm text-navy-100/70">{s.k}</dt>
+                <dd class="mt-1 text-[16px] font-semibold text-white">{s.v}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a
+              href={waLink(waMsg)}
+              target="_blank"
+              rel="noopener"
+              class="btn-gold"
+              data-track="whatsapp_property_detail"
+            >
+              Ask About This Project
+            </a>
+            {d.listingUrl && (
+              <a href={d.listingUrl} target="_blank" rel="noopener" class="btn-gold-outline text-white">
+                Developer Site
+              </a>
+            )}
+          </div>
+          <p class="mt-4 text-[13px] text-navy-100/70">
+            I’ll send you the full layout plans, price list and current availability — no pressure,
+            no spam.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ===== Calculator, opened on this project's price ===== */}
+  {hasPrice && (
+    <MortgageCalculator
+      price={priceNum}
+      projectName={d.name}
+      heading={`Can I Afford ${d.name}?`}
+      tone="light"
+    />
+  )}
+
+  {/* ===== Same-area projects ===== */}
+  {related.length > 0 && (
+    <section class="section-pad border-t border-border bg-white">
+      <div class="container-site">
+        <p class="label-sm mb-3 text-gold-500">Also in {d.region ? REGION_LABEL[d.region] : 'this area'}</p>
+        <h2 class="section-heading">Compare Before You Decide</h2>
+        <div class="gold-rule"></div>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {related.map((r) => (
+            <PropertyCard {...r.data} slug={r.id} />
+          ))}
+        </div>
+        <div class="mt-10">
+          <a href={url('/properties/')} class="btn-gold-outline text-navy-900">
+            Browse All Properties
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CTASection
+    heading={`Thinking about ${d.name}?`}
+    sub="Tell me your budget and what matters most — I’ll tell you honestly whether this one fits, and show you the alternatives if it doesn’t."
+    waMessage={waMsg}
+  />
+</BaseLayout>

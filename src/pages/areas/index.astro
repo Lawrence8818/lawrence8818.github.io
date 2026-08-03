@@ -1,0 +1,45 @@
+---
+import PendingNotice from '../../components/PendingNotice.astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AreaCard from '../../components/AreaCard.astro';
+import CTASection from '../../components/CTASection.astro';
+
+const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Areas: Klang Valley (KL/Selangor), Johor & Penang New Launches, All Covered"
+  description="Lawrence covers the entire Klang Valley (all Kuala Lumpur + Selangor new projects), plus Johor Bahru and Penang. The market logic, hot spots and common buyer questions for each area — read first, then ask."
+>
+  <PendingNotice note="Area guides are drafts — awaiting Lawrence’s review." />
+  <section class="bg-navy-900 py-12 text-white">
+    <div class="container-site">
+      <h1 class="text-3xl sm:text-4xl text-white">Areas I serve</h1>
+      <p class="mt-3 max-w-2xl text-navy-100">
+        I can arrange projects across the entire Klang Valley — all new launches in KL and Selangor,
+        not tied to any single developer. I also track Johor and Penang closely, and out-of-state
+        buyers can work with me remotely.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-12">
+    <div class="container-site grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {areas.map((a) => (
+        <AreaCard
+          slug={a.id}
+          name={a.data.name}
+          nameEn={a.data.nameEn}
+          intro={a.data.intro}
+          heroImage={a.data.heroImage}
+        />
+      ))}
+    </div>
+  </section>
+
+  <CTASection
+    heading="Not sure which area to look at?"
+    sub="Tell me your budget, where you work and your family needs, and I’ll narrow down the areas worth viewing."
+  />
+</BaseLayout>

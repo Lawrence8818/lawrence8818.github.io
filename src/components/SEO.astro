@@ -1,0 +1,42 @@
+---
+import { url } from '../lib/url';
+import { SITE } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  ogType?: string;
+  noTitleTemplate?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogImage = '/images/og/og-default.svg',
+  ogType = 'website',
+  noTitleTemplate = false,
+} = Astro.props;
+
+const fullTitle = noTitleTemplate ? title : `${title} | ${SITE.name} · Malaysia Property Consultant`;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImageUrl = new URL(url(ogImage), Astro.site).href;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:locale" content="en_MY" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />

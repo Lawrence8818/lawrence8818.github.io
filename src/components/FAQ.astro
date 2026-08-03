@@ -1,0 +1,30 @@
+---
+import JsonLd from './JsonLd.astro';
+import { faqSchema } from '../lib/schema';
+
+interface Props {
+  faqs: { question: string; answer: string }[];
+  heading?: string;
+  /** 默认输出 FAQPage JSON-LD;同页已有其他 FAQPage 时可关掉避免重复 */
+  withSchema?: boolean;
+}
+const { faqs, heading = 'Frequently asked questions', withSchema = true } = Astro.props;
+---
+
+{faqs.length > 0 && (
+  <div>
+    <h2 class="mb-5 text-xl sm:text-2xl">{heading}</h2>
+    <div class="space-y-3">
+      {faqs.map((f) => (
+        <details class="group rounded-lg border border-navy-100 bg-white">
+          <summary class="flex cursor-pointer items-center justify-between gap-3 px-5 py-4 font-medium text-navy-900 [&::-webkit-details-marker]:hidden">
+            {f.question}
+            <span class="text-gold-500 transition-transform group-open:rotate-45" aria-hidden="true">＋</span>
+          </summary>
+          <p class="border-t border-navy-100 px-5 py-4 text-ink/90">{f.answer}</p>
+        </details>
+      ))}
+    </div>
+    {withSchema && <JsonLd data={faqSchema(faqs)} />}
+  </div>
+)}

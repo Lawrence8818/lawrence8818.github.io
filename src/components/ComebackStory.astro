@@ -1,0 +1,43 @@
+---
+// Comeback narrative shared by the home page and the About page:
+// e-commerce detour → 2025 Top 47 nationwide. Sits right after the
+// first-deal story block, same navy treatment.
+interface Props {
+  /** home page links out to the full story; the About page doesn't need it */
+  showStoryLink?: boolean;
+}
+const { showStoryLink = false } = Astro.props;
+---
+
+<section class="section-pad border-t border-white/10 bg-navy-900">
+  <div class="container-site">
+    <h2 class="text-[26px] text-gold-500 sm:text-4xl">From Setbacks to a Nationwide Top 47</h2>
+    <div class="mt-4 max-w-3xl space-y-4 text-navy-100">
+      <p>
+        My journey wasn’t a straight line. After years in real estate, I stepped away to build an
+        e-commerce business — a detour that taught me digital marketing, data, and systems thinking
+        that most agents never get to learn.
+      </p>
+      <p>
+        In late 2024, I returned to property. Within one year, I closed 2025 as a
+        <strong class="font-bold text-gold-500"> Million Dollar Achiever (Diamond)</strong> and ranked
+        <strong class="font-bold text-gold-500"> Top 47 nationwide</strong> in the primary market —
+        proof that doing right by clients never goes out of style.
+      </p>
+      <p>
+        That’s why my clients today get both: a decade of hard-won property experience, and a
+        modern, data-driven approach to finding the right home.
+      </p>
+      {showStoryLink && (
+        <p>
+          <a
+            href="https://lawrencelawproperty.com/about"
+            class="font-semibold text-gold-500 transition-colors hover:text-gold-600"
+          >
+            Read my full story →
+          </a>
+        </p>
+      )}
+    </div>
+  </div>
+</section>

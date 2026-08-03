@@ -1,0 +1,258 @@
+---
+import { SITE } from '../data/site';
+
+interface Props {
+  /** Pre-fill the price box, e.g. 626000 (from a listing's priceFrom) */
+  price?: number;
+  /** Project name, used in the prefilled WhatsApp message */
+  projectName?: string;
+  /** Section heading; omit for the default */
+  heading?: string;
+  /** dark = navy band (default), light = white band */
+  tone?: 'dark' | 'light';
+}
+const {
+  price = 600000,
+  projectName,
+  heading = 'What Would It Cost Me Monthly?',
+  tone = 'dark',
+} = Astro.props;
+
+const dark = tone === 'dark';
+// Typical Malaysian housing-loan starting point; the buyer can change all three.
+const DEFAULTS = { downPct: 10, rate: 3.6, years: 35 };
+const id = 'mc-' + Math.random().toString(36).slice(2, 8);
+---
+
+<section class:list={['section-pad', dark ? 'bg-navy-900 text-white' : 'bg-white']}>
+  <div class="container-site">
+    <p class="label-sm mb-3 text-gold-500">Instant Estimate</p>
+    <h2 class:list={['section-heading', dark && 'text-white']}>{heading}</h2>
+    <div class="gold-rule"></div>
+    <p class:list={['mb-8 max-w-2xl text-[17px] leading-[1.8]', dark ? 'text-navy-100' : 'text-ink']}>
+      Move the sliders to see the monthly instalment and the cash you need upfront. It is an
+      estimate to help you plan, not a bank approval — your final rate depends on your profile.
+    </p>
+
+    <div
+      id={id}
+      class:list={[
+        'mc grid gap-8 rounded-[6px] border p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]',
+        dark ? 'border-white/15 bg-white/[0.04]' : 'border-border bg-white shadow-card',
+      ]}
+      data-project={projectName}
+    >
+      {/* ---------- Inputs ---------- */}
+      <div class="space-y-6">
+        <div>
+          <label class:list={['label-sm mb-2 block', dark ? 'text-navy-100' : 'text-ink/70']} for={`${id}-price`}>
+            Property price
+          </label>
+          <div
+            class:list={[
+              'flex items-center gap-2 rounded-[4px] border px-4',
+              dark ? 'border-white/25 bg-navy-950' : 'border-border bg-white',
+            ]}
+          >
+            <span class="text-gold-500">RM</span>
+            <input
+              id={`${id}-price`}
+              class:list={[
+                'mc-price min-h-11 w-full bg-transparent py-2 text-[22px] font-bold outline-none',
+                dark ? 'text-white' : 'text-navy-900',
+              ]}
+              type="text"
+              inputmode="numeric"
+              value={price.toLocaleString('en-US')}
+              aria-label="Property price in ringgit"
+            />
+          </div>
+        </div>
+
+        {[
+          { key: 'down', label: 'Down payment', min: 5, max: 50, step: 1, val: DEFAULTS.downPct, unit: '%' },
+          { key: 'rate', label: 'Interest rate', min: 3, max: 6, step: 0.05, val: DEFAULTS.rate, unit: '%' },
+          { key: 'years', label: 'Loan tenure', min: 5, max: 35, step: 1, val: DEFAULTS.years, unit: ' yrs' },
+        ].map((f) => (
+          <div>
+            <div class="mb-2 flex items-baseline justify-between gap-3">
+              <label class:list={['label-sm', dark ? 'text-navy-100' : 'text-ink/70']} for={`${id}-${f.key}`}>
+                {f.label}
+              </label>
+              <output class={`mc-out-${f.key} text-[15px] font-bold text-gold-500`} for={`${id}-${f.key}`} />
+            </div>
+            <input
+              id={`${id}-${f.key}`}
+              class={`mc-range mc-${f.key}`}
+              type="range"
+              min={f.min}
+              max={f.max}
+              step={f.step}
+              value={f.val}
+              data-unit={f.unit}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* ---------- Result ---------- */}
+      <div
+        class:list={[
+          'flex flex-col justify-between gap-6 rounded-[4px] p-6',
+          dark ? 'bg-navy-950' : 'bg-navy-900 text-white',
+        ]}
+      >
+        <div>
+          <p class="label-sm text-gold-500">Estimated monthly instalment</p>
+          <p class="mc-monthly mt-2 text-[40px] leading-none font-extrabold text-white sm:text-[52px]">
+            RM 0
+          </p>
+          <dl class="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-white/15 pt-5">
+            <div>
+              <dt class="label-sm text-navy-100/70">Loan amount</dt>
+              <dd class="mc-loan mt-1 text-[17px] font-semibold text-white">—</dd>
+            </div>
+            <div>
+              <dt class="label-sm text-navy-100/70">Down payment</dt>
+              <dd class="mc-downamt mt-1 text-[17px] font-semibold text-white">—</dd>
+            </div>
+            <div class="col-span-2">
+              <dt class="label-sm text-navy-100/70">Cash needed upfront (incl. ~3% fees)</dt>
+              <dd class="mc-upfront mt-1 text-[17px] font-semibold text-gold-500">—</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div>
+          <a
+            class="mc-wa btn-gold w-full !px-5"
+            href={`https://wa.me/${SITE.whatsappNumber}`}
+            target="_blank"
+            rel="noopener"
+            data-track="whatsapp_calculator"
+          >
+            Check if I qualify
+          </a>
+          <p class="mt-3 text-[13px] leading-relaxed text-navy-100/70">
+            Send me these numbers and I’ll tell you honestly what the banks are likely to approve.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Gold range sliders, matching the Properties size filter */
+  .mc-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 36px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .mc-range::-webkit-slider-runnable-track {
+    height: 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, currentColor 22%, transparent);
+  }
+  .mc-range::-moz-range-track {
+    height: 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, currentColor 22%, transparent);
+  }
+  .mc-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -8.5px;
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    background: #c9a227;
+    border: 3px solid #0a2540;
+    box-shadow: 0 1px 5px rgb(0 0 0 / 0.45);
+  }
+  .mc-range::-moz-range-thumb {
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    background: #c9a227;
+    border: 3px solid #0a2540;
+    box-shadow: 0 1px 5px rgb(0 0 0 / 0.45);
+  }
+  .mc-range:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid #c9a227;
+    outline-offset: 2px;
+  }
+  .mc-monthly {
+    transition: color 0.25s ease;
+  }
+</style>
+
+<script is:inline define:vars={{ id, waNumber: SITE.whatsappNumber }}>
+  (function () {
+    const root = document.getElementById(id);
+    if (!root) return;
+    const $ = (s) => root.querySelector(s);
+    const priceEl = $('.mc-price');
+    const down = $('.mc-down');
+    const rate = $('.mc-rate');
+    const years = $('.mc-years');
+    const project = root.dataset.project || '';
+
+    const fmt = (n) => Math.round(n).toLocaleString('en-US');
+    const num = (s) => parseFloat(String(s).replace(/[^\d.]/g, '')) || 0;
+
+    function calc() {
+      const price = num(priceEl.value);
+      const dPct = +down.value;
+      const r = +rate.value;
+      const yrs = +years.value;
+
+      const loan = price * (1 - dPct / 100);
+      const downAmt = price - loan;
+      const i = r / 100 / 12;
+      const n = yrs * 12;
+      // standard amortising instalment; i=0 falls back to straight division
+      const monthly = i > 0 ? (loan * i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1) : loan / n;
+      // rough upfront: down payment + ~3% legal fees, stamp duty and disbursements
+      const upfront = downAmt + price * 0.03;
+
+      root.querySelector('.mc-out-down').textContent = dPct + '%';
+      root.querySelector('.mc-out-rate').textContent = r.toFixed(2) + '%';
+      root.querySelector('.mc-out-years').textContent = yrs + ' yrs';
+      root.querySelector('.mc-monthly').textContent = 'RM ' + (price ? fmt(monthly) : '0');
+      root.querySelector('.mc-loan').textContent = 'RM ' + fmt(loan);
+      root.querySelector('.mc-downamt').textContent = 'RM ' + fmt(downAmt);
+      root.querySelector('.mc-upfront').textContent = 'RM ' + fmt(upfront);
+
+      // The WhatsApp message carries the buyer's own numbers — it arrives
+      // already qualified instead of a blank "hi".
+      const msg =
+        'Hi Lawrence, I used the calculator on your website' +
+        (project ? ` for ${project}` : '') +
+        `.\n\nPrice: RM ${fmt(price)}\nDown payment: ${dPct}% (RM ${fmt(downAmt)})\n` +
+        `Loan: RM ${fmt(loan)} over ${yrs} years at ${r.toFixed(2)}%\n` +
+        `Monthly: about RM ${fmt(monthly)}\n\nCan you advise if this is realistic for me?`;
+      root.querySelector('.mc-wa').href =
+        'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(msg);
+    }
+
+    // Keep the price box readable while typing (thousands separators)
+    priceEl.addEventListener('input', function () {
+      const raw = num(priceEl.value);
+      const pos = priceEl.selectionStart;
+      const before = priceEl.value.length;
+      priceEl.value = raw ? raw.toLocaleString('en-US') : '';
+      const after = priceEl.value.length;
+      try {
+        priceEl.setSelectionRange(pos + (after - before), pos + (after - before));
+      } catch (e) {}
+      calc();
+    });
+    [down, rate, years].forEach((el) => el.addEventListener('input', calc));
+    calc();
+  })();
+</script>

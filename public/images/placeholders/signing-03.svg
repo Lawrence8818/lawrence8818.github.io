@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A2540"/>
+      <stop offset="1" stop-color="#071A30"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#g)"/>
+  <rect x="32" y="36" width="736" height="528" fill="none" stroke="#C9A227" stroke-width="2" stroke-dasharray="10 8" opacity="0.7"/>
+  <text x="50%" y="46%" text-anchor="middle" font-family="system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="54" fill="#C9A227" font-weight="bold">签约照</text>
+  <text x="50%" y="60%" text-anchor="middle" font-family="system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="33" fill="#F7F5F0" opacity="0.85">待替换:客户签约照片 3</text>
+</svg>
