@@ -7,7 +7,7 @@ import { SITE } from '../data/site';
 // lawrencelawproperty.com, so the shared menu must work from any pasted page.
 // Section links (#videos/#areas/#testimonials) land on the main page.
 const navItems = [
-  { href: url('/'), label: 'Home' },
+  { href: 'https://lawrencelawproperty.com/', label: 'Home' },
   { href: 'https://lawrencelawproperty.com/allproperties', label: 'Properties' },
   { href: 'https://lawrencelawproperty.com/buyerguide', label: 'Buyer Guides' },
   { href: 'https://lawrencelawproperty.com/#areas', label: 'Areas' },
@@ -19,7 +19,7 @@ const navItems = [
 
 <header class="sticky top-0 z-40 bg-navy-900">
   <div class="container-site flex h-[72px] items-center justify-between gap-3">
-    <a href={url('/')} class="flex min-w-0 items-center gap-3" aria-label="LLP Property — home">
+    <a href="https://lawrencelawproperty.com/" class="flex min-w-0 items-center gap-3" aria-label="LLP Property — home">
       {/* Gold emblem image + the LLP PROPERTY wordmark recreated in type,
           matching Lawrence's logo lockup (crisp at any size) */}
       <img
