@@ -142,6 +142,7 @@ const priceLabel = /^RM/.test(priceFrom) ? `From ${priceFrom}` : priceFrom;
           href={listingUrl || waLink(contactMsg)}
           target="_blank"
           rel="noopener"
+          data-track={listingUrl ? undefined : 'whatsapp_property'}
           class="btn-gold-outline !px-4 !py-2.5 !text-sm"
         >
           View Listing
