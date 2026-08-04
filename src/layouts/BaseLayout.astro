@@ -73,10 +73,11 @@ const siteUrl = Astro.site?.href ?? 'https://lawrencelawproperty.com';
         if (!el) return;
         var name = el.getAttribute('data-track');
         if (typeof window.gtag === 'function') {
-          window.gtag('event', 'whatsapp_click', { source: name });
+          window.gtag('event', name, { page_path: location.pathname });
         }
         if (typeof window.fbq === 'function') {
-          window.fbq('track', 'Contact', { source: name });
+          if (name.indexOf('whatsapp') === 0) window.fbq('track', 'Contact', { source: name });
+          else window.fbq('trackCustom', name, { page_path: location.pathname });
         }
       });
     </script>

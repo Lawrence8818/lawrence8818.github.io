@@ -47,7 +47,7 @@ export const SITE = {
    * Analytics IDs — leave empty and the corresponding script never loads.
    * GA4: like 'G-XXXXXXXXXX'; Meta Pixel: numeric ID.
    */
-  ga4Id: '',
+  ga4Id: 'G-2G3M1Y4Q6Q',
   metaPixelId: '',
 
   /**
