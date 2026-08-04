@@ -48,7 +48,7 @@ export const SITE = {
    * GA4: like 'G-XXXXXXXXXX'; Meta Pixel: numeric ID.
    */
   ga4Id: 'G-2G3M1Y4Q6Q',
-  metaPixelId: '',
+  metaPixelId: '1448303492862108',
 
   /**
    * Contact form (backup conversion channel). After creating a form on
