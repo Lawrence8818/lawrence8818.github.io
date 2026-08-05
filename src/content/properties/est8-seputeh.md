@@ -1,12 +1,12 @@
 ---
 name: "Est8 Seputeh"
-priceFrom: "RM 700,000"
+priceFrom: "RM 529,000"
 location: "Seputeh, KL"
 region: "kuala-lumpur"
-tenure: "Freehold"
-landSize: "4 acres"
+tenure: "Leasehold (2118)"
+landSize: "2.9 acres"
 layoutSize: "753–2,884 sf"
-completion: "Completed 2024"
+completion: "Est Q3 2026"
 image: /images/property-est8-seputeh.jpg
 fallbackImage: /images/placeholders/property-02.svg
 penthouse: true

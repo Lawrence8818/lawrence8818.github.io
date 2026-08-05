@@ -1,6 +1,6 @@
 ---
 name: "Laurel Residence"
-priceFrom: "RM 530,000"
+priceFrom: "Price on request"
 location: "Bangsar South, KL"
 region: "kuala-lumpur"
 tenure: "Leasehold"

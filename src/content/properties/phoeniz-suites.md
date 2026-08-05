@@ -1,6 +1,6 @@
 ---
 name: "Phoeniz Suites"
-priceFrom: "RM 1,016,400"
+priceFrom: "RM 914,760"
 location: "Jalan Yap Kwan Seng, KLCC"
 region: "klcc"
 tenure: "Freehold"

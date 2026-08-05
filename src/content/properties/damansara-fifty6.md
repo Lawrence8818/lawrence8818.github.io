@@ -1,12 +1,12 @@
 ---
 name: "Damansara Fifty6"
-priceFrom: "RM 2,500,000"
+priceFrom: "RM 1,361,000"
 location: "Damansara Heights, KL"
 region: "kuala-lumpur"
-tenure: "Freehold"
-landSize: "-"
+tenure: "Leasehold (2108)"
+landSize: "1.11 acres"
 layoutSize: "2,200–4,300 sf"
-completion: "Completed 2024"
+completion: "Completed"
 image: /images/property-damansara-fifty6.jpg
 fallbackImage: /images/placeholders/property-06.svg
 penthouse: true

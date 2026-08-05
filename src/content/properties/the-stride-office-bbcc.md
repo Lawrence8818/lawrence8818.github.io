@@ -4,9 +4,9 @@ priceFrom: "Price on request"
 location: "Bukit Bintang City Centre, KL"
 region: "kuala-lumpur"
 tenure: "Leasehold"
-landSize: "-"
+landSize: "Part of 19.4-acre BBCC"
 layoutSize: "1,087+ sf"
-completion: "Completed 2023"
+completion: "Completed 2022–2023"
 image: /images/property-the-stride-office-bbcc.jpg
 fallbackImage: /images/placeholders/property-03.svg
 order: 71

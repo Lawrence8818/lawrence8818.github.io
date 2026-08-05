@@ -1,6 +1,6 @@
 ---
 name: "Khaya Residences"
-priceFrom: "RM 500,000"
+priceFrom: "Price on request"
 location: "Jalan Bangsar, KL"
 region: "kuala-lumpur"
 tenure: "Leasehold"

@@ -1,10 +1,10 @@
 ---
 name: "Kyliez Suites"
-priceFrom: "Price on request"
+priceFrom: "RM 695,733"
 location: "KLCC, KL"
 region: "klcc"
 tenure: "Freehold"
-landSize: "0.38 acres"
+landSize: "0.3769 acre"
 layoutSize: "323–560 sf"
 completion: "Q4 2027"
 image: /images/property-kyliez-suites.jpg

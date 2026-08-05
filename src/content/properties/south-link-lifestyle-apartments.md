@@ -1,6 +1,6 @@
 ---
 name: "South Link Lifestyle Apartments"
-priceFrom: "RM 380,000"
+priceFrom: "Price on request"
 location: "Bangsar South, KL"
 region: "kuala-lumpur"
 tenure: "Freehold"

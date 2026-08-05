@@ -1,5 +1,5 @@
 ---
-name: "OAKA Residence"
+name: "OAKA Residences"
 label: "FAMILY-ORIENTED"
 priceFrom: "RM 760,000"
 location: "Bukit Jalil, Kuala Lumpur"

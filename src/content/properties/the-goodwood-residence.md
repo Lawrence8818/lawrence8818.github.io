@@ -1,6 +1,6 @@
 ---
 name: "The Goodwood Residence"
-priceFrom: "RM 859,000"
+priceFrom: "Price on request"
 location: "Bangsar South, KL"
 region: "kuala-lumpur"
 tenure: "Leasehold"

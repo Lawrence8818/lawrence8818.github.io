@@ -1,5 +1,5 @@
 ---
-name: "Avantro Residence"
+name: "Avantro Residences"
 priceFrom: "RM 664,000"
 location: "Puchong BK5"
 region: "selangor"
