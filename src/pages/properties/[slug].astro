@@ -66,6 +66,14 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
             <span>{REGION_LABEL[d.region]}</span>
           </>
         )}
+        {d.location.includes('Bukit Jalil') && (
+          <>
+            <span class="mx-2 opacity-40">·</span>
+            <a href="https://lawrencelawproperty.com/bukitjalil" class="inline-flex min-h-11 items-center text-gold-500 hover:underline">
+              Explore Bukit Jalil →
+            </a>
+          </>
+        )}
       </nav>
 
       <div class="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
@@ -123,6 +131,11 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
             >
               Ask About This Project
             </a>
+            {d.landingUrl && (
+              <a href={d.landingUrl} class="btn-gold-outline text-white">
+                Full Project Tour
+              </a>
+            )}
             {d.listingUrl && (
               <a href={d.listingUrl} target="_blank" rel="noopener" class="btn-gold-outline text-white">
                 Developer Site

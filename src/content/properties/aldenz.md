@@ -8,6 +8,7 @@ landSize: "2.555 acres"
 layoutSize: "775–926 sf"
 maintenance: "RM 0.42 psf"
 monthly: "RM 2,500"
+landingUrl: "https://lawrencelawproperty.com/aldenzexsim"
 completion: "2029"
 image: /images/property-aldenz.jpg
 fallbackImage: /images/placeholders/property-03.svg

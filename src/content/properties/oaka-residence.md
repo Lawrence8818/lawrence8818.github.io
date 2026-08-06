@@ -9,6 +9,7 @@ landSize: "2.2 acres"
 layoutSize: "882–1,423 sf"
 maintenance: "RM 0.33 psf"
 monthly: "RM 3,300"
+landingUrl: "https://lawrencelawproperty.com/oakaberjaya"
 completion: "Feb 2028"
 image: /images/property-oaka.jpg
 fallbackImage: /images/placeholders/property-01.svg

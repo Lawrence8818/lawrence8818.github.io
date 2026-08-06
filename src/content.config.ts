@@ -92,6 +92,9 @@ const properties = defineCollection({
     /** branded placeholder shown until the real photo file is uploaded */
     fallbackImage: z.string().default('/images/placeholders/property-01.svg'),
     listingUrl: z.string().optional(),
+    /** Lawrence's own conversion landing page on the main domain — when set,
+     *  card links and the detail page's "Full Project Tour" button use it */
+    landingUrl: z.string().optional(),
     featured: z.boolean().default(false),
     order: z.number(),
     /** true = sample data, card shows a "Sample" tag; replace before launch */

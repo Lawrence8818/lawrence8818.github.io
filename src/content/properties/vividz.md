@@ -8,6 +8,7 @@ landSize: "2.55 acres"
 layoutSize: "484–915 sf"
 maintenance: "RM 0.44 psf"
 monthly: "RM 1,700"
+landingUrl: "https://lawrencelawproperty.com/vividzexsim"
 completion: "Q2 2029"
 image: /images/property-vividz.jpg
 fallbackImage: /images/placeholders/property-05.svg

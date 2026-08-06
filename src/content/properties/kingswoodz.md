@@ -8,6 +8,7 @@ landSize: "3.45 acres"
 layoutSize: "474–904 sf"
 maintenance: "RM 0.42 psf"
 monthly: "RM 1,700"
+landingUrl: "https://lawrencelawproperty.com/kingswoodzexsim"
 completion: "Q4 2028"
 image: /images/property-kingswoodz.jpg
 fallbackImage: /images/placeholders/property-05.svg

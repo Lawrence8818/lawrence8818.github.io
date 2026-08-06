@@ -167,7 +167,7 @@ const marqueeItems =
           <div class="flex gap-6 pr-6 pl-0" aria-hidden={copy > 0 ? 'true' : undefined}>
             {featuredProperties.map((p) => (
               <div class="group w-[280px] sm:w-[340px] lg:w-[400px]">
-                <a href={url(`/properties/${p.id}/`)} class="block" tabindex={copy > 0 ? -1 : undefined}>
+                <a href={p.data.landingUrl || url(`/properties/${p.id}/`)} class="block" tabindex={copy > 0 ? -1 : undefined}>
                   <div class="relative aspect-[4/3] overflow-hidden bg-navy-900">
                     <img
                       src={url(p.data.image)}
@@ -201,7 +201,7 @@ const marqueeItems =
                   <a href={waLink(waContextMessage(p.data.name))} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4" data-track="whatsapp_property" tabindex={copy > 0 ? -1 : undefined}>
                     Contact Us
                   </a>
-                  <a href={url(`/properties/${p.id}/`)} class="inline-flex min-h-11 items-center font-semibold text-ink/60 hover:text-navy-900" tabindex={copy > 0 ? -1 : undefined}>
+                  <a href={p.data.landingUrl || url(`/properties/${p.id}/`)} class="inline-flex min-h-11 items-center font-semibold text-ink/60 hover:text-navy-900" tabindex={copy > 0 ? -1 : undefined}>
                     Details
                   </a>
                 </div>
@@ -322,6 +322,14 @@ const marqueeItems =
     <div class="container-site">
       <SectionHeading title="Areas I Serve" sub="Coverage" />
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Bukit Jalil has its own dedicated intro page on the main domain */}
+        <a href="https://lawrencelawproperty.com/bukitjalil" class="card group block border-gold-500/50 transition-colors hover:border-gold-500">
+          <p class="text-xl font-bold tracking-tight text-navy-900 uppercase group-hover:text-gold-600">Bukit Jalil</p>
+          <div class="gold-rule mt-3 mb-4 !w-10"></div>
+          <p class="text-sm leading-relaxed text-ink/80">
+            KL's fastest-growing township — parks, stadiums, Pavilion Bukit Jalil and a wave of new launches. Read my full area guide, then browse every project I cover here.
+          </p>
+        </a>
         {areas.map((a) => (
           <AreaCard
             slug={a.id}

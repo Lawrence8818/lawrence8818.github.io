@@ -8,6 +8,7 @@ landSize: "9.66 acres"
 layoutSize: "559–1,420 sf"
 maintenance: "RM 0.32 psf"
 monthly: "RM 2,650"
+landingUrl: "https://lawrencelawproperty.com/theatera"
 completion: "Nov 2027"
 image: /images/property-atera.jpg
 fallbackImage: /images/placeholders/property-01.svg

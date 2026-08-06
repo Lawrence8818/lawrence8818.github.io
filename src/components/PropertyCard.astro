@@ -17,6 +17,8 @@ interface Props {
   image: string;
   fallbackImage?: string;
   listingUrl?: string;
+  /** Lawrence's own landing page — outranks the generated detail page */
+  landingUrl?: string;
   placeholder?: boolean;
   soldOut?: boolean;
   penthouse?: boolean;
@@ -37,13 +39,14 @@ const {
   image,
   fallbackImage,
   listingUrl,
+  landingUrl,
   placeholder = false,
   soldOut = false,
   penthouse = false,
   slug,
 } = Astro.props;
 
-const detailHref = slug ? url(`/properties/${slug}/`) : undefined;
+const detailHref = landingUrl || (slug ? url(`/properties/${slug}/`) : undefined);
 
 const specs = [
   { k: 'Land Tenure', v: tenure },

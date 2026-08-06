@@ -9,6 +9,7 @@ landSize: "3.44 acres"
 layoutSize: "807–1,410 sf"
 maintenance: "RM 0.42 psf"
 monthly: "RM 2,700"
+landingUrl: "https://lawrencelawproperty.com/queenswoodzexsim"
 completion: "2029"
 image: /images/property-queenswoodz.jpg
 fallbackImage: /images/placeholders/property-02.svg
