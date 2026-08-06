@@ -55,6 +55,8 @@ for (const need of ['slug', 'name', 'region', 'tenure', 'completion', 'price_fro
 }
 
 const REGIONS = ['kuala-lumpur', 'klcc', 'petaling-jaya', 'selangor', 'johor', 'penang'];
+/** Optional fields an empty CSV cell is allowed to remove (see setStr). */
+const CLEARABLE = new Set(['landingUrl']);
 const q = (v) => '"' + String(v).replace(/"/g, '\\"') + '"';
 
 let changedFiles = 0, created = 0;
@@ -129,7 +131,16 @@ for (const line of lines) {
     const re = new RegExp('^' + key + ':\\s*(.*)$', 'm');
     const m = raw.match(re);
     const old = m ? m[1].trim().replace(/^["']|["']$/g, '') : undefined;
-    if (value === '' || value === undefined) return; // never blank a field from CSV silence
+    if (value === '' || value === undefined) {
+      // Blank normally means "no info in the sheet" and is ignored, so a
+      // half-filled row can never wipe live copy. CLEARABLE fields are the
+      // exception: they're optional extras, so an empty cell removes them
+      // (e.g. taking a landing page down).
+      if (!CLEARABLE.has(key) || !m) return;
+      raw = raw.replace(new RegExp('^' + key + ':.*\\n', 'm'), '');
+      edits.push(key + ': ' + old + ' → (已移除)');
+      return;
+    }
     if (old === value) return;
     if (m) raw = raw.replace(re, key + ': ' + q(value));
     else raw = raw.replace(/^(completion:.*)$/m, key + ': ' + q(value) + '\n$1');

@@ -9,7 +9,6 @@ landSize: "2.29 acres"
 layoutSize: "1,012 sf"
 maintenance: "RM 0.38 psf"
 monthly: "RM 2,900"
-landingUrl: "https://lawrencelawproperty.com/veladazexsim"
 completion: "Q3 2027"
 image: /images/property-veladaz.jpg
 fallbackImage: /images/placeholders/property-06.svg
