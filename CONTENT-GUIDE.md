@@ -235,6 +235,33 @@ hotProjects:
     note: 靠近 MRT
 ```
 
+## 🎯 加一个项目落地页(landing page)
+
+落地页在 **网站这个 session 做**(这里有品牌样式、86 个项目数据、追踪代码),
+做好后贴到 qiai;`Project-Info-Master` 只负责记录"哪个项目有落地页"这个事实。
+两边分工:**资料的源头在 master,建造的源头在这里。**
+
+```
+① 你在这个 session 做落地页
+        ↓
+② 你贴到 qiai,拿到网址(如 lawrencelawproperty.com/papyrusexsim)
+        ↓
+③ 跟 Claude 说一声 —— 剩下的全自动:
+     ⒜ 写进 master CSV 的 landing_page 栏 + push
+        (master 依然是资料的唯一源头,你不用去那边手动填)
+     ⒝ 同步到网站:卡片(图片/标题/View Details)、详情页
+        「Full Project Tour」按钮、首页楼盘滚动条 —— 全部自动接好
+     ⒞ 重建 Copy HTML → 你重贴受影响的页面(通常是 Home + All Properties)
+```
+
+**撤下一个落地页**(项目售罄等):跟 Claude 说一声就行 —— 把 master CSV 那一格清空,
+同步后卡片自动改回 github.io 详情页,「Full Project Tour」按钮自动消失。
+qiai 上那个页面本身留着不影响(没有入口),以后要接回来随时说。
+
+**注意**:落地页的 HTML 目前只存在 qiai 后台,仓库里没有备份。
+建议把每一页的 HTML 交给 Claude 归档进 `landing-pages/`,这样有版本历史、
+以后改价格或加追踪能直接动源码。
+
 ## 🔄 改完之后怎么发布?
 
 1. 所有改动 push 到 GitHub 的 `main` 分支;
