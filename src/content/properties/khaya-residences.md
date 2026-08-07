@@ -6,6 +6,7 @@ region: "kuala-lumpur"
 tenure: "Leasehold"
 landSize: "-"
 layoutSize: "630–1,321 sf"
+landingUrl: "https://lawrencelawproperty.com/khayabangsar"
 completion: "2029"
 image: /images/property-khaya-residences.jpg
 fallbackImage: /images/placeholders/property-04.svg

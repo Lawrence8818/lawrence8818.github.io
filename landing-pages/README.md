@@ -37,3 +37,38 @@ Lawrence 手工做的项目落地页,发布在主域名 qiai 上。这个资料�
 网址记录在 `Project-Info-Master` 的 `landing_page` 栏,同步后自动接进
 All Properties 卡片、详情页「Full Project Tour」按钮、首页楼盘滚动条。
 详见 `CONTENT-GUIDE.md` 的「🎯 加一个项目落地页」。
+
+---
+
+## 归档进度(2026-08-06)
+
+| 落地页 | 状态 | 来源 |
+|---|---|---|
+| oakaberjaya | ✅ 已归档 4.4MB | Copy artifact |
+| vividzexsim | ✅ 已归档 3.6MB | Copy artifact |
+| queenswoodzexsim | ✅ 已归档 3.1MB(Version F) | Copy artifact |
+| aldenzexsim | ✅ 已归档 2.5MB | Copy artifact |
+| renbukitjalil | ✅ 已归档 2.0MB | Copy artifact |
+| deviaexsim | ✅ 已归档 1.5MB | Copy artifact |
+| theatera | ⬜ 待补 | artifact 超出可列范围 |
+| kingswoodzexsim | ⬜ 待补 | 同上 |
+| veladazexsim | ⬜ 待补 | 同上(已售罄) |
+| bukitjalil | ⬜ 待补 | 同上(区域页) |
+
+**未归档的 4 页怎么补**:到 Landing Page Center 那个 session,
+让它把该页的 Copy artifact 链接发给你,贴给我,我直接抓取归档。
+(artifact 列表只能列最近 50 个,这 4 页做得比较早所以列不到。)
+
+## 审计结果摘要
+
+- ~~追踪全部是占位符~~ **已修复**: —— 6 页的 `G-XXXXXXXXXX` / `AW-XXXXXXXXX`
+  原本 `G-XXXXXXXXXX` / `AW-XXXXXXXXX` 从未替换、Meta Pixel 完全没有,
+  现已接上 GA4 `G-2G3M1Y4Q6Q` + Pixel `1448303492862108`。
+  WhatsApp 点击 → `whatsapp_landing` + Meta `Contact`;
+  表单提交 → `lead_form_submit` + Meta `Lead`。
+- WhatsApp 号码 6 页一致(60199939860)✅
+- 每页 1 个表单 + 内建 thank-you 视图 ✅
+- canonical 已全部指向 lawrencelawproperty.com/<页面>(OAKA 原指 oakakl.com、
+  Queenswoodz 原指 thequeenswoodz.com,已按 Lawrence 决定改掉;另 4 页原本完全没有)
+- deviaexsim 有 10 处 "To be confirmed"(brochure 无 APDL 资料)
+- 5 页从 Google Fonts 外链字体(queenswoodz 已内嵌)—— 广告拦截器可能导致字体回退
