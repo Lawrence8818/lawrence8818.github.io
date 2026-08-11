@@ -30,8 +30,8 @@ const id = 'mc-' + Math.random().toString(36).slice(2, 8);
     <h2 class:list={['section-heading', dark && 'text-white']}>{heading}</h2>
     <div class="gold-rule"></div>
     <p class:list={['mb-8 max-w-2xl text-[17px] leading-[1.8]', dark ? 'text-navy-100' : 'text-ink']}>
-      Move the sliders to see the monthly instalment and the cash you need upfront. It is an
-      estimate to help you plan, not a bank approval — your final rate depends on your profile.
+      Move the sliders to see the monthly instalment, the loan amount and the down payment. It is
+      an estimate to help you plan, not a bank approval — your final rate depends on your profile.
     </p>
 
     <div
@@ -115,10 +115,6 @@ const id = 'mc-' + Math.random().toString(36).slice(2, 8);
             <div>
               <dt class="label-sm text-navy-100/70">Down payment</dt>
               <dd class="mc-downamt mt-1 text-[17px] font-semibold text-white">—</dd>
-            </div>
-            <div class="col-span-2">
-              <dt class="label-sm text-navy-100/70">Cash needed upfront</dt>
-              <dd class="mc-upfront mt-1 text-[17px] font-semibold text-gold-500">—</dd>
             </div>
           </dl>
         </div>
@@ -217,11 +213,6 @@ const id = 'mc-' + Math.random().toString(36).slice(2, 8);
       const n = yrs * 12;
       // standard amortising instalment; i=0 falls back to straight division
       const monthly = i > 0 ? (loan * i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1) : loan / n;
-      // Cash on the day is the down payment, nothing more. Legal fees and stamp
-      // duty are not quoted here — on these launches they are routinely absorbed
-      // by the developer, so adding a blanket ~3% overstated it by tens of
-      // thousands and scared buyers off a deal they could actually afford.
-      const upfront = downAmt;
 
       root.querySelector('.mc-out-down').textContent = dPct + '%';
       root.querySelector('.mc-out-rate').textContent = r.toFixed(2) + '%';
@@ -229,7 +220,6 @@ const id = 'mc-' + Math.random().toString(36).slice(2, 8);
       root.querySelector('.mc-monthly').textContent = 'RM ' + (price ? fmt(monthly) : '0');
       root.querySelector('.mc-loan').textContent = 'RM ' + fmt(loan);
       root.querySelector('.mc-downamt').textContent = 'RM ' + fmt(downAmt);
-      root.querySelector('.mc-upfront').textContent = 'RM ' + fmt(upfront);
 
       // The WhatsApp message carries the buyer's own numbers — it arrives
       // already qualified instead of a blank "hi".
