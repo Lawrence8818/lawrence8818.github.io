@@ -117,7 +117,7 @@ const id = 'mc-' + Math.random().toString(36).slice(2, 8);
               <dd class="mc-downamt mt-1 text-[17px] font-semibold text-white">—</dd>
             </div>
             <div class="col-span-2">
-              <dt class="mc-upfront-label label-sm text-navy-100/70">Cash needed upfront (incl. ~3% fees)</dt>
+              <dt class="label-sm text-navy-100/70">Cash needed upfront</dt>
               <dd class="mc-upfront mt-1 text-[17px] font-semibold text-gold-500">—</dd>
             </div>
           </dl>
@@ -217,10 +217,11 @@ const id = 'mc-' + Math.random().toString(36).slice(2, 8);
       const n = yrs * 12;
       // standard amortising instalment; i=0 falls back to straight division
       const monthly = i > 0 ? (loan * i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1) : loan / n;
-      // rough upfront: down payment + ~3% legal fees, stamp duty and disbursements.
-      // At 0% down the package is a full-loan deal — the developer absorbs those
-      // costs, so there is nothing to bring on the day.
-      const upfront = dPct > 0 ? downAmt + price * 0.03 : 0;
+      // Cash on the day is the down payment, nothing more. Legal fees and stamp
+      // duty are not quoted here — on these launches they are routinely absorbed
+      // by the developer, so adding a blanket ~3% overstated it by tens of
+      // thousands and scared buyers off a deal they could actually afford.
+      const upfront = downAmt;
 
       root.querySelector('.mc-out-down').textContent = dPct + '%';
       root.querySelector('.mc-out-rate').textContent = r.toFixed(2) + '%';
@@ -229,8 +230,6 @@ const id = 'mc-' + Math.random().toString(36).slice(2, 8);
       root.querySelector('.mc-loan').textContent = 'RM ' + fmt(loan);
       root.querySelector('.mc-downamt').textContent = 'RM ' + fmt(downAmt);
       root.querySelector('.mc-upfront').textContent = 'RM ' + fmt(upfront);
-      root.querySelector('.mc-upfront-label').textContent =
-        dPct > 0 ? 'Cash needed upfront (incl. ~3% fees)' : 'Cash needed upfront';
 
       // The WhatsApp message carries the buyer's own numbers — it arrives
       // already qualified instead of a blank "hi".
