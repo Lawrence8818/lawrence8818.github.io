@@ -47,7 +47,7 @@ const siteUrl = Astro.site?.href ?? 'https://lawrencelawproperty.com';
     {SITE.ga4Id && (
       <script
         is:inline
-        set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${SITE.ga4Id}');`}
+        set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${SITE.ga4Id}',{linker:{domains:${JSON.stringify(SITE.analyticsDomains)},accept_incoming:true}});`}
       />
     )}
     {/* Meta Pixel — only rendered when metaPixelId is set */}

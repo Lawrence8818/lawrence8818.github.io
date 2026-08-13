@@ -51,6 +51,20 @@ export const SITE = {
   metaPixelId: '1448303492862108',
 
   /**
+   * Every host the funnel spans. A visitor crosses from the qiai-hosted pages
+   * to the detail pages on github.io mid-journey; without these listed, GA4
+   * ends the session at the hop and re-attributes the WhatsApp click to a
+   * self-referral instead of the ad that paid for it. Also add them under
+   * GA4 → Admin → Data streams → Configure tag settings → List unwanted
+   * referrals, or the referral itself still restarts the session.
+   */
+  analyticsDomains: [
+    'lawrencelawproperty.com',
+    'www.lawrencelawproperty.com',
+    'lawrence8818.github.io',
+  ],
+
+  /**
    * Contact form (backup conversion channel). After creating a form on
    * formspree.io, paste its endpoint here (like 'https://formspree.io/f/xxxxxxxx').
    * Leave empty and the contact page shows WhatsApp only.
