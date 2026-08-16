@@ -9,6 +9,7 @@ landSize: "—"
 layoutSize: "1,201–1,905 sf"
 maintenance: "RM 0.44 psf"
 monthly: "RM 4,500"
+landingUrl: "https://lawrencelawproperty.com/parkgreenmalton"
 completion: "Mar 2029"
 image: /images/property-park-green.jpg
 fallbackImage: /images/placeholders/property-06.svg
