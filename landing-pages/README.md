@@ -12,13 +12,15 @@ Lawrence 手工做的项目落地页,发布在主域名 qiai 上。这个资料�
 | `oakaberjaya.html` | lawrencelawproperty.com/oakaberjaya | OAKA Residences |
 | `queenswoodzexsim.html` | …/queenswoodzexsim | Queenswoodz |
 | `renbukitjalil.html` | …/renbukitjalil | REN Residence |
-| `kingswoodzexsim.html` | …/kingswoodzexsim | Kingswoodz |
 | `vividzexsim.html` | …/vividzexsim | Vividz |
-| `theatera.html` | …/theatera | Atera |
 | `aldenzexsim.html` | …/aldenzexsim | Aldenz |
 | `deviaexsim.html` | …/deviaexsim | D'Evia |
-| `bukitjalil.html` | …/bukitjalil | Bukit Jalil 区域介绍 |
-| `veladazexsim.html` | …/veladazexsim | Veladaz(已售罄,网站链接已撤) |
+| `clouthausklcc.html` | …/clouthausklcc | cloutHaus KLCC |
+| `khayabangsar.html` | …/khayabangsar | Khaya Bangsar |
+| `parkgreenmalton.html` | …/parkgreenmalton | Park Green |
+
+这 9 个就是全部。曾经列在这里的 `kingswoodzexsim` / `theatera` /
+`bukitjalil` / `veladazexsim` 已确定不保留,见下方「归档进度」。
 
 ## 怎么归档一页(从 qiai 拿源码)
 
@@ -40,24 +42,48 @@ All Properties 卡片、详情页「Full Project Tour」按钮、首页楼盘滚
 
 ---
 
-## 归档进度(2026-08-06)
+## 归档进度(2026-09-20 对账完毕)
 
-| 落地页 | 状态 | 来源 |
+依据 qiai 后台页面列表截图逐页对账。**qiai 共 25 页**,结论如下。
+
+### 已归档 · 9 页(全部已成为真实路由)
+
+| 落地页 | 大小 | qiai 后台名称 |
 |---|---|---|
-| oakaberjaya | ✅ 已归档 4.4MB | Copy artifact |
-| vividzexsim | ✅ 已归档 3.6MB | Copy artifact |
-| queenswoodzexsim | ✅ 已归档 3.1MB(Version F) | Copy artifact |
-| aldenzexsim | ✅ 已归档 2.5MB | Copy artifact |
-| renbukitjalil | ✅ 已归档 2.0MB | Copy artifact |
-| deviaexsim | ✅ 已归档 1.5MB | Copy artifact |
-| theatera | ⬜ 待补 | artifact 超出可列范围 |
-| kingswoodzexsim | ⬜ 待补 | 同上 |
-| veladazexsim | ⬜ 待补 | 同上(已售罄) |
-| bukitjalil | ⬜ 待补 | 同上(区域页) |
+| oakaberjaya | 4.4MB | Oaka Bukit Jalil |
+| vividzexsim | 3.6MB | Vividz Residence |
+| parkgreenmalton | 3.1MB | Park Green Bukit Jalil |
+| queenswoodzexsim | 3.1MB | Queenswoodz exsim |
+| clouthausklcc | 2.7MB | cloutHaus KLCC |
+| aldenzexsim | 2.5MB | Aldenz PJ |
+| khayabangsar | 2.1MB | Khaya Bangsar |
+| renbukitjalil | 1.9MB | Ren Bukit Jalil |
+| deviaexsim | 1.5MB | D'Evia Kwasa Damansara |
 
-**未归档的 4 页怎么补**:到 Landing Page Center 那个 session,
-让它把该页的 Copy artifact 链接发给你,贴给我,我直接抓取归档。
-(artifact 列表只能列最近 50 个,这 4 页做得比较早所以列不到。)
+另有 5 个主页面(Main Page / about / allproperties / Buyer Guide /
+Testimonial)已作为 Astro 页面重建,合计已搬 14 页。
+
+### 不保留 · 11 页(Lawrence 2026-09-20 决定)
+
+| qiai 页面 | 说明 |
+|---|---|
+| Kingswoodz Residence | 原计划重做,决定不要 |
+| Bukit Jalil | 区域介绍页,决定不要 |
+| PJ Atera | 原计划重做,决定不要 |
+| Veladaz Residence | 已售罄,站内链接早已撤除 |
+| 222blueprint | 此前完全未知 |
+| Colonialinfinite | 此前完全未知 |
+| Whycolonialinfinite | 此前完全未知 |
+| Maple OUG | 此前完全未知 |
+| Park Green Pavilion | 与已归档的 Park Green Bukit Jalil 重复 |
+| Queenswoodz Bukit Jalil | 与已归档的 Queenswoodz exsim 重复 |
+| Main Page (Clone) | 首页副本 |
+
+**这些页面随 qiai 退订一并消失,不再归档。** 上面这份清单就是决定记录 ——
+以后若有人问「qiai 上是不是还有东西没搬」,答案在这里,不必再猜。
+
+> 对账之前,这 8 页(Veladaz 之后那 8 项)是整个迁移里唯一不可逆的风险:
+> 仓库和站内链接都反推不出它们的存在。是后台截图把它们找出来的。
 
 ## 审计结果摘要
 

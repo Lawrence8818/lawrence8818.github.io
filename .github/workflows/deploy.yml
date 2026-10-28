@@ -2,12 +2,9 @@
 #
 # ⚠️ 一次性手动设置:GitHub 仓库 Settings → Pages → Source 选 "GitHub Actions"
 #
-# 🌐 以后切换到自定义域名 lawrencelawproperty.com 时,只需三步:
-#   1. 把下面 env 改成:
-#        SITE_URL: https://lawrencelawproperty.com
-#        BASE_PATH: /
-#   2. 新建文件 public/CNAME,内容一行:lawrencelawproperty.com
-#   3. 到域名 DNS 把 www/apex 指向 GitHub Pages(见 README)
+# 🌐 已切换到自定义域名 www.lawrencelawproperty.com(两步走:先 www,再 apex)。
+#    env 和 public/CNAME 都已就位;DNS 步骤见私有仓库 deploy/SWITCH-RUNBOOK.md。
+#    BASE_PATH 本来就是 / —— 用户站从根目录服务,不要改成别的。
 name: Deploy to GitHub Pages
 
 on:
@@ -25,7 +22,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SITE_URL: https://lawrence8818.github.io
+  SITE_URL: https://www.lawrencelawproperty.com
   BASE_PATH: /
 
 jobs:
