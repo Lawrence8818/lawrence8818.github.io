@@ -11,7 +11,6 @@
 | 4 | Orion | `property-orion.jpg` |
 | 5 | Riverville 2 | `property-riverville-2.jpg` |
 | 6 | Avantro Residence | `property-avantro-residence.jpg` |
-| 7 | Aetas Seputeh | `property-aetas-seputeh.jpg` |
 | 8 | Aster Hill | `property-aster-hill.jpg` |
 | 9 | Papyrus | `property-papyrus.jpg` |
 | 10 | Pavilion Square | `property-pavilion-square.jpg` |
@@ -37,7 +36,6 @@
 | 30 | Colonial Infinite @Edu Metro | `property-colonial-infinite.jpg` |
 | 31 | Bangsar Hill Park | `property-bangsar-hill-park.jpg` |
 | 32 | Park Side | `property-park-side.jpg` |
-| 34 | Accent Jaya 33 | `property-accent-jaya-33.jpg` |
 | 35 | Lunar | `property-lunar.jpg` |
 | 36 | Maple | `property-maple.jpg` |
 | 37 | Leverra Phase 2 | `property-leverra-phase-2.jpg` |
