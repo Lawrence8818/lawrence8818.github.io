@@ -11,3 +11,14 @@ npm-debug.log*
 .env.production
 # macOS
 .DS_Store
+
+# 构建时由 scripts/stage-landing-pages.mjs 生成,不是手写的
+/public/aldenzexsim/
+/public/clouthausklcc/
+/public/deviaexsim/
+/public/khayabangsar/
+/public/oakaberjaya/
+/public/parkgreenmalton/
+/public/queenswoodzexsim/
+/public/renbukitjalil/
+/public/vividzexsim/

@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PropertyCard from '../../components/PropertyCard.astro';
-import CTASection from '../../components/CTASection.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PropertyCard from '../components/PropertyCard.astro';
+import CTASection from '../components/CTASection.astro';
 
 // Real projects (order 1–99) come first, sample/demo entries (order 100+) after.
 const properties = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
