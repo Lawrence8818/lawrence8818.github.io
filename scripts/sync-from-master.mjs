@@ -29,7 +29,10 @@ const WRITE = process.argv.includes('--write');
 // 就会当成新项目重建,第二天同步一跑就回来了。列在这里才是真的下架。
 // 资料仍然留在 Project-Info-Master 里(发展商、佣金、户型都不受影响)。
 const NOT_PUBLISHED = new Set([
-  'aetas-taman-desa', // Lawrence 2026-10-28:从网站移除
+  // Avaland 的三个项目,Lawrence 2026-10-28 决定全部不放在网站上
+  'aetas-taman-desa',
+  'aetas-seputeh',
+  'accent-jaya-33',
 ]);
 
 if (!existsSync(CSV)) {
