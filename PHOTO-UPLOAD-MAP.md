@@ -37,7 +37,6 @@
 | 30 | Colonial Infinite @Edu Metro | `property-colonial-infinite.jpg` |
 | 31 | Bangsar Hill Park | `property-bangsar-hill-park.jpg` |
 | 32 | Park Side | `property-park-side.jpg` |
-| 33 | Aetas Taman Desa | `property-aetas-taman-desa.jpg` |
 | 34 | Accent Jaya 33 | `property-accent-jaya-33.jpg` |
 | 35 | Lunar | `property-lunar.jpg` |
 | 36 | Maple | `property-maple.jpg` |

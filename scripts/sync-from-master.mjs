@@ -23,6 +23,15 @@ const CSV =
   process.env.MASTER_CSV || '/workspace/project-info-master/projects-master.csv';
 const WRITE = process.argv.includes('--write');
 
+// CSV 里有、但刻意不放上网站的项目。
+//
+// 光删 src/content/properties/<slug>.md 是不够的:下面看到文件不存在
+// 就会当成新项目重建,第二天同步一跑就回来了。列在这里才是真的下架。
+// 资料仍然留在 Project-Info-Master 里(发展商、佣金、户型都不受影响)。
+const NOT_PUBLISHED = new Set([
+  'aetas-taman-desa', // Lawrence 2026-10-28:从网站移除
+]);
+
 if (!existsSync(CSV)) {
   console.error('master CSV not found: ' + CSV + '\n(clone Project-Info-Master or set MASTER_CSV)');
   process.exit(1);
@@ -59,7 +68,7 @@ const REGIONS = ['kuala-lumpur', 'klcc', 'petaling-jaya', 'selangor', 'johor', '
 const CLEARABLE = new Set(['landingUrl']);
 const q = (v) => '"' + String(v).replace(/"/g, '\\"') + '"';
 
-let changedFiles = 0, created = 0;
+let changedFiles = 0, created = 0, unpublished = 0;
 const report = [], problems = [];
 const csvSlugs = new Set();
 
@@ -75,6 +84,14 @@ for (const line of lines) {
   const slug = v('slug');
   if (!slug) continue;
   csvSlugs.add(slug);
+
+  if (NOT_PUBLISHED.has(slug)) {
+    unpublished++;
+    if (existsSync(PROPS + slug + '.md')) {
+      problems.push(slug + ': 在 NOT_PUBLISHED 名单里,但 src/content/properties/ 还有文件');
+    }
+    continue;
+  }
 
   if (v('region') && !REGIONS.includes(v('region'))) {
     problems.push(slug + ': 无效 region "' + v('region') + '" (可用: ' + REGIONS.join(' / ') + ')');
@@ -169,7 +186,8 @@ const orphans = readdirSync(PROPS)
   .filter((n) => n.endsWith('.md') && !csvSlugs.has(n.replace('.md', '')));
 
 console.log((WRITE ? '已写入' : '试运行(加 --write 才会写入)') +
-  ' · CSV ' + lines.length + ' 行 · 更新 ' + changedFiles + ' · 新增 ' + created);
+  ' · CSV ' + lines.length + ' 行 · 更新 ' + changedFiles + ' · 新增 ' + created +
+  (unpublished ? ' · 不上网站 ' + unpublished : ''));
 if (report.length) console.log('\n' + report.join('\n'));
 if (orphans.length)
   console.log('\n⚠ 网站有但 CSV 没有(不会自动删除,需人工确认): ' + orphans.join(', '));
