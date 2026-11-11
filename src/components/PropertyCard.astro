@@ -1,6 +1,7 @@
 ---
 import { url } from '../lib/url';
 import { waLink, waContextMessage } from '../lib/whatsapp';
+import { landingHref } from '../lib/landing';
 
 interface Props {
   name: string;
@@ -46,7 +47,7 @@ const {
   slug,
 } = Astro.props;
 
-const detailHref = landingUrl || (slug ? url(`/properties/${slug}/`) : undefined);
+const detailHref = landingHref(landingUrl) || (slug ? url(`/properties/${slug}/`) : undefined);
 
 const specs = [
   { k: 'Land Tenure', v: tenure },
