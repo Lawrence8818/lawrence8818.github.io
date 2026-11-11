@@ -35,6 +35,32 @@ const NOT_PUBLISHED = new Set([
   'accent-jaya-33',
 ]);
 
+// 网站上要盖过 CSV 的栏位(键名用下面 `want` 里的:location、monthly …)。
+//
+// 用在 Lawrence 直接在网站这边给了更正、而 Project-Info-Master 还没跟上的时候。
+// 没有这一层,每日同步会把网站改回 CSV 的旧值。
+// CSV 补上之后(值变得一样),同步会提示哪几条可以从这里删掉。
+const SITE_OVERRIDES = {
+  // Lawrence 2026-11-11 给的正确地点
+  'quaver-residence': { location: 'Seri Kembangan, Selangor' },
+  'colonial-infinite': { location: 'Subang Jaya, Selangor' },
+  'd-evia': { location: 'Kwasa Damansara, Selangor' },
+  'd-nuri': { location: 'Kwasa Damansara, Selangor' },
+  daya: { location: 'Kwasa Damansara, Selangor' },
+  linari: { location: 'Kwasa Damansara, Selangor' },
+  'ria-sunsuria': { location: 'Kwasa Damansara, Selangor' },
+  'tujuh-residences': { location: 'Kwasa Damansara, Selangor' },
+  'zenia-condovilla': { location: 'ParkCity Damansara, Selangor' },
+  'zenia-parkhomes': { location: 'ParkCity Damansara, Selangor' },
+  'aster-hill': { location: 'Sri Petaling, Kuala Lumpur' },
+  'aurum-2': { location: 'Sri Petaling, Kuala Lumpur' },
+  'pavilion-square': { location: 'Bukit Bintang, Kuala Lumpur' },
+  'avantro-residence': { location: 'Puchong BK5, Selangor' },
+  'atwater-corporate-tower': { location: 'Petaling Jaya, Selangor' },
+  tessera: { location: 'Damansara Perdana, Selangor' },
+  'grand-damansara': { location: 'Bandar Utama, Selangor' },
+};
+
 if (!existsSync(CSV)) {
   console.error('master CSV not found: ' + CSV + '\n(clone Project-Info-Master or set MASTER_CSV)');
   process.exit(1);
@@ -72,7 +98,8 @@ const CLEARABLE = new Set(['landingUrl']);
 const q = (v) => '"' + String(v).replace(/"/g, '\\"') + '"';
 
 let changedFiles = 0, created = 0, unpublished = 0;
-const report = [], problems = [];
+const report = [], problems = [], redundant = [];
+const overrideSlugsSeen = new Set();
 const csvSlugs = new Set();
 
 // next `order` for brand-new listings
@@ -114,6 +141,15 @@ for (const line of lines) {
     maintenance: v('maintenance'),
     landingUrl: v('landing_page'),
   };
+  const override = SITE_OVERRIDES[slug];
+  if (override) {
+    overrideSlugsSeen.add(slug);
+    for (const [k, val] of Object.entries(override)) {
+      if (!(k in want)) { problems.push(slug + ': SITE_OVERRIDES 里的栏位 "' + k + '" 不存在'); continue; }
+      if (want[k] === val) redundant.push(slug + '.' + k);
+      want[k] = val;
+    }
+  }
   const soldOut = v('status') === 'fully-sold';
   const penthouse = v('penthouse') === 'yes';
 
@@ -194,6 +230,10 @@ console.log((WRITE ? '已写入' : '试运行(加 --write 才会写入)') +
 if (report.length) console.log('\n' + report.join('\n'));
 if (orphans.length)
   console.log('\n⚠ 网站有但 CSV 没有(不会自动删除,需人工确认): ' + orphans.join(', '));
+if (redundant.length)
+  console.log('\nℹ CSV 已经跟上,这些 SITE_OVERRIDES 可以删掉: ' + redundant.join(', '));
+for (const slug of Object.keys(SITE_OVERRIDES))
+  if (!overrideSlugsSeen.has(slug)) problems.push(slug + ': 在 SITE_OVERRIDES 里,但 CSV 没有这个 slug');
 if (problems.length) {
   console.log('\n❌ 有问题的行:\n' + problems.join('\n'));
   process.exit(2);

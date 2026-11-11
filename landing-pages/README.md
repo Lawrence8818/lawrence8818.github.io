@@ -22,6 +22,17 @@ Lawrence 手工做的项目落地页,发布在主域名 qiai 上。这个资料�
 这 9 个就是全部。曾经列在这里的 `kingswoodzexsim` / `theatera` /
 `bukitjalil` / `veladazexsim` 已确定不保留,见下方「归档进度」。
 
+## 不写售价(2026-11-11 起)
+
+Lawrence 的要求:全站不显示售价,只讲月供,落地页也一样。
+
+- 四页底部执照披露栏里原有的「Selling price」已经拿掉:
+  `aldenzexsim`、`clouthausklcc`、`renbukitjalil` 换成月供起步金额;
+  `khayabangsar` 没有月供资料,整行删除。
+- 这几个月供金额是**写死在 HTML 里的**,不随每日同步更新。
+  Project-Info-Master 的 `monthly_from` 改了,要手动来这里跟着改。
+- 新做的落地页同样不要写售价。
+
 ## 怎么归档一页(从 qiai 拿源码)
 
 1. qiai 后台打开那一页 → 进 HTML/代码编辑模式 → **全选复制**整段 HTML

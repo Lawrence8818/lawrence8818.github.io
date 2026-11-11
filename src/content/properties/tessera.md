@@ -2,7 +2,7 @@
 name: "Tessera"
 label: "FAMILY-ORIENTED"
 priceFrom: "RM 793,200"
-location: "PJ Damansara Perdana"
+location: "Damansara Perdana, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold"
 landSize: "3.67 acres"

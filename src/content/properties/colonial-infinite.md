@@ -1,7 +1,7 @@
 ---
 name: "Colonial Infinite @Edu Metro"
 priceFrom: "RM 265,880"
-location: "Subang Jaya, PJ"
+location: "Subang Jaya, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold"
 landSize: "3.76 acres"

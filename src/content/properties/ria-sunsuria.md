@@ -1,7 +1,7 @@
 ---
 name: "RIA Sunsuria"
 priceFrom: "RM 730,140"
-location: "Kwasa Damansara, PJ"
+location: "Kwasa Damansara, Selangor"
 region: "petaling-jaya"
 tenure: "Freehold"
 landSize: "9.464 acres"

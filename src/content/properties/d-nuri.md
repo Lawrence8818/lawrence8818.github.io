@@ -1,7 +1,7 @@
 ---
 name: "D'Nuri"
 priceFrom: "RM 270,000"
-location: "Kwasa Damansara"
+location: "Kwasa Damansara, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold"
 landSize: "1.511 acres"

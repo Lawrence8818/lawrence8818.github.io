@@ -2,7 +2,7 @@
 name: "D'Evia"
 label: "FAMILY-ORIENTED"
 priceFrom: "RM 498,100"
-location: "Kwasa Damansara"
+location: "Kwasa Damansara, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold"
 landSize: "2.014 acres"

@@ -1,7 +1,7 @@
 ---
 name: "Tujuh Residences"
 priceFrom: "RM 475,950"
-location: "Kwasa Damansara City Centre, PJ"
+location: "Kwasa Damansara, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold"
 landSize: "-"

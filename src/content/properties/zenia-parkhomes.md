@@ -1,7 +1,7 @@
 ---
 name: "Zenia ParkHomes"
 priceFrom: "RM 2,500,000"
-location: "Kwasa Damansara, PJ"
+location: "ParkCity Damansara, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold"
 landSize: "55.05 Acres"

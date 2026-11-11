@@ -2,7 +2,7 @@
 name: "Aurum 2"
 label: "FAMILY-ORIENTED"
 priceFrom: "RM 417,545"
-location: "Sri Petaling"
+location: "Sri Petaling, Kuala Lumpur"
 region: "kuala-lumpur"
 tenure: "Freehold"
 landSize: "2.3 acres"
