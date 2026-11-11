@@ -42,7 +42,8 @@ const NOT_PUBLISHED = new Set([
 // CSV 补上之后(值变得一样),同步会提示哪几条可以从这里删掉。
 const SITE_OVERRIDES = {
   // Lawrence 2026-11-11 给的正确地点
-  'quaver-residence': { location: 'Seri Kembangan, Selangor' },
+  // Quaver 连筛选分组也一起移到 Selangor(原本归在 kuala-lumpur)
+  'quaver-residence': { location: 'Seri Kembangan, Selangor', region: 'selangor' },
   'colonial-infinite': { location: 'Subang Jaya, Selangor' },
   'd-evia': { location: 'Kwasa Damansara, Selangor' },
   'd-nuri': { location: 'Kwasa Damansara, Selangor' },
