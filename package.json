@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/stage-landing-pages.mjs && astro build",
+    "build": "node scripts/stage-landing-pages.mjs && astro build && node scripts/enrich-landing-pages.mjs",
     "preview": "astro preview",
     "check": "astro check"
   },
