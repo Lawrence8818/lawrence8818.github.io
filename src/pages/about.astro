@@ -7,13 +7,28 @@ import ComebackStory from '../components/ComebackStory.astro';
 import { AWARDS } from '../data/awards';
 import { SITE } from '../data/site';
 import { url } from '../lib/url';
+import JsonLd from '../components/JsonLd.astro';
+import { profileSchema } from '../lib/schema';
 
+const description =
+  'From subsales to new property, a decade of hands-on experience you can count on. Trusted by 2,000+ buyers over the years, since 2015. Registered estate negotiator (REN 26610) serving KL, Selangor, Johor and Penang.';
+const siteUrl = Astro.site?.href ?? 'https://www.lawrencelawproperty.com/';
 ---
 
 <BaseLayout
   title="About Lawrence Law — New Property Specialist with Subsales Expertise"
-  description="From subsales to new property, a decade of hands-on experience you can count on. Trusted by 2,000+ buyers over the years, since 2015. Registered estate negotiator (REN 26610) serving KL, Selangor, Johor and Penang."
+  description={description}
 >
+  <JsonLd
+    slot="head"
+    data={profileSchema({
+      siteUrl,
+      url: new URL(Astro.url.pathname, Astro.site).href,
+      description:
+        `${SITE.tagline}. Registered estate negotiator in Malaysia (${SITE.renNumber}), in real estate since ${SITE.since}, ` +
+        `serving ${SITE.serviceAreas.join(', ')}.`,
+    })}
+  />
   {/* ===== Intro: photo + story on navy ===== */}
   <section class="bg-navy-900 py-14 text-white sm:py-20">
     <div class="container-site grid items-center gap-10 lg:grid-cols-[2fr_3fr]">

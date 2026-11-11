@@ -4,8 +4,22 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import MortgageCalculator from '../../components/MortgageCalculator.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
 import CTASection from '../../components/CTASection.astro';
+import FAQ from '../../components/FAQ.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { url } from '../../lib/url';
 import { waLink } from '../../lib/whatsapp';
+import { landingHref } from '../../lib/landing';
+import { breadcrumbSchema, propertyListingSchema } from '../../lib/schema';
+import {
+  REGION_LABEL,
+  placeText,
+  priceNumber,
+  propertyFaqs,
+  propertySpecs,
+  propertySummary,
+} from '../../lib/property-facts';
 
 export async function getStaticPaths() {
   const all = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
@@ -18,18 +32,19 @@ export async function getStaticPaths() {
 const { p, all } = Astro.props;
 const d = p.data;
 
-const REGION_LABEL: Record<string, string> = {
-  'kuala-lumpur': 'Kuala Lumpur',
-  klcc: 'KLCC',
-  'petaling-jaya': 'Petaling Jaya',
-  selangor: 'Selangor',
-  johor: 'Johor',
-  penang: 'Penang',
-};
-
 // "RM 626,000" → 626000 so the calculator opens on this project's own price
-const priceNum = parseInt((d.priceFrom.match(/[\d,]+/)?.[0] ?? '').replace(/,/g, ''), 10);
-const hasPrice = Number.isFinite(priceNum) && priceNum > 0;
+const priceNum = priceNumber(d.priceFrom);
+const hasPrice = priceNum !== undefined;
+
+// Plain-sentence facts + Q&A, built from the same fields as the spec list.
+// This is what answer engines (ChatGPT, Perplexity, Google AI Overviews) quote.
+const summary = propertySummary(d);
+const faqs = propertyFaqs(d);
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+// Only advertise the photo to crawlers once the real file has been uploaded
+const hasPhoto = existsSync(join(process.cwd(), 'public', d.image));
+const tourHref = landingHref(d.landingUrl);
 
 const specs = [
   { k: 'Land Tenure', v: d.tenure },
@@ -53,25 +68,37 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
   description={`${d.name} in ${d.location}. From ${d.priceFrom}${d.layoutSize ? `, layouts ${d.layoutSize}` : ''}, ${d.tenure}, completion ${d.completion}. Personally vetted by Lawrence Law — ask me anything on WhatsApp.`}
   waMessage={waMsg}
 >
+  <JsonLd
+    slot="head"
+    data={propertyListingSchema({
+      url: canonical,
+      name: d.name,
+      description: summary,
+      locality: placeText(d),
+      image: hasPhoto ? new URL(url(d.image), Astro.site).href : undefined,
+      specs: propertySpecs(d),
+    })}
+  />
+  <JsonLd
+    slot="head"
+    data={breadcrumbSchema([
+      { name: 'Home', url: new URL(url('/'), Astro.site).href },
+      { name: 'Properties', url: new URL(url('/allproperties/'), Astro.site).href },
+      { name: d.name, url: canonical },
+    ])}
+  />
+
   {/* ===== Hero ===== */}
   <section class="bg-navy-900 pt-10 pb-14 text-white sm:pt-14 sm:pb-20">
     <div class="container-site">
       <nav class="mb-6 text-[13px] text-navy-100/80" aria-label="Breadcrumb">
-        <a href="https://lawrencelawproperty.com/allproperties" class="inline-flex min-h-11 items-center hover:text-gold-500">
+        <a href={url('/allproperties/')} class="inline-flex min-h-11 items-center hover:text-gold-500">
           ← All Properties
         </a>
         {d.region && (
           <>
             <span class="mx-2 opacity-40">/</span>
             <span>{REGION_LABEL[d.region]}</span>
-          </>
-        )}
-        {d.location.includes('Bukit Jalil') && (
-          <>
-            <span class="mx-2 opacity-40">·</span>
-            <a href="https://lawrencelawproperty.com/bukitjalil" class="inline-flex min-h-11 items-center text-gold-500 hover:underline">
-              Explore Bukit Jalil →
-            </a>
           </>
         )}
       </nav>
@@ -131,8 +158,8 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
             >
               Ask About This Project
             </a>
-            {d.landingUrl && (
-              <a href={d.landingUrl} class="btn-gold-outline text-white">
+            {tourHref && (
+              <a href={tourHref} class="btn-gold-outline text-white">
                 Full Project Tour
               </a>
             )}
@@ -148,6 +175,20 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
           </p>
         </div>
       </div>
+    </div>
+  </section>
+
+  {/* ===== Facts in plain sentences ===== */}
+  <section class="border-b border-border bg-white py-12 sm:py-16">
+    <div class="container-site max-w-3xl">
+      <p class="label-sm mb-3 text-gold-500">Project Overview</p>
+      <h2 class="section-heading">{d.name} at a Glance</h2>
+      <div class="gold-rule"></div>
+      <p class="text-[17px] leading-relaxed text-ink/90">{summary}</p>
+      <p class="mt-4 text-[13px] text-ink/60">
+        Instalment figures are estimates and project details can change — message me for the
+        latest numbers and availability.
+      </p>
     </div>
   </section>
 
@@ -174,13 +215,20 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
           ))}
         </div>
         <div class="mt-10">
-          <a href="https://lawrencelawproperty.com/allproperties" class="btn-gold-outline text-navy-900">
+          <a href={url('/allproperties/')} class="btn-gold-outline text-navy-900">
             Browse All Properties
           </a>
         </div>
       </div>
     </section>
   )}
+
+  {/* ===== Q&A ===== */}
+  <section class="section-pad border-t border-border bg-white">
+    <div class="container-site max-w-3xl">
+      <FAQ faqs={faqs} heading={`${d.name}: Common Questions`} />
+    </div>
+  </section>
 
   <CTASection
     heading={`Thinking about ${d.name}?`}

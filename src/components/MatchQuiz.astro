@@ -1,12 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
 import { SITE } from '../data/site';
+import { url } from '../lib/url';
 
 // 30-second property match quiz — 3 taps (budget / area / size). The result
 // step shows only HOW MANY projects match; the list itself is locked and the
 // only way to get it is the WhatsApp button, which arrives at Lawrence's
 // phone with all three answers pre-filled. Zero backend.
-const ALLPROPS = 'https://lawrencelawproperty.com/allproperties';
+const ALLPROPS = url('/allproperties/');
 
 // Compact dataset for the client-side match count: [price, region, sizeMin,
 // sizeMax] per live listing. Parsing and matching mirror the All Properties

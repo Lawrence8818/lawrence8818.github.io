@@ -3,23 +3,25 @@ import { url } from '../lib/url';
 import { waLink } from '../lib/whatsapp';
 import { SITE } from '../data/site';
 
-// Absolute URLs throughout: the site is published page-by-page on
-// lawrencelawproperty.com, so the shared menu must work from any pasted page.
-// Section links (#videos/#areas/#testimonials) land on the main page.
+// Internal links. These used to be absolute https://lawrencelawproperty.com/…
+// URLs from the days the pages were pasted one by one into the old CMS; now
+// that this site serves the domain itself, that only cost every click a
+// redirect (apex → www, then → trailing slash).
+// Section links (#areas) land on the main page.
 const navItems = [
-  { href: 'https://lawrencelawproperty.com/', label: 'Home' },
-  { href: 'https://lawrencelawproperty.com/allproperties', label: 'Properties' },
-  { href: 'https://lawrencelawproperty.com/buyerguide', label: 'Buyer Guides' },
-  { href: 'https://lawrencelawproperty.com/#areas', label: 'Areas' },
-  { href: 'https://lawrencelawproperty.com/spasignings', label: 'Client Stories' },
-  { href: 'https://lawrencelawproperty.com/about', label: 'About' },
+  { href: url('/'), label: 'Home' },
+  { href: url('/allproperties/'), label: 'Properties' },
+  { href: url('/buyerguide/'), label: 'Buyer Guides' },
+  { href: url('/#areas'), label: 'Areas' },
+  { href: url('/spasignings/'), label: 'Client Stories' },
+  { href: url('/about/'), label: 'About' },
   { href: waLink(), label: 'Contact', external: true },
 ];
 ---
 
 <header class="sticky top-0 z-40 bg-navy-900">
   <div class="container-site flex h-[72px] items-center justify-between gap-3">
-    <a href="https://lawrencelawproperty.com/" class="flex min-w-0 items-center gap-3" aria-label="LLP Property — home">
+    <a href={url('/')} class="flex min-w-0 items-center gap-3" aria-label="LLP Property — home">
       {/* Gold emblem image + the LLP PROPERTY wordmark recreated in type,
           matching Lawrence's logo lockup (crisp at any size) */}
       <img

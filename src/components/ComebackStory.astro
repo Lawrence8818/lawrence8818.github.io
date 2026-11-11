@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 // Comeback narrative shared by the home page and the About page:
 // e-commerce detour → 2025 Top 47 nationwide. Sits right after the
 // first-deal story block, same navy treatment.
@@ -31,7 +32,7 @@ const { showStoryLink = false } = Astro.props;
       {showStoryLink && (
         <p>
           <a
-            href="https://lawrencelawproperty.com/about"
+            href={url('/about/')}
             class="font-semibold text-gold-500 transition-colors hover:text-gold-600"
           >
             Read my full story →

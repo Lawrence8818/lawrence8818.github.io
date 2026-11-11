@@ -16,6 +16,16 @@ export const SITE = {
   /** Office address (shown in footer) */
   address: 'No. 11G, Medan Kelang Lama 28, No. 419, Jalan Kelang Lama, 58000 Kuala Lumpur',
 
+  /** Same address split into parts — used only by the SEO structured data */
+  addressParts: {
+    street: 'No. 11G, Medan Kelang Lama 28, No. 419, Jalan Kelang Lama',
+    postcode: '58000',
+    city: 'Kuala Lumpur',
+  },
+
+  /** Year Lawrence started in real estate (as told on the About page) */
+  since: 2015,
+
   /** WhatsApp number, international format, digits only, no + sign */
   whatsappNumber: '60199939860',
 
