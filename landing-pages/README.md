@@ -33,6 +33,26 @@ Lawrence 的要求:全站不显示售价,只讲月供,落地页也一样。
   Project-Info-Master 的 `monthly_from` 改了,要手动来这里跟着改。
 - 新做的落地页同样不要写售价。
 
+## 不显示所属公司、不放顶部横幅(2026-11-11 起)
+
+Lawrence 的要求,9 页都已照做,新页面也要照做:
+
+- **顶部不放** "Independent Marketing Site by … | Authorized Agency" 那一行。
+  旧页面里留着一个空的隐藏元素 `<div class="topbar" hidden></div>`,
+  **不要删** —— 页面脚本还会去量它的高度,删掉脚本会报错。
+- **底部不放**所属公司:Appointed Agency、公司注册号、执照号、公司地址、
+  页脚和版权行里的公司名称都已拿掉,只留姓名、REN 26610 和 WhatsApp。
+- **仍保留**:最底部法律免责声明里的公司名称(说明本站不是发展商官网、由谁运营)。
+
+## 示范单位怎么回答(2026-11-11 起)
+
+问答里「Can I visit a show unit?」只回答有,不写示范单位或销售画廊的名称、
+地址、开放时间,统一接一句:
+
+> Message me and I will arrange a slot and meet you there.
+
+页面其他位置(登记区、位置说明、地图等)目前还有画廊名称或地址,是否一并拿掉待定。
+
 ## 构建时自动补上的东西(2026-11-11 起)
 
 这里的源文件保持作者写的原样。`npm run build` 的最后一步

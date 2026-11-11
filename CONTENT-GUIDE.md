@@ -4,10 +4,68 @@
 
 ---
 
+## 📌 现行规则(2026-11-11 定下,全站适用)
+
+这一节是你最近定下来的规矩。以后做新页面、改旧页面,都照这里走;
+和下面旧章节有冲突的,**以这一节为准**。
+
+### 1. 不显示售价,只讲月供
+
+- 网站任何地方都不出现售价:项目页、项目卡、首页、页面描述、落地页都一样。
+- 显示的是月供,例如 `From RM 2,060 / month`;数字来自 `Project-Info-Master` 的 `monthly_from` 栏。
+- 没填月供的项目显示 `Instalment on request`;已售完的显示 `Fully sold`。
+  **不拿售价去推算月供**(你现有的月供不是按固定公式算的)。
+- 首页的配对小测验、项目列表的预算筛选,都改成按月供。
+- 项目页不放贷款计算器(它会把售价填在输入框里);Buyer Guide 页的通用计算器保留。
+- 售价仍然留在 CSV 的 `price_from` 栏,照常同步,只是不上网站。
+
+### 2. 不显示所属公司
+
+- 全站不出现所属公司名称;奖项只写名称和年份,不带颁奖机构。
+- 落地页顶部不放 "Independent Marketing Site by …" 那一行。
+- 落地页底部不放 Appointed Agency、公司注册号、执照号和公司地址,
+  只留姓名、REN 26610 和 WhatsApp。
+- 例外:落地页最底部的**法律免责声明**里仍有公司名称(说明本站不是发展商官网、
+  由谁运营)。这是保护你的条文,目前保留。
+
+### 3. 示范单位怎么回答
+
+- 问到能不能看示范单位:只回答有,**不写示范单位或销售画廊的名称、地址、开放时间**。
+- 统一接一句:`Message me and I will arrange a slot and meet you there.`
+
+### 4. 地点的写法
+
+- 格式是「地区, 州属或城市」,例如 `Kwasa Damansara, Selangor`、`Sri Petaling, Kuala Lumpur`。
+- 2026-11-11 更正了 17 个项目的地点,Quaver Residence 也移到 Selangor 筛选分组。
+- 这些更正**还没进 `Project-Info-Master`**。在那边补上之前,网站靠
+  `scripts/sync-from-master.mjs` 里的 `SITE_OVERRIDES` 保住正确写法,不会被每日同步改回去。
+  CSV 补上后,同步会提示可以把对应的条目删掉。
+
+### 5. 给 AI 搜索看的资料(AEO)都是自动生成的
+
+- **项目页**(83 页):事实摘要、常见问题、结构化数据,全部由项目资料自动写出来。
+  CSV 改了,每日同步后页面自动跟着变,不用手写。
+- **落地页**(9 页):问答标记从页面上的问答原文自动生成;你的身份资料、正确网址也是构建时自动补上。
+- **`llms.txt`**:给 AI 看的网站目录,自动生成。
+- 落地页已经列进 sitemap(现在共 126 条)。
+
+### 6. 指南和区域页是正式内容
+
+- 顶部「等待 · Pending」的黄色横幅已经拿掉,这些页面视为你审过的正式内容。
+
+### 还没做完的
+
+- **26 个项目没有月供数字**,目前显示 `Instalment on request`。有数字就发给 Claude。
+- **AEO 第 5 项**:客户见证页的标记;更重要的是开通 Google 商家资料并请客户留评价(这部分只有你能做)。
+- **AEO 第 3 项**:中文版。建议先做首页、About 和 9 篇指南。
+- **落地页其他位置的画廊名称和地址**(登记区、位置说明等)还在,是否一并拿掉待定。
+
+---
+
 ## ✅ 上线前检查清单(必做)
 
 - [ ] `src/data/site.ts`:填真实 **WhatsApp 号码**(格式 `60123456789`,不带 +)
-- [ ] `src/data/site.ts`:填真实 **REN 编号** 和 **所属 Agency 名称**
+- [ ] `src/data/site.ts`:填真实 **REN 编号**(所属公司名称不显示,见上方「现行规则」第 2 条)
 - [ ] `src/data/site.ts`:填社媒链接(TikTok / FB / IG / YouTube / 小红书,没有的留空)
 - [ ] `src/data/awards.ts`:换成**真实奖项**和真实数字(年资、成交组数)
 - [ ] `src/content/testimonials.json`:把 6 条**示例见证换成真实客户见证**(示例数据带 `"placeholder": true`,替换后把这个字段删掉或改成 `false`,页面上的"示例"标签就会消失)。⚠️ 见证必须真实,虚构见证有法律与信誉风险
@@ -231,36 +289,31 @@ longform: true
 hotProjects:
   - name: 项目名
     type: 服务式公寓
-    priceFrom: RM4xx k
     note: 靠近 MRT
 ```
 
+(不要写 `priceFrom` —— 全站不显示售价,见「现行规则」第 1 条。)
+
 ## 🎯 加一个项目落地页(landing page)
 
-落地页在 **网站这个 session 做**(这里有品牌样式、86 个项目数据、追踪代码),
-做好后贴到 qiai;`Project-Info-Master` 只负责记录"哪个项目有落地页"这个事实。
-两边分工:**资料的源头在 master,建造的源头在这里。**
+落地页在 **网站这个 session 做**(这里有品牌样式、项目数据、追踪代码)。
+旧平台 qiai 已经停用,落地页现在直接由这个仓库上线:
 
 ```
-① 你在这个 session 做落地页
+① 你在这个 session 让 Claude 做落地页
         ↓
-② 你贴到 qiai,拿到网址(如 lawrencelawproperty.com/papyrusexsim)
+② 源码存进 landing-pages/<网址最后一段>.html
         ↓
-③ 跟 Claude 说一声 —— 剩下的全自动:
-     ⒜ 写进 master CSV 的 landing_page 栏 + push
-        (master 依然是资料的唯一源头,你不用去那边手动填)
-     ⒝ 同步到网站:卡片(图片/标题/View Details)、详情页
-        「Full Project Tour」按钮、首页楼盘滚动条 —— 全部自动接好
-     ⒞ 重建 Copy HTML → 你重贴受影响的页面(通常是 Home + All Properties)
+③ 合并上线后,网址就是 www.lawrencelawproperty.com/<网址最后一段>/
+     · 项目卡、详情页的「Full Project Tour」按钮自动接到这一页
+     · 问答标记、身份资料、sitemap 都在构建时自动补上
 ```
 
-**撤下一个落地页**(项目售罄等):跟 Claude 说一声就行 —— 把 master CSV 那一格清空,
-同步后卡片自动改回 github.io 详情页,「Full Project Tour」按钮自动消失。
-qiai 上那个页面本身留着不影响(没有入口),以后要接回来随时说。
+**新落地页必须照「现行规则」做**:不写售价、不写所属公司、顶部不放
+"Independent Marketing Site" 横幅、示范单位只回答有。细节见 `landing-pages/README.md`。
 
-**注意**:落地页的 HTML 目前只存在 qiai 后台,仓库里没有备份。
-建议把每一页的 HTML 交给 Claude 归档进 `landing-pages/`,这样有版本历史、
-以后改价格或加追踪能直接动源码。
+**撤下一个落地页**:跟 Claude 说一声,把 `landing-pages/` 里那个文件拿掉即可。
+卡片会自动改回站内的项目详情页,不会留下死链接。
 
 ## 🔄 改完之后怎么发布?
 
