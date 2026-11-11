@@ -652,6 +652,23 @@ a{color:inherit;text-decoration:none}
 .disc-panel b,.disc-panel dt{color:rgba(245,233,206,.72);font-weight:500}
 .disc-panel .disc-note{margin:0 0 1rem;color:rgba(245,233,206,.6)}
 @media(prefers-reduced-motion:reduce){.disc-more>summary::after{transition:none}}
+
+/* ---------- FAQ ---------- */
+.faq{background:#fff}
+.faq__list{max-width:860px;margin-top:2.2rem;display:grid;gap:.9rem}
+.qa{background:var(--cream-soft);border-radius:18px;overflow:hidden}
+.qa button{
+  display:flex;width:100%;align-items:center;justify-content:space-between;gap:1rem;
+  min-height:56px;padding:1.05rem 1.4rem;border:0;background:none;cursor:pointer;text-align:left;
+  font-family:var(--font-body);font-weight:700;font-size:1rem;line-height:1.4;color:var(--violet-ink);
+}
+.qa button::after{content:"+";flex:none;font-size:1.6rem;font-weight:400;line-height:1;color:var(--coral);transition:transform .3s var(--ease-out)}
+.qa.open button::after{transform:rotate(45deg)}
+.qa button:focus-visible{outline:3px solid var(--teal);outline-offset:-3px;border-radius:18px}
+.qa .ans{padding:0 1.4rem 1.25rem;line-height:1.7;color:var(--violet-ink)}
+/* answers stay readable if the script never runs */
+.faq__list.is-ready .qa:not(.open) .ans{display:none}
+@media (prefers-reduced-motion:reduce){.qa button::after{transition:none}}
 </style>
 </head>
 <body>
@@ -674,6 +691,7 @@ a{color:inherit;text-decoration:none}
       <a href="#facilities">Facilities</a>
       <a href="#floorplans">Floor Plans</a>
       <a href="#location">Location</a>
+      <a href="#faq">FAQ</a>
       <a href="videos.html" id="navMore" hidden>More</a>
       <a href="#register" class="nav__cta">Register Interest</a>
     </nav>
@@ -767,7 +785,7 @@ a{color:inherit;text-decoration:none}
         <li>Integrated with the KL Wellness City masterplan</li>
         <li>1, 2 &amp; 3-bedroom efficient layouts — 484 to 915 sq.ft.</li>
         <li>By EXSIM × Three Towers — GreenRE eco-responsible developer</li>
-        <li>Targeted completion 2028</li>
+        <li>Targeted completion Q2 2029</li>
       </ul>
       <a href="#register" class="btn btn--violet reveal">Get the Full E-Brochure</a>
     </div>
@@ -858,7 +876,7 @@ a{color:inherit;text-decoration:none}
         <div class="plan__info">
           <h3>Type B1</h3>
           <p class="plan__spec">2 Bedrooms + 2 Baths · 689 sq.ft.</p>
-          <ul class="ticks"><li>Dual-key friendly twin-room layout</li><li>Master bedroom with en-suite</li><li>Central living with dining core</li></ul>
+          <ul class="ticks"><li>Two bedrooms, two bathrooms, two car parks</li><li>Master bedroom with en-suite</li><li>Central living with dining core</li></ul>
           <a class="btn btn--coral js-plan-cta" data-type="Type B1 (2R+2B, 689 sq.ft.)" href="#register">WhatsApp Me This Floor Plan</a>
         </div>
       </article>
@@ -899,7 +917,7 @@ a{color:inherit;text-decoration:none}
         <div class="lpoint reveal reveal--right" style="--rd:.06s"><span class="lpoint__icon lpoint__icon--teal">🛍</span>
           <div><h4>Pavilion Bukit Jalil</h4><p>Directly opposite — 1.8 million sq.ft. of retail, dining and entertainment.</p></div></div>
         <div class="lpoint reveal reveal--right" style="--rd:.12s"><span class="lpoint__icon lpoint__icon--lime">🚈</span>
-          <div><h4>LRT + Shuttle Access</h4><p>Proposed shuttle linking LRT Awan Besar (SP19), Jalil Link and Pavilion Bukit Jalil.</p></div></div>
+          <div><h4>LRT + Shuttle Access</h4><p>Free shuttle service to LRT Awan Besar (SP19), Jalil Link and Pavilion Bukit Jalil.</p></div></div>
         <div class="lpoint reveal reveal--right" style="--rd:.18s"><span class="lpoint__icon lpoint__icon--violet">🎓</span>
           <div><h4>Education &amp; Healthcare</h4><p>Tzu Chi International School, IMU, Sunway Medical Centre and more nearby.</p></div></div>
         <div class="lpoint reveal reveal--right" style="--rd:.24s"><span class="lpoint__icon lpoint__icon--coral">🌳</span>
@@ -907,6 +925,28 @@ a{color:inherit;text-decoration:none}
         <div class="lpoint reveal reveal--right" style="--rd:.30s"><span class="lpoint__icon lpoint__icon--teal">🛣</span>
           <div><h4>5 Major Expressways</h4><p>MEX, LDP, KESAS, Bukit Jalil Expressway &amp; NPE — quick links to KL city and KLIA.</p></div></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq section" id="faq">
+  <div class="section__inner">
+    <p class="section__eyebrow reveal">Before You Ask</p>
+    <h2 class="section__title reveal">The questions that come up <em>first</em></h2>
+    <div class="faq__list" id="faqList">
+      <div class="qa"><button type="button" aria-expanded="false">Where exactly is The Vividz?</button><div class="ans"><p>In Bukit Jalil, Kuala Lumpur, inside the KL Wellness City masterplan and directly opposite Pavilion Bukit Jalil.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">Who is the developer?</button><div class="ans"><p>The Vividz is developed by EXSIM.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">How many units and towers are there?</button><div class="ans"><p>Two 57-storey towers with 1,138 homes in total.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">What layouts and sizes are available?</button><div class="ans"><p>Three sizes: a 1-bedroom, 1-bathroom at 484 sq ft (Type A1); a 2-bedroom, 2-bathroom at 689 sq ft (Type B1); and a 3-bedroom, 2-bathroom at 915 sq ft, with a balcony (Type C1) or without (Type C2).</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">How many car parks come with each unit?</button><div class="ans"><p>The 1-bedroom comes with one car park. The 2-bedroom and 3-bedroom each come with two.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">Is the 2-bedroom a dual-key unit?</button><div class="ans"><p>No. It is a standard 2-bedroom, 2-bathroom home with two car parks.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">Freehold or leasehold?</button><div class="ans"><p>Leasehold, 99 years.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">When will it be completed?</button><div class="ans"><p>Targeted completion is Q2 2029.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">What is the monthly instalment?</button><div class="ans"><p>The estimated monthly instalment starts from about RM 1,700. The actual figure depends on the unit, your loan margin, interest rate and tenure. Message me and I'll work it out on your numbers.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">What is the maintenance fee?</button><div class="ans"><p>RM 0.44 per sq ft.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">Is there a shuttle to the LRT?</button><div class="ans"><p>Yes. A free shuttle service connects The Vividz to LRT Awan Besar, Jalil Link and Pavilion Bukit Jalil.</p></div></div>
+      <div class="qa"><button type="button" aria-expanded="false">Can I visit a show unit?</button><div class="ans"><p>Yes. There are show units for the 1-bedroom, 2-bedroom and 3-bedroom layouts. Message me a time that suits you and I'll arrange the appointment.</p></div></div>
     </div>
   </div>
 </section>
@@ -1017,6 +1057,7 @@ a{color:inherit;text-decoration:none}
           <a href="#facilities">Facilities</a>
           <a href="#floorplans">Floor Plans</a>
           <a href="#location">Location</a>
+          <a href="#faq">FAQ</a>
         </nav>
       </div>
     </div>
@@ -1520,5 +1561,19 @@ if (navMore && window.VIDEOS && window.VIDEOS.length) navMore.hidden = false;
 })();
 </script>
 <!-- ═══ /Lead tracking ═══ -->
+<script>
+/* FAQ accordion */
+(function(){
+  var list=document.getElementById('faqList');
+  if(!list) return;
+  list.classList.add('is-ready');
+  list.addEventListener('click',function(e){
+    var btn=e.target.closest('.qa > button');
+    if(!btn) return;
+    var open=btn.parentNode.classList.toggle('open');
+    btn.setAttribute('aria-expanded',open?'true':'false');
+  });
+})();
+</script>
 </body>
 </html>
