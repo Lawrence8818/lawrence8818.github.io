@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { SITE } from '../data/site';
 import { propertyOneLine } from '../lib/property-facts';
+import { landingHref } from '../lib/landing';
 
 // llms.txt —— 给 AI 助手看的网站说明书(格式见 llmstxt.org)。
 // 一份纯文字的目录:这个网站是谁的、每一页讲什么、每个项目的关键数字。
@@ -51,9 +52,12 @@ export const GET: APIRoute = async ({ site }) => {
     `## Projects (${properties.length})`,
     '',
     `- [All properties](${abs('/allproperties/')}): the full list, filterable by region`,
-    ...properties.map(
-      (p) => `- [${p.data.name}](${abs(`/properties/${p.id}/`)}): ${propertyOneLine(p.data)}`,
-    ),
+    ...properties.map((p) => {
+      // 有专属落地页的项目,把那一页也指出来 —— 那里有完整的介绍和问答
+      const landing = landingHref(p.data.landingUrl);
+      const more = landing ? ` · in-depth page: ${new URL(landing, site).href}` : '';
+      return `- [${p.data.name}](${abs(`/properties/${p.id}/`)}): ${propertyOneLine(p.data)}${more}`;
+    }),
     '',
     '## Optional',
     '',

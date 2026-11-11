@@ -33,6 +33,23 @@ Lawrence 的要求:全站不显示售价,只讲月供,落地页也一样。
   Project-Info-Master 的 `monthly_from` 改了,要手动来这里跟着改。
 - 新做的落地页同样不要写售价。
 
+## 构建时自动补上的东西(2026-11-11 起)
+
+这里的源文件保持作者写的原样。`npm run build` 的最后一步
+(`scripts/enrich-landing-pages.mjs`)会在**成品**(`dist/<slug>/index.html`)上补:
+
+- 正式网址:canonical / og:url 从旧平台时期的 `https://lawrencelawproperty.com/<slug>`
+  改成 `https://www.lawrencelawproperty.com/<slug>/`,不用再跳转两次。
+- `FAQPage`:从页面上的问答(`<div class="qa">` 区块)原文生成。
+  改了页面上的问答,下次构建标记会自动跟着变,不用另外维护。
+- 项目 schema:页面自己没写的(Park Green、Vividz)会补一个。
+- `RealEstateAgent`、`WebPage`、`BreadcrumbList`:和全站其他页面一致。
+
+落地页也已经列进 sitemap 和 `llms.txt`。
+
+写新落地页时:问答照旧用 `<div class="qa"><button>问</button><div class="ans">答</div></div>`
+的结构,就会自动被读到;不需要自己手写 FAQ 的 JSON-LD。
+
 ## 怎么归档一页(从 qiai 拿源码)
 
 1. qiai 后台打开那一页 → 进 HTML/代码编辑模式 → **全选复制**整段 HTML
