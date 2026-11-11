@@ -2,17 +2,19 @@
 import { getCollection } from 'astro:content';
 import { SITE } from '../data/site';
 import { url } from '../lib/url';
+import { monthlyNumber } from '../lib/property-facts';
 
-// 30-second property match quiz — 3 taps (budget / area / size). The result
+// 30-second property match quiz — 3 taps (monthly budget / area / size). The result
 // step shows only HOW MANY projects match; the list itself is locked and the
 // only way to get it is the WhatsApp button, which arrives at Lawrence's
 // phone with all three answers pre-filled. Zero backend.
 const ALLPROPS = url('/allproperties/');
 
-// Compact dataset for the client-side match count: [price, region, sizeMin,
+// Compact dataset for the client-side match count: [monthly, region, sizeMin,
 // sizeMax] per live listing. Parsing and matching mirror the All Properties
 // page (src/pages/properties/index.astro) so the count equals what the full
-// filter UI would show.
+// filter UI would show. Budget is matched on the monthly instalment — selling
+// prices are never sent to the browser.
 const live = (await getCollection('properties')).filter((p) => !p.data.soldOut);
 const parseSize = (s?: string) => {
   const nums = ((s || '').match(/[\d,]+/g) || [])
@@ -21,10 +23,9 @@ const parseSize = (s?: string) => {
   return nums.length ? { min: Math.min(...nums), max: Math.max(...nums) } : null;
 };
 const PROPS = live.map((p) => {
-  const price = parseInt((p.data.priceFrom.match(/[\d,]+/)?.[0] ?? '').replace(/,/g, ''), 10);
   const sz = parseSize(p.data.layoutSize);
   return [
-    Number.isFinite(price) && price > 0 ? price : 0,
+    monthlyNumber(p.data.monthly) ?? 0,
     p.data.region ?? '',
     sz ? sz.min : 0,
     sz ? sz.max : 0,
@@ -35,12 +36,12 @@ const WA_NUMBER = SITE.whatsappNumber;
 const STEPS = [
   {
     key: 'budget',
-    q: 'What is your budget?',
+    q: 'What monthly instalment suits you?',
     opts: [
-      { label: 'Under RM500k', v: 'pmax=500000' },
-      { label: 'RM500k – 800k', v: 'pmin=500000&pmax=800000' },
-      { label: 'RM800k – 1.5M', v: 'pmin=800000&pmax=1500000' },
-      { label: 'Above RM1.5M', v: 'pmin=1500000' },
+      { label: 'Under RM2,000', v: 'mmax=2000' },
+      { label: 'RM2,000 – 3,500', v: 'mmin=2000&mmax=3500' },
+      { label: 'RM3,500 – 6,000', v: 'mmin=3500&mmax=6000' },
+      { label: 'Above RM6,000', v: 'mmin=6000' },
       { label: 'Flexible', v: '' },
     ],
   },
@@ -116,7 +117,7 @@ const STEPS = [
           </svg>
           <p class="text-[15px] leading-relaxed text-navy-100">
             <span class="mq-lock-copy">Your personalised shortlist is ready — locked to keep it personal.</span>
-            WhatsApp me your answers with one tap and I’ll send the full list, with layouts and prices, usually within the hour.
+            WhatsApp me your answers with one tap and I’ll send the full list, with layouts and instalment estimates, usually within the hour.
           </p>
         </div>
         <div class="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -144,8 +145,8 @@ const STEPS = [
     var root = document.getElementById('match-quiz');
     if (!root) return;
     var steps = Array.prototype.slice.call(root.querySelectorAll('.mq-step'));
-    var picks = [];   // query fragments, e.g. "pmin=500000&pmax=800000"
-    var labels = [];  // human-readable, e.g. "RM500k – 800k"
+    var picks = [];   // query fragments, e.g. "mmin=2000&mmax=3500"
+    var labels = [];  // human-readable, e.g. "RM2,000 – 3,500"
     var cur = 0;
 
     function show(i) {
@@ -168,11 +169,11 @@ const STEPS = [
 
     // Same rules as the All Properties filter: sold-out already excluded from
     // PROPS; listings without size data always pass the size filter; listings
-    // without a price only pass when no budget is chosen.
+    // without an instalment figure only pass when no budget is chosen.
     function countMatches() {
       var q = params();
-      var pmin = +q.pmin || 0;
-      var pmax = +q.pmax || Infinity;
+      var pmin = +q.mmin || 0;
+      var pmax = +q.mmax || Infinity;
       var smin = +q.smin || 0;
       var smax = +q.smax || Infinity;
       var region = q.region || 'all';
@@ -201,7 +202,7 @@ const STEPS = [
       root.querySelector('.mq-lock-copy').style.display = n > 0 ? '' : 'none';
 
       var msg =
-        'Hi Lawrence, I just did the property match quiz on your website. My answers — Budget: ' +
+        'Hi Lawrence, I just did the property match quiz on your website. My answers — Monthly budget: ' +
         budget + ' | Area: ' + area + ' | Space: ' + size + '. ' +
         (n > 0
           ? 'It found ' + n + ' matching projects — please send me the list.'

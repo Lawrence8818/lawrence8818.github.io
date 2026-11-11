@@ -10,7 +10,6 @@ import { SITE } from '../data/site';
  */
 export interface PropertyFacts {
   name: string;
-  priceFrom: string;
   location: string;
   region?: string;
   tenure: string;
@@ -46,11 +45,25 @@ export function placeText(d: PropertyFacts): string {
   return loc;
 }
 
-/** "RM 626,000" → 626000;不是数字价格(如 Price on request)回传 undefined */
-export function priceNumber(priceFrom: string): number | undefined {
-  if (!isRm(priceFrom)) return undefined;
-  const n = parseInt((priceFrom.match(/[\d,]+/)?.[0] ?? '').replace(/,/g, ''), 10);
+/** "RM 2,060" → 2060;没填月供回传 undefined(配对测验和筛选用) */
+export function monthlyNumber(monthly?: string): number | undefined {
+  if (!isRm(monthly)) return undefined;
+  const n = parseInt((monthly!.match(/[\d,]+/)?.[0] ?? '').replace(/,/g, ''), 10);
   return Number.isFinite(n) && n > 0 ? n : undefined;
+}
+
+/**
+ * 卡片和页首那个大字金额。全站不显示售价,只讲月供:
+ * 有月供 → "RM 2,060";已售完 → "Fully sold";没填月供 → "Instalment on request"。
+ * amount 为 true 时前面可以接 "From"、后面可以接 "/ month"。
+ */
+export function instalmentDisplay(d: { monthly?: string; soldOut?: boolean }): {
+  text: string;
+  amount: boolean;
+} {
+  if (d.soldOut) return { text: 'Fully sold', amount: false };
+  if (isRm(d.monthly)) return { text: d.monthly!, amount: true };
+  return { text: 'Instalment on request', amount: false };
 }
 
 const tenureKnown = (d: PropertyFacts) => !/tbc|tba/i.test(d.tenure);

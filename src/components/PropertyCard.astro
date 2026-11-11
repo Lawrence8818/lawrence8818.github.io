@@ -2,11 +2,13 @@
 import { url } from '../lib/url';
 import { waLink, waContextMessage } from '../lib/whatsapp';
 import { landingHref } from '../lib/landing';
+import { instalmentDisplay } from '../lib/property-facts';
 
 interface Props {
   name: string;
   label?: string;
-  priceFrom: string;
+  /** kept as data only — never rendered (the site shows instalments, not prices) */
+  priceFrom?: string;
   location: string;
   type?: string;
   tenure: string;
@@ -29,7 +31,6 @@ interface Props {
 const {
   name,
   label,
-  priceFrom,
   location,
   type,
   tenure,
@@ -53,13 +54,13 @@ const specs = [
   { k: 'Land Tenure', v: tenure },
   { k: 'Land Size', v: landSize },
   ...(layoutSize ? [{ k: 'Layout Size', v: layoutSize }] : []),
-  ...(monthly ? [{ k: 'Monthly', v: `${monthly}+` }] : []),
   { k: 'Completion', v: completion },
 ];
 const contactMsg = waContextMessage(name);
-// Numeric prices read as "From RM …"; a non-RM placeholder (e.g. "Price on
-// request") is shown on its own so it never renders "From Price on request".
-const priceLabel = /^RM/.test(priceFrom) ? `From ${priceFrom}` : priceFrom;
+// The headline figure is the monthly instalment — the site never shows the
+// selling price. Listings without one read "Instalment on request".
+const instalment = instalmentDisplay({ monthly, soldOut });
+const priceLabel = instalment.amount ? `From ${instalment.text} / month` : instalment.text;
 ---
 
 <article
