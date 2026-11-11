@@ -5,6 +5,7 @@ import { SITE } from '../data/site';
  *
  * AI 搜索引用的是「能直接当答案的句子」,光有一格一格的规格表不够。
  * 所有内容都只从现有栏位推出来,不加任何资料里没有的说法;
+ * 金额只讲月供,不写售价(Lawrence 2026-11-11 的要求);
  * 每日同步改了 CSV,这些句子会跟着变,不用手写。
  */
 export interface PropertyFacts {
@@ -85,15 +86,11 @@ function completionSentence(d: PropertyFacts): string {
   return `The target completion date for ${d.name} is ${c}.`;
 }
 
-function priceSentence(d: PropertyFacts): string {
-  if (!isRm(d.priceFrom)) {
-    return d.soldOut ? '' : `Pricing for ${d.name} is available on request.`;
-  }
-  if (d.soldOut) return `Prices at ${d.name} started from ${d.priceFrom}.`;
-  const monthly = isRm(d.monthly)
-    ? `, with an estimated monthly instalment from about ${d.monthly}`
-    : '';
-  return `Prices at ${d.name} start from ${d.priceFrom}${monthly}.`;
+// 不写售价 —— Lawrence 要求对外只讲月供。月供数字来自 CSV 的 monthly_from,
+// 没填的项目就不提金额,不自己拿售价去推算。
+function instalmentSentence(d: PropertyFacts): string {
+  if (d.soldOut || !isRm(d.monthly)) return '';
+  return `The estimated monthly instalment for ${d.name} starts from about ${d.monthly}.`;
 }
 
 const hasMaintenance = (d: PropertyFacts) => isRm(d.maintenance);
@@ -108,7 +105,7 @@ export function propertySummary(d: PropertyFacts): string {
       ? `It is ${lcFirst(d.tenure)}${land ? ` and the site covers ${land}` : ''}.`
       : tenureSentence(d) + (land ? ` The site covers ${land}.` : ''),
     layoutSentence(d, false),
-    priceSentence(d),
+    instalmentSentence(d),
     hasMaintenance(d) ? `The maintenance fee is ${maintenanceText(d)}.` : '',
     completionSentence(d),
   ]
@@ -121,17 +118,17 @@ export function propertyFaqs(d: PropertyFacts): { question: string; answer: stri
   const phone = `+${SITE.whatsappNumber}`;
   const faqs: { question: string; answer: string }[] = [];
 
-  const price = priceSentence(d);
-  if (price || d.soldOut) {
-    faqs.push({
-      question: `How much does ${d.name} cost?`,
-      answer: d.soldOut
-        ? `${d.name} is fully sold.${price ? ' ' + price : ''}`
-        : isRm(d.priceFrom) && isRm(d.monthly)
-          ? `${price} The actual instalment depends on your loan margin, interest rate and tenure.`
-          : `${price}${isRm(d.priceFrom) ? '' : ` Message Lawrence Law on WhatsApp (${phone}) for the current price list.`}`,
-    });
-  }
+  const instalment = instalmentSentence(d);
+  faqs.push(
+    d.soldOut
+      ? { question: `Is ${d.name} still available?`, answer: `No — ${d.name} is fully sold.` }
+      : {
+          question: `What is the monthly instalment for ${d.name}?`,
+          answer: instalment
+            ? `${instalment} The actual figure depends on your loan margin, interest rate and tenure.`
+            : `The instalment for ${d.name} depends on the unit you choose and on your loan margin, interest rate and tenure. Message ${SITE.name} on WhatsApp (${phone}) for an estimate based on your own numbers.`,
+        },
+  );
 
   faqs.push({
     question: `Where is ${d.name} located?`,
@@ -184,6 +181,7 @@ export function propertySpecs(d: PropertyFacts): { name: string; value: string }
     { name: 'Estimated monthly instalment from', value: d.monthly },
     { name: 'Maintenance fee', value: d.maintenance },
     { name: 'Completion', value: d.completion },
+    { name: 'Sales status', value: d.soldOut ? 'Fully sold' : undefined },
   ].filter((s): s is { name: string; value: string } => !blank(s.value));
 }
 
@@ -191,8 +189,7 @@ export function propertySpecs(d: PropertyFacts): { name: string; value: string }
 export function propertyOneLine(d: PropertyFacts): string {
   return [
     placeText(d),
-    d.soldOut ? 'fully sold' : '',
-    isRm(d.priceFrom) ? `from ${d.priceFrom}` : d.soldOut ? '' : 'price on request',
+    d.soldOut ? 'fully sold' : isRm(d.monthly) ? `monthly instalment from about ${d.monthly}` : '',
     d.tenure,
     d.layoutSize ? sqft(d.layoutSize) : '',
     `completion: ${d.completion}`,

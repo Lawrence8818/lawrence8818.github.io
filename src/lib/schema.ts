@@ -115,20 +115,17 @@ export function articleSchema(opts: {
 }
 
 /**
- * 项目详情页:一个 RealEstateListing(这一页)+ 它讲的那个项目(Place —— 清单里也有办公楼,不能一律标成住宅)
- * + 起价。起价用 AggregateOffer.lowPrice —— schema.org 里「从 RM xxx 起」的
- * 标准写法,不会被读成固定售价。
+ * 项目详情页:一个 RealEstateListing(这一页)+ 它讲的那个项目(Place ——
+ * 清单里也有办公楼,不能一律标成住宅)。
+ * 不输出售价(offers):对外只讲月供,月供在 additionalProperty 里。
  */
 export function propertyListingSchema(opts: {
-  siteUrl: string;
   url: string;
   name: string;
   description: string;
   locality: string;
   image?: string;
   specs: { name: string; value: string }[];
-  lowPrice?: number;
-  soldOut?: boolean;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -154,17 +151,6 @@ export function propertyListingSchema(opts: {
         value: s.value,
       })),
     },
-    ...(opts.lowPrice
-      ? {
-          offers: {
-            '@type': 'AggregateOffer',
-            priceCurrency: 'MYR',
-            lowPrice: opts.lowPrice,
-            ...(opts.soldOut ? { availability: 'https://schema.org/SoldOut' } : {}),
-            seller: { '@id': agentId(opts.siteUrl) },
-          },
-        }
-      : {}),
   };
 }
 

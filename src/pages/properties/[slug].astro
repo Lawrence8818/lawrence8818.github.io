@@ -41,7 +41,6 @@ const hasPrice = priceNum !== undefined;
 const summary = propertySummary(d);
 const faqs = propertyFaqs(d);
 
-const siteUrl = Astro.site?.href ?? 'https://www.lawrencelawproperty.com/';
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 // Only advertise the photo to crawlers once the real file has been uploaded
 const hasPhoto = existsSync(join(process.cwd(), 'public', d.image));
@@ -72,15 +71,12 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
   <JsonLd
     slot="head"
     data={propertyListingSchema({
-      siteUrl,
       url: canonical,
       name: d.name,
       description: summary,
       locality: placeText(d),
       image: hasPhoto ? new URL(url(d.image), Astro.site).href : undefined,
       specs: propertySpecs(d),
-      lowPrice: priceNum,
-      soldOut: d.soldOut,
     })}
   />
   <JsonLd
@@ -190,8 +186,8 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
       <div class="gold-rule"></div>
       <p class="text-[17px] leading-relaxed text-ink/90">{summary}</p>
       <p class="mt-4 text-[13px] text-ink/60">
-        Figures are starting prices and developer estimates and can change — message me for the
-        latest price list and availability.
+        Instalment figures are estimates and project details can change — message me for the
+        latest numbers and availability.
       </p>
     </div>
   </section>

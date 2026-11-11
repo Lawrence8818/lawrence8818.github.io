@@ -27,11 +27,11 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     `> ${SITE.name} (${SITE.nameZh}) is a registered estate negotiator in Malaysia (${SITE.renNumber}), in real estate since ${SITE.since}. ` +
       `He specialises in new-launch property in ${areasText}, with a background in the subsale market. ` +
-      'This site lists the projects he covers — with starting price, land tenure, unit sizes and completion date — alongside his home-buyer guides.',
+      'This site lists the projects he covers — with estimated monthly instalment, land tenure, unit sizes and completion date — alongside his home-buyer guides.',
     '',
     `- Contact: WhatsApp +${SITE.whatsappNumber} · ${SITE.email}`,
     '- Languages: Chinese, English, Malay',
-    '- Project figures are starting prices and developer estimates. They change, so confirm the current price and availability before relying on them.',
+    '- Instalment figures are estimates and project details change, so confirm the current numbers and availability before relying on them.',
     '',
     '## About',
     '',
