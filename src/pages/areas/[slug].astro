@@ -1,5 +1,4 @@
 ---
-import PendingNotice from '../../components/PendingNotice.astro';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FAQ from '../../components/FAQ.astro';
@@ -25,7 +24,6 @@ const waMsg = waContextMessage(`buying property in ${area.data.name}`);
   description={area.data.intro}
   waMessage={waMsg}
 >
-  <PendingNotice note="Area guide draft — awaiting Lawrence’s review." />
   <JsonLd
     slot="head"
     data={breadcrumbSchema([
@@ -74,7 +72,6 @@ const waMsg = waContextMessage(`buying property in ${area.data.name}`);
                   <p class="font-semibold text-navy-900">{p.name}</p>
                   <p class="text-sm text-ink/70">{p.type}{p.note && ` · ${p.note}`}</p>
                 </div>
-                {p.priceFrom && <p class="text-sm font-semibold text-gold-600">From {p.priceFrom}</p>}
               </div>
             ))}
           </div>

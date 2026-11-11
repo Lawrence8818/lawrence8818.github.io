@@ -2,7 +2,8 @@
 import { SITE } from '../data/site';
 
 interface Props {
-  /** Pre-fill the price box, e.g. 626000 (from a listing's priceFrom) */
+  /** Pre-fill the price box. Never pass a listing's own price here — the
+   *  site shows instalments only; the default is a neutral example figure. */
   price?: number;
   /** Project name, used in the prefilled WhatsApp message */
   projectName?: string;

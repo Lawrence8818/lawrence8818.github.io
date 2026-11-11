@@ -15,6 +15,7 @@ import { SERVICES } from '../data/services';
 import { SITE } from '../data/site';
 import { url } from '../lib/url';
 import { landingHref } from '../lib/landing';
+import { instalmentDisplay } from '../lib/property-facts';
 import { waLink, waContextMessage } from '../lib/whatsapp';
 
 const videos = (await getCollection('videos'))
@@ -195,7 +196,10 @@ const marqueeItems =
                     <p class="text-sm text-ink/60">{p.data.location}</p>
                   </div>
                   <p class="flex-none font-bold text-navy-900">
-                    From {p.data.priceFrom} <span class="text-gold-500">→</span>
+                    {(() => {
+                      const i = instalmentDisplay(p.data);
+                      return i.amount ? `From ${i.text}/mo` : i.text;
+                    })()} <span class="text-gold-500">→</span>
                   </p>
                 </div>
                 <div class="mt-1 flex gap-5 text-sm">

@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import MortgageCalculator from '../../components/MortgageCalculator.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
 import CTASection from '../../components/CTASection.astro';
 import FAQ from '../../components/FAQ.astro';
@@ -14,8 +13,8 @@ import { landingHref } from '../../lib/landing';
 import { breadcrumbSchema, propertyListingSchema } from '../../lib/schema';
 import {
   REGION_LABEL,
+  instalmentDisplay,
   placeText,
-  priceNumber,
   propertyFaqs,
   propertySpecs,
   propertySummary,
@@ -32,9 +31,17 @@ export async function getStaticPaths() {
 const { p, all } = Astro.props;
 const d = p.data;
 
-// "RM 626,000" → 626000 so the calculator opens on this project's own price
-const priceNum = priceNumber(d.priceFrom);
-const hasPrice = priceNum !== undefined;
+// The site shows monthly instalments, never the selling price.
+const instalment = instalmentDisplay(d);
+const descFacts = [
+  instalment.amount ? `Monthly instalment from about ${instalment.text}` : '',
+  d.layoutSize ? `layouts ${d.layoutSize}` : '',
+  d.tenure,
+  `completion ${d.completion}`,
+]
+  .filter(Boolean)
+  .join(', ')
+  .replace(/^./, (c) => c.toUpperCase());
 
 // Plain-sentence facts + Q&A, built from the same fields as the spec list.
 // This is what answer engines (ChatGPT, Perplexity, Google AI Overviews) quote.
@@ -50,7 +57,6 @@ const specs = [
   { k: 'Land Tenure', v: d.tenure },
   { k: 'Land Size', v: d.landSize },
   ...(d.layoutSize ? [{ k: 'Layout Size', v: d.layoutSize }] : []),
-  ...(d.monthly ? [{ k: 'Monthly From', v: `${d.monthly}+` }] : []),
   ...(d.maintenance && d.maintenance !== '-' ? [{ k: 'Maintenance', v: d.maintenance }] : []),
   { k: 'Completion', v: d.completion },
 ];
@@ -64,8 +70,8 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
 ---
 
 <BaseLayout
-  title={`${d.name}, ${d.location} — Price, Layouts & Completion`}
-  description={`${d.name} in ${d.location}. From ${d.priceFrom}${d.layoutSize ? `, layouts ${d.layoutSize}` : ''}, ${d.tenure}, completion ${d.completion}. Personally vetted by Lawrence Law — ask me anything on WhatsApp.`}
+  title={`${d.name}, ${d.location} — Instalment, Layouts & Completion`}
+  description={`${d.name} in ${d.location}. ${descFacts}. Personally vetted by Lawrence Law — ask me anything on WhatsApp.`}
   waMessage={waMsg}
 >
   <JsonLd
@@ -134,10 +140,18 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
           <h1 class="text-[34px] leading-tight text-white sm:text-5xl">{d.name}</h1>
           <div class="my-5 h-px w-16 bg-gold-500"></div>
 
-          <p class="text-[15px] text-navy-100">{/^RM/.test(d.priceFrom) ? 'From' : ''}</p>
-          <p class="text-[34px] leading-none font-extrabold text-white sm:text-[44px]">
-            {d.priceFrom}
-          </p>
+          {instalment.amount ? (
+            <>
+              <p class="text-[15px] text-navy-100">Monthly instalment from</p>
+              <p class="text-[34px] leading-none font-extrabold text-white sm:text-[44px]">
+                {instalment.text}
+              </p>
+            </>
+          ) : (
+            <p class="text-[26px] leading-tight font-extrabold text-white sm:text-[32px]">
+              {instalment.text}
+            </p>
+          )}
 
           <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-white/15 pt-6">
             {specs.map((s) => (
@@ -191,16 +205,6 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
       </p>
     </div>
   </section>
-
-  {/* ===== Calculator, opened on this project's price ===== */}
-  {hasPrice && (
-    <MortgageCalculator
-      price={priceNum}
-      projectName={d.name}
-      heading={`Can I Afford ${d.name}?`}
-      tone="light"
-    />
-  )}
 
   {/* ===== Same-area projects ===== */}
   {related.length > 0 && (
