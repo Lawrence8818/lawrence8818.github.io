@@ -1,6 +1,5 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import PendingNotice from '../components/PendingNotice.astro';
 import FAQ from '../components/FAQ.astro';
 import CTASection from '../components/CTASection.astro';
 import JsonLd from '../components/JsonLd.astro';
@@ -23,7 +22,6 @@ const dateFmt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' });
 ---
 
 <BaseLayout title={title} description={description} ogType="article" waMessage={waContextMessage(title)}>
-  <PendingNotice note="Draft article written for Lawrence — awaiting his review before launch." />
   <JsonLd
     slot="head"
     data={articleSchema({ title, description, url: canonical, datePublished: publishDate, dateModified: updatedDate })}

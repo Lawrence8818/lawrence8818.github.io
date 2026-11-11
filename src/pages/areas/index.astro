@@ -1,5 +1,4 @@
 ---
-import PendingNotice from '../../components/PendingNotice.astro';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AreaCard from '../../components/AreaCard.astro';
@@ -12,7 +11,6 @@ const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.dat
   title="Areas: Klang Valley (KL/Selangor), Johor & Penang New Launches, All Covered"
   description="Lawrence covers the entire Klang Valley (all Kuala Lumpur + Selangor new projects), plus Johor Bahru and Penang. The market logic, hot spots and common buyer questions for each area — read first, then ask."
 >
-  <PendingNotice note="Area guides are drafts — awaiting Lawrence’s review." />
   <section class="bg-navy-900 py-12 text-white">
     <div class="container-site">
       <h1 class="text-3xl sm:text-4xl text-white">Areas I serve</h1>
