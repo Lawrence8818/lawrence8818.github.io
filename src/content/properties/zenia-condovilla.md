@@ -1,7 +1,7 @@
 ---
 name: "Zenia Condovilla @Block B & E"
 priceFrom: "RM 1,300,000"
-location: "ParkCity Damansara, Kwasa Damansara, PJ"
+location: "ParkCity Damansara, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold"
 landSize: "55.05 Acres"

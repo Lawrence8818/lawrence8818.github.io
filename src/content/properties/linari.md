@@ -1,7 +1,7 @@
 ---
 name: "Linari"
 priceFrom: "RM 820,000"
-location: "Kwasa Damansara, PJ"
+location: "Kwasa Damansara, Selangor"
 region: "petaling-jaya"
 tenure: "Freehold"
 landSize: "8.79 acres"

@@ -1,7 +1,7 @@
 ---
 name: "Avantro Residences"
 priceFrom: "RM 664,000"
-location: "Puchong BK5"
+location: "Puchong BK5, Selangor"
 region: "selangor"
 tenure: "Freehold"
 landSize: "3.43 acres"

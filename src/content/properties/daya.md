@@ -1,7 +1,7 @@
 ---
 name: "Daya"
 priceFrom: "RM 576,000"
-location: "Kwasa Damansara, PJ"
+location: "Kwasa Damansara, Selangor"
 region: "petaling-jaya"
 tenure: "Freehold"
 landSize: "-"

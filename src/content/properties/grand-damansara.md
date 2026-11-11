@@ -1,7 +1,7 @@
 ---
 name: "Grand Damansara"
 priceFrom: "RM 253,800"
-location: "Damansara, PJ"
+location: "Bandar Utama, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold"
 landSize: "2.8 acres"

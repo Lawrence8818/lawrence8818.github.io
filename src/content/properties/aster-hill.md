@@ -2,7 +2,7 @@
 name: "Aster Hill"
 label: "FAMILY-ORIENTED"
 priceFrom: "RM 500,000"
-location: "Sri Petaling"
+location: "Sri Petaling, Kuala Lumpur"
 region: "kuala-lumpur"
 tenure: "Freehold"
 landSize: "4.72 acres"

@@ -2,7 +2,7 @@
 name: "Quaver Residence"
 label: "FAMILY-ORIENTED"
 priceFrom: "RM 575,000"
-location: "Seri Kembangan, Kuala Lumpur"
+location: "Seri Kembangan, Selangor"
 region: "kuala-lumpur"
 tenure: "Leasehold"
 landSize: "3.406 acres"

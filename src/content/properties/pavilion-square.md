@@ -1,7 +1,7 @@
 ---
 name: "Pavilion Square"
 priceFrom: "RM 1,240,000"
-location: "Bukit Bintang"
+location: "Bukit Bintang, Kuala Lumpur"
 region: "klcc"
 tenure: "Leasehold"
 landSize: "2.023 acres"

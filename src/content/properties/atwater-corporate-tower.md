@@ -1,7 +1,7 @@
 ---
 name: "Atwater Corporate Tower"
 priceFrom: "RM 1,236,100"
-location: "Petaling Jaya"
+location: "Petaling Jaya, Selangor"
 region: "petaling-jaya"
 tenure: "Leasehold (to Dec 2116)"
 landSize: "5.09 acres (2.95 commercial)"
