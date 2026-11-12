@@ -51,7 +51,13 @@ Lawrence 的要求,9 页都已照做,新页面也要照做:
 
 > Message me and I will arrange a slot and meet you there.
 
-页面其他位置(登记区、位置说明、地图等)目前还有画廊名称或地址,是否一并拿掉待定。
+页面其他位置也照同一条规矩(2026-11-12 已全部处理):登记区、步骤说明、位置介绍、
+页脚、执照披露栏里都不出现画廊名称、所在大楼、地址、地图或开放时间。统一写法:
+
+- 清单里:`A viewing appointment, arranged by me`
+- 步骤里:`We book a viewing — I'll arrange a slot and meet you there.`
+
+发展商自己的注册地址(执照披露栏、「Who is the developer」)属于法定资料,保留。
 
 ## 构建时自动补上的东西(2026-11-11 起)
 

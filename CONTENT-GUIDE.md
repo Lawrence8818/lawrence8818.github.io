@@ -32,14 +32,18 @@
 
 - 问到能不能看示范单位:只回答有,**不写示范单位或销售画廊的名称、地址、开放时间**。
 - 统一接一句:`Message me and I will arrange a slot and meet you there.`
+- 页面其他位置也一样(登记区、步骤说明、位置介绍、页脚、执照披露栏):
+  不出现画廊名称、所在大楼、地址、地图或开放时间,一律写成由你安排,
+  例如 `A viewing appointment, arranged by me`。
 
 ### 4. 地点的写法
 
 - 格式是「地区, 州属或城市」,例如 `Kwasa Damansara, Selangor`、`Sri Petaling, Kuala Lumpur`。
 - 2026-11-11 更正了 17 个项目的地点,Quaver Residence 也移到 Selangor 筛选分组。
-- 这些更正**还没进 `Project-Info-Master`**。在那边补上之前,网站靠
-  `scripts/sync-from-master.mjs` 里的 `SITE_OVERRIDES` 保住正确写法,不会被每日同步改回去。
-  CSV 补上后,同步会提示可以把对应的条目删掉。
+- 这些更正已经写进 `Project-Info-Master`(2026-11-12 确认),网站和资料仓库现在一致。
+- 以后如果你先在网站这边更正了某个栏位、资料仓库还没改,Claude 会把它暂时记在
+  `scripts/sync-from-master.mjs` 的 `SITE_OVERRIDES` 里,免得被每日同步改回去;
+  资料仓库跟上后,同步会提示可以删掉。
 
 ### 5. 给 AI 搜索看的资料(AEO)都是自动生成的
 
@@ -58,7 +62,6 @@
 - **26 个项目没有月供数字**,目前显示 `Instalment on request`。有数字就发给 Claude。
 - **AEO 第 5 项**:客户见证页的标记;更重要的是开通 Google 商家资料并请客户留评价(这部分只有你能做)。
 - **AEO 第 3 项**:中文版。建议先做首页、About 和 9 篇指南。
-- **落地页其他位置的画廊名称和地址**(登记区、位置说明等)还在,是否一并拿掉待定。
 
 ---
 
