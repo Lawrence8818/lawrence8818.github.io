@@ -1,0 +1,9 @@
+---
+// 中文版项目页:/zh/properties/<slug>/
+// 版面和资料与英文版共用同一个模板,模板会按网址判断语言。
+import Page, { getStaticPaths as base } from '../../properties/[slug].astro';
+
+export const getStaticPaths = base;
+---
+
+<Page {...Astro.props} />

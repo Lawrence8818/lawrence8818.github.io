@@ -33,6 +33,7 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     `- Contact: WhatsApp +${SITE.whatsappNumber} · ${SITE.email}`,
     '- Languages: Chinese, English, Malay',
+    `- 中文版 (Simplified Chinese edition of the home page, About, buyer guides and every project page): ${abs('/zh/')}`,
     '- Instalment figures are estimates and project details change, so confirm the current numbers and availability before relying on them.',
     '',
     '## About',

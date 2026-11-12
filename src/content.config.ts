@@ -1,22 +1,34 @@
 import { defineCollection, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 
+const guideSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  category: z.enum(['Buying Basics', 'Avoiding Pitfalls', 'Loans & Financing', 'The Buying Process']),
+  publishDate: z.coerce.date(),
+  updatedDate: z.coerce.date().optional(),
+  cover: z.string().optional(),
+  faqs: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
+  featured: z.boolean().default(false),
+  draft: z.boolean().default(false),
+  /** 可选:关联视频的 slug,文章页会嵌入该视频 */
+  relatedVideo: z.string().optional(),
+});
+
 /** 买房指南文章:src/content/guides/*.md,一篇文章 = 一个文件 */
 const guides = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/guides' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    category: z.enum(['Buying Basics', 'Avoiding Pitfalls', 'Loans & Financing', 'The Buying Process']),
-    publishDate: z.coerce.date(),
-    updatedDate: z.coerce.date().optional(),
-    cover: z.string().optional(),
-    faqs: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
-    featured: z.boolean().default(false),
-    draft: z.boolean().default(false),
-    /** 可选:关联视频的 slug,文章页会嵌入该视频 */
-    relatedVideo: z.string().optional(),
-  }),
+  schema: guideSchema,
+});
+
+/**
+ * 指南的中文版:src/content/guides-zh/*.md,文件名和英文版一一对应
+ * (同一个文件名 = 同一篇文章的两种语言)。category 仍填英文的四个分类名,
+ * 页面上会显示成中文。
+ */
+const guidesZh = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/guides-zh' }),
+  schema: guideSchema,
 });
 
 /** 视频:src/content/videos/*.md,一支视频 = 一个文件,正文是 show notes(可空) */
@@ -127,4 +139,4 @@ const testimonials = defineCollection({
   }),
 });
 
-export const collections = { guides, videos, areas, properties, testimonials };
+export const collections = { guides, guidesZh, videos, areas, properties, testimonials };

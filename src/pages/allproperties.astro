@@ -3,7 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PropertyCard from '../components/PropertyCard.astro';
 import CTASection from '../components/CTASection.astro';
-import { monthlyNumber } from '../lib/property-facts';
+import { monthlyNumber, REGION_LABEL_ZH } from '../lib/property-facts';
+import { langOf, pick } from '../i18n';
+
+// 这个模板同时出英文页(/allproperties/)和中文页(/zh/allproperties/)
+const lang = langOf(Astro);
+const zh = lang === 'zh';
 
 // Real projects (order 1–99) come first, sample/demo entries (order 100+) after.
 const properties = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
@@ -25,7 +30,36 @@ const REGIONS = [
   { key: 'selangor', label: 'Selangor' },
   { key: 'johor', label: 'Johor' },
   { key: 'penang', label: 'Penang' },
-].filter((r) => countFor(r.key) > 0);
+]
+  .filter((r) => countFor(r.key) > 0)
+  .map((r) => (zh ? { ...r, label: r.key === 'all' ? '全部' : REGION_LABEL_ZH[r.key] } : r));
+
+// 页面脚本里要显示的文字,按语言备好再传进去
+const T = zh
+  ? {
+      showing: '显示第 {a}–{b} 个，共 {n} 个项目',
+      prev: '‹ 上一页',
+      next: '下一页 ›',
+      sf: ' 平方尺',
+      photoView: '图片模式',
+      textView: '文字模式',
+      above: '{x} 以上',
+      under: '{x} 以下',
+      monthly: '月供：',
+      clear: '清除月供筛选 ',
+    }
+  : {
+      showing: 'Showing {a}–{b} of {n} projects',
+      prev: '‹ Prev',
+      next: 'Next ›',
+      sf: ' sf',
+      photoView: 'Photo view',
+      textView: 'Text view',
+      above: 'Above {x}',
+      under: 'Under {x}',
+      monthly: 'Monthly: ',
+      clear: 'Clear budget filter ',
+    };
 
 // Special filters
 const penthouseCount = liveProps.filter((p) => p.data.penthouse).length;
@@ -53,13 +87,17 @@ const PAGE_SIZE = 9;
 ---
 
 <BaseLayout
-  title="Featured Properties: Curated New Launches in KL, Selangor, Johor & Penang"
-  description="Browse new-launch projects Lawrence recommends across Kuala Lumpur, Selangor, Johor and Penang — filter by region and page through the full list. Every listing personally vetted."
+  title={pick(lang, 'Featured Properties: Curated New Launches in KL, Selangor, Johor & Penang', '精选项目：吉隆坡、雪兰莪、柔佛、槟城的新盘')}
+  description={pick(
+    lang,
+    'Browse new-launch projects Lawrence recommends across Kuala Lumpur, Selangor, Johor and Penang — filter by region and page through the full list. Every listing personally vetted.',
+    '浏览 Lawrence 在吉隆坡、雪兰莪、柔佛和槟城推荐的新盘，可按地区和单位面积筛选。每一个项目都经过他亲自了解。',
+  )}
 >
   <section class="bg-navy-900 pt-14 pb-4 text-white sm:pt-20 sm:pb-6">
     <div class="container-site">
       <div class="flex items-start justify-between gap-4">
-        <h1 class="mb-4 text-[32px] leading-tight text-white sm:text-5xl">Featured Properties</h1>
+        <h1 class="mb-4 text-[32px] leading-tight text-white sm:text-5xl">{pick(lang, 'Featured Properties', '精选项目')}</h1>
         <button
           id="view-toggle"
           type="button"
@@ -67,13 +105,16 @@ const PAGE_SIZE = 9;
           class="label-sm mt-1 inline-flex min-h-11 flex-none items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-white transition hover:border-gold-500 hover:text-gold-500"
         >
           <span id="view-toggle-icon" class="flex-none" aria-hidden="true"></span>
-          <span id="view-toggle-label">Text view</span>
+          <span id="view-toggle-label">{T.textView}</span>
         </button>
       </div>
       <div class="mb-5 h-px w-16 bg-gold-500"></div>
       <p class="max-w-2xl text-[17px] leading-[1.8] text-navy-100">
-        Premium developments across Kuala Lumpur, Petaling Jaya, Selangor, Johor & Penang, every
-        project here has passed my own developer background check before I show it to buyers.
+        {pick(
+          lang,
+          'Premium developments across Kuala Lumpur, Petaling Jaya, Selangor, Johor & Penang, every project here has passed my own developer background check before I show it to buyers.',
+          '吉隆坡、八打灵再也、雪兰莪、柔佛和槟城的优质发展项目。这里的每一个项目，都是我先查过发展商背景，才介绍给买家的。',
+        )}
       </p>
     </div>
   </section>
@@ -94,7 +135,7 @@ const PAGE_SIZE = 9;
         ))}
         {(penthouseCount > 0 || soldOutCount > 0) && (
           <span class="flex flex-wrap items-center gap-2.5 border-l border-white/25 pl-2.5">
-            <span class="label-sm text-navy-100/70">Special</span>
+            <span class="label-sm text-navy-100/70">{pick(lang, 'Special', '特别筛选')}</span>
             {penthouseCount > 0 && (
               <button
                 type="button"
@@ -110,7 +151,7 @@ const PAGE_SIZE = 9;
                 id="prop-soldout"
                 class="label-sm inline-flex min-h-11 items-center rounded-full border border-white/40 px-4 py-2 text-navy-100 transition hover:border-white data-[active]:border-white data-[active]:bg-white/90 data-[active]:text-navy-900"
               >
-                Fully Sold <span class="opacity-70">({soldOutCount})</span>
+                {pick(lang, 'Fully Sold', '已售完')} <span class="opacity-70">({soldOutCount})</span>
               </button>
             )}
           </span>
@@ -120,7 +161,7 @@ const PAGE_SIZE = 9;
       {/* ===== Layout-size range slider — drag either handle ===== */}
       <div id="prop-size" class="mb-8 max-w-md">
         <div class="mb-2.5 flex items-baseline justify-between">
-          <span class="label-sm text-navy-100/70">Layout size (sq ft)</span>
+          <span class="label-sm text-navy-100/70">{pick(lang, 'Layout size (sq ft)', '单位面积（平方尺）')}</span>
           <span class="label-sm text-gold-500" id="prop-size-readout"></span>
         </div>
         <div class="prop-range">
@@ -133,7 +174,7 @@ const PAGE_SIZE = 9;
             max={SIZE_MAX}
             step={SIZE_STEP}
             value={SIZE_MIN}
-            aria-label="Minimum layout size"
+            aria-label={pick(lang, 'Minimum layout size', '最小单位面积')}
           />
           <input
             type="range"
@@ -142,7 +183,7 @@ const PAGE_SIZE = 9;
             max={SIZE_MAX}
             step={SIZE_STEP}
             value={SIZE_MAX}
-            aria-label="Maximum layout size"
+            aria-label={pick(lang, 'Maximum layout size', '最大单位面积')}
           />
         </div>
       </div>
@@ -170,22 +211,25 @@ const PAGE_SIZE = 9;
       </div>
 
       <p id="prop-empty" class="hidden py-12 text-center text-navy-100">
-        No projects in this region yet — message me on WhatsApp and I’ll send you what’s launching.
+        {pick(lang, 'No projects in this region yet — message me on WhatsApp and I’ll send you what’s launching.', '这一区暂时没有项目。WhatsApp 我，我把即将推出的项目发给你。')}
       </p>
 
       {/* ===== Pagination controls (built by JS) ===== */}
-      <nav id="prop-pagination" class="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="Property pages"></nav>
+      <nav id="prop-pagination" class="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label={pick(lang, 'Property pages', '项目分页')}></nav>
 
       <p class="mt-10 text-center text-sm text-navy-100/80">
-        Don’t see what you’re looking for? These are highlights only — I cover every new launch in
-        the Klang Valley, Johor and Penang.
+        {pick(
+          lang,
+          'Don’t see what you’re looking for? These are highlights only — I cover every new launch in the Klang Valley, Johor and Penang.',
+          '没找到想要的？这里只是精选。巴生谷、柔佛和槟城的新盘我都有覆盖。',
+        )}
       </p>
     </div>
   </section>
 
   <CTASection
-    heading="Want a shortlist matched to your budget?"
-    sub="Tell me your budget and preferred area — I’ll compare the options side by side and send you a personal shortlist."
+    heading={pick(lang, 'Want a shortlist matched to your budget?', '想要一份符合你预算的名单？')}
+    sub={pick(lang, 'Tell me your budget and preferred area — I’ll compare the options side by side and send you a personal shortlist.', '告诉我你的预算和想住的地区，我把合适的项目摆在一起比较，整理一份专属名单给你。')}
   />
 </BaseLayout>
 
@@ -302,7 +346,7 @@ const PAGE_SIZE = 9;
   }
 </style>
 
-<script is:inline define:vars={{ PAGE_SIZE, SIZE_MIN, SIZE_MAX }}>
+<script is:inline define:vars={{ PAGE_SIZE, SIZE_MIN, SIZE_MAX, T }}>
   (function () {
     const grid = document.getElementById('prop-grid');
     if (!grid) return;
@@ -381,7 +425,7 @@ const PAGE_SIZE = 9;
       emptyEl.classList.toggle('hidden', visible.length !== 0);
       if (countEl) {
         countEl.textContent = visible.length
-          ? `Showing ${start + 1}–${Math.min(end, visible.length)} of ${visible.length} projects`
+          ? T.showing.replace('{a}', start + 1).replace('{b}', Math.min(end, visible.length)).replace('{n}', visible.length)
           : '';
       }
       buildPager(pages);
@@ -407,11 +451,11 @@ const PAGE_SIZE = 9;
     function buildPager(pages) {
       pager.innerHTML = '';
       if (pages <= 1) return;
-      pager.appendChild(pageBtn('‹ Prev', page - 1, { disabled: page === 1 }));
+      pager.appendChild(pageBtn(T.prev, page - 1, { disabled: page === 1 }));
       for (let i = 1; i <= pages; i++) {
         pager.appendChild(pageBtn(String(i), i, { active: i === page }));
       }
-      pager.appendChild(pageBtn('Next ›', page + 1, { disabled: page === pages }));
+      pager.appendChild(pageBtn(T.next, page + 1, { disabled: page === pages }));
     }
 
     // The region buttons are single-select; the two Special toggles (Penthouse,
@@ -482,7 +526,7 @@ const PAGE_SIZE = 9;
       }
       if (sOut) {
         sOut.textContent =
-          fmt(sizeLo) + ' – ' + (sizeHi >= SIZE_MAX ? fmt(SIZE_MAX) + '+' : fmt(sizeHi)) + ' sf';
+          fmt(sizeLo) + ' – ' + (sizeHi >= SIZE_MAX ? fmt(SIZE_MAX) + '+' : fmt(sizeHi)) + T.sf;
       }
     }
 
@@ -517,7 +561,7 @@ const PAGE_SIZE = 9;
       grid.classList.toggle('is-text', text);
       if (viewToggle) viewToggle.setAttribute('aria-pressed', text ? 'true' : 'false');
       // The button always names the view it will switch TO.
-      if (vLabel) vLabel.textContent = text ? 'Photo view' : 'Text view';
+      if (vLabel) vLabel.textContent = text ? T.photoView : T.textView;
       if (vIcon) vIcon.innerHTML = text ? GRID_SVG : LIST_SVG;
       try {
         localStorage.setItem('llp-prop-view', mode);
@@ -564,16 +608,16 @@ const PAGE_SIZE = 9;
         const fmtK = (n) => 'RM' + n.toLocaleString('en-US');
         const label =
           priceLo > 0 && priceHi !== Infinity ? fmtK(priceLo) + ' – ' + fmtK(priceHi)
-          : priceLo > 0 ? 'Above ' + fmtK(priceLo)
-          : 'Under ' + fmtK(priceHi);
+          : priceLo > 0 ? T.above.replace('{x}', fmtK(priceLo))
+          : T.under.replace('{x}', fmtK(priceHi));
         const bar = document.getElementById('prop-filters');
         if (bar) {
           const chip = document.createElement('button');
           chip.type = 'button';
           chip.className =
             'label-sm inline-flex min-h-11 items-center gap-2 rounded-full border border-gold-500 bg-gold-500 px-4 py-2 text-navy-900';
-          chip.innerHTML = 'Monthly: ' + label + ' <span aria-hidden="true">✕</span>';
-          chip.setAttribute('aria-label', 'Clear budget filter ' + label);
+          chip.innerHTML = T.monthly + label + ' <span aria-hidden="true">✕</span>';
+          chip.setAttribute('aria-label', T.clear + label);
           chip.addEventListener('click', () => {
             priceLo = 0;
             priceHi = Infinity;

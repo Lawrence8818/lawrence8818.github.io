@@ -12,13 +12,21 @@ import { waLink } from '../../lib/whatsapp';
 import { landingHref } from '../../lib/landing';
 import { breadcrumbSchema, propertyListingSchema } from '../../lib/schema';
 import {
+  LABEL_ZH,
   REGION_LABEL,
+  REGION_LABEL_ZH,
   instalmentDisplay,
+  instalmentDisplayZh,
   placeText,
+  placeZh,
   propertyFaqs,
+  propertyFaqsZh,
   propertySpecs,
   propertySummary,
+  propertySummaryZh,
+  specsZh,
 } from '../../lib/property-facts';
+import { langOf, pick, href } from '../../i18n';
 
 export async function getStaticPaths() {
   const all = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
@@ -30,48 +38,72 @@ export async function getStaticPaths() {
 
 const { p, all } = Astro.props;
 const d = p.data;
+// 这个模板同时出英文页(/properties/…)和中文页(/zh/properties/…)
+const lang = langOf(Astro);
+const zh = lang === 'zh';
 
 // The site shows monthly instalments, never the selling price.
-const instalment = instalmentDisplay(d);
-const descFacts = [
-  instalment.amount ? `Monthly instalment from about ${instalment.text}` : '',
-  d.layoutSize ? `layouts ${d.layoutSize}` : '',
-  d.tenure,
-  `completion ${d.completion}`,
-]
-  .filter(Boolean)
-  .join(', ')
-  .replace(/^./, (c) => c.toUpperCase());
+const instalment = zh ? instalmentDisplayZh(d) : instalmentDisplay(d);
+const zhSpecs = specsZh(d);
+const descFacts = zh
+  ? [
+      instalment.amount ? `预估月供约 ${instalment.text} 起` : '',
+      ...zhSpecs.filter((x) => x.k !== '土地面积' && x.k !== '管理费').map((x) => (x.k === '地契' ? x.v : `${x.k} ${x.v}`)),
+    ]
+      .filter(Boolean)
+      .join('，')
+  : [
+      instalment.amount ? `Monthly instalment from about ${instalment.text}` : '',
+      d.layoutSize ? `layouts ${d.layoutSize}` : '',
+      d.tenure,
+      `completion ${d.completion}`,
+    ]
+      .filter(Boolean)
+      .join(', ')
+      .replace(/^./, (c) => c.toUpperCase());
 
 // Plain-sentence facts + Q&A, built from the same fields as the spec list.
 // This is what answer engines (ChatGPT, Perplexity, Google AI Overviews) quote.
-const summary = propertySummary(d);
-const faqs = propertyFaqs(d);
+const summary = zh ? propertySummaryZh(d) : propertySummary(d);
+const faqs = zh ? propertyFaqsZh(d) : propertyFaqs(d);
+const regionLabel = d.region ? pick(lang, REGION_LABEL, REGION_LABEL_ZH)[d.region] : '';
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 // Only advertise the photo to crawlers once the real file has been uploaded
 const hasPhoto = existsSync(join(process.cwd(), 'public', d.image));
 const tourHref = landingHref(d.landingUrl);
 
-const specs = [
-  { k: 'Land Tenure', v: d.tenure },
-  { k: 'Land Size', v: d.landSize },
-  ...(d.layoutSize ? [{ k: 'Layout Size', v: d.layoutSize }] : []),
-  ...(d.maintenance && d.maintenance !== '-' ? [{ k: 'Maintenance', v: d.maintenance }] : []),
-  { k: 'Completion', v: d.completion },
-];
+const specs = zh
+  ? zhSpecs
+  : [
+      { k: 'Land Tenure', v: d.tenure },
+      { k: 'Land Size', v: d.landSize },
+      ...(d.layoutSize ? [{ k: 'Layout Size', v: d.layoutSize }] : []),
+      ...(d.maintenance && d.maintenance !== '-' ? [{ k: 'Maintenance', v: d.maintenance }] : []),
+      { k: 'Completion', v: d.completion },
+    ];
 
 // Same-region projects give the buyer somewhere to go next instead of leaving
 const related = all
   .filter((x) => x.id !== p.id && x.data.region === d.region && !x.data.soldOut)
   .slice(0, 3);
 
-const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could you send me the layouts, price list and availability?`;
+const waMsg = zh
+  ? `你好 Lawrence，我对 ${d.name}（${d.location}）有兴趣，可以把户型图、价目表和目前还有哪些单位发给我吗？`
+  : `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could you send me the layouts, price list and availability?`;
 ---
 
 <BaseLayout
-  title={`${d.name}, ${d.location} — Instalment, Layouts & Completion`}
-  description={`${d.name} in ${d.location}. ${descFacts}. Personally vetted by Lawrence Law — ask me anything on WhatsApp.`}
+  title={pick(
+    lang,
+    `${d.name}, ${d.location} — Instalment, Layouts & Completion`,
+    `${d.name}（${d.location}）— 月供、户型与完工日期`,
+  )}
+  description={pick(
+    lang,
+    `${d.name} in ${d.location}. ${descFacts}. Personally vetted by Lawrence Law — ask me anything on WhatsApp.`,
+    `${d.name} 位于 ${placeZh(d)}。${descFacts}。Lawrence Law 亲自了解过的项目，有问题可以直接 WhatsApp 问我。`,
+  )}
   waMessage={waMsg}
 >
   <JsonLd
@@ -82,14 +114,15 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
       description: summary,
       locality: placeText(d),
       image: hasPhoto ? new URL(url(d.image), Astro.site).href : undefined,
-      specs: propertySpecs(d),
+      specs: zh ? zhSpecs.map((x) => ({ name: x.k, value: x.v })) : propertySpecs(d),
+      lang,
     })}
   />
   <JsonLd
     slot="head"
     data={breadcrumbSchema([
-      { name: 'Home', url: new URL(url('/'), Astro.site).href },
-      { name: 'Properties', url: new URL(url('/allproperties/'), Astro.site).href },
+      { name: pick(lang, 'Home', '首页'), url: new URL(href(lang, '/'), Astro.site).href },
+      { name: pick(lang, 'Properties', '项目'), url: new URL(href(lang, '/allproperties/'), Astro.site).href },
       { name: d.name, url: canonical },
     ])}
   />
@@ -98,13 +131,13 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
   <section class="bg-navy-900 pt-10 pb-14 text-white sm:pt-14 sm:pb-20">
     <div class="container-site">
       <nav class="mb-6 text-[13px] text-navy-100/80" aria-label="Breadcrumb">
-        <a href={url('/allproperties/')} class="inline-flex min-h-11 items-center hover:text-gold-500">
-          ← All Properties
+        <a href={href(lang, '/allproperties/')} class="inline-flex min-h-11 items-center hover:text-gold-500">
+          {pick(lang, '← All Properties', '← 全部项目')}
         </a>
         {d.region && (
           <>
             <span class="mx-2 opacity-40">/</span>
-            <span>{REGION_LABEL[d.region]}</span>
+            <span>{regionLabel}</span>
           </>
         )}
       </nav>
@@ -114,7 +147,7 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
           <img
             src={url(d.image)}
             onerror={d.fallbackImage ? `this.onerror=null;this.src='${url(d.fallbackImage)}'` : undefined}
-            alt={`${d.name} — building facade`}
+            alt={pick(lang, `${d.name} — building facade`, `${d.name} 外观图`)}
             class="plx-cover aspect-[4/3] w-full object-cover object-top"
             fetchpriority="high"
           />
@@ -126,10 +159,10 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
                 </span>
               )}
               {d.label && (
-                <span class="label-sm rounded-full bg-gold-500 px-3 py-1 text-navy-900">{d.label}</span>
+                <span class="label-sm rounded-full bg-gold-500 px-3 py-1 text-navy-900">{zh ? (LABEL_ZH[d.label] ?? d.label) : d.label}</span>
               )}
               {d.soldOut && (
-                <span class="label-sm rounded-full bg-white/90 px-3 py-1 text-navy-900">Fully Sold</span>
+                <span class="label-sm rounded-full bg-white/90 px-3 py-1 text-navy-900">{pick(lang, 'Fully Sold', '已售完')}</span>
               )}
             </span>
           )}
@@ -142,9 +175,9 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
 
           {instalment.amount ? (
             <>
-              <p class="text-[15px] text-navy-100">Monthly instalment from</p>
+              <p class="text-[15px] text-navy-100">{pick(lang, 'Monthly instalment from', '预估月供，约从')}</p>
               <p class="text-[34px] leading-none font-extrabold text-white sm:text-[44px]">
-                {instalment.text}
+                {instalment.text}{zh && <span class="ml-2 text-[18px] font-semibold text-navy-100">起</span>}
               </p>
             </>
           ) : (
@@ -170,22 +203,25 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
               class="btn-gold"
               data-track="whatsapp_property_detail"
             >
-              Ask About This Project
+              {pick(lang, 'Ask About This Project', '询问这个项目')}
             </a>
             {tourHref && (
               <a href={tourHref} class="btn-gold-outline text-white">
-                Full Project Tour
+                {pick(lang, 'Full Project Tour', '完整项目介绍（英文）')}
               </a>
             )}
             {d.listingUrl && (
               <a href={d.listingUrl} target="_blank" rel="noopener" class="btn-gold-outline text-white">
-                Developer Site
+                {pick(lang, 'Developer Site', '发展商网站')}
               </a>
             )}
           </div>
           <p class="mt-4 text-[13px] text-navy-100/70">
-            I’ll send you the full layout plans, price list and current availability — no pressure,
-            no spam.
+            {pick(
+              lang,
+              'I’ll send you the full layout plans, price list and current availability — no pressure, no spam.',
+              '我会把完整的户型图、价目表和目前还有哪些单位发给你。不催促，不骚扰。',
+            )}
           </p>
         </div>
       </div>
@@ -195,13 +231,16 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
   {/* ===== Facts in plain sentences ===== */}
   <section class="border-b border-border bg-white py-12 sm:py-16">
     <div class="container-site max-w-3xl">
-      <p class="label-sm mb-3 text-gold-500">Project Overview</p>
-      <h2 class="section-heading">{d.name} at a Glance</h2>
+      <p class="label-sm mb-3 text-gold-500">{pick(lang, 'Project Overview', '项目概览')}</p>
+      <h2 class="section-heading">{pick(lang, `${d.name} at a Glance`, `${d.name} 一览`)}</h2>
       <div class="gold-rule"></div>
       <p class="text-[17px] leading-relaxed text-ink/90">{summary}</p>
       <p class="mt-4 text-[13px] text-ink/60">
-        Instalment figures are estimates and project details can change — message me for the
-        latest numbers and availability.
+        {pick(
+          lang,
+          'Instalment figures are estimates and project details can change — message me for the latest numbers and availability.',
+          '月供为预估数字，项目资料也可能更新。最新的数字和还有哪些单位，请直接问我。',
+        )}
       </p>
     </div>
   </section>
@@ -210,8 +249,10 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
   {related.length > 0 && (
     <section class="section-pad border-t border-border bg-white">
       <div class="container-site">
-        <p class="label-sm mb-3 text-gold-500">Also in {d.region ? REGION_LABEL[d.region] : 'this area'}</p>
-        <h2 class="section-heading">Compare Before You Decide</h2>
+        <p class="label-sm mb-3 text-gold-500">
+          {pick(lang, `Also in ${regionLabel || 'this area'}`, `同在${regionLabel || '这一区'}`)}
+        </p>
+        <h2 class="section-heading">{pick(lang, 'Compare Before You Decide', '决定之前，先比较')}</h2>
         <div class="gold-rule"></div>
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {related.map((r) => (
@@ -219,8 +260,8 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
           ))}
         </div>
         <div class="mt-10">
-          <a href={url('/allproperties/')} class="btn-gold-outline text-navy-900">
-            Browse All Properties
+          <a href={href(lang, '/allproperties/')} class="btn-gold-outline text-navy-900">
+            {pick(lang, 'Browse All Properties', '浏览全部项目')}
           </a>
         </div>
       </div>
@@ -230,13 +271,17 @@ const waMsg = `Hi Lawrence, I'm interested in ${d.name} (${d.location}). Could y
   {/* ===== Q&A ===== */}
   <section class="section-pad border-t border-border bg-white">
     <div class="container-site max-w-3xl">
-      <FAQ faqs={faqs} heading={`${d.name}: Common Questions`} />
+      <FAQ faqs={faqs} heading={pick(lang, `${d.name}: Common Questions`, `${d.name}：常见问题`)} />
     </div>
   </section>
 
   <CTASection
-    heading={`Thinking about ${d.name}?`}
-    sub="Tell me your budget and what matters most — I’ll tell you honestly whether this one fits, and show you the alternatives if it doesn’t."
+    heading={pick(lang, `Thinking about ${d.name}?`, `在考虑 ${d.name} 吗？`)}
+    sub={pick(
+      lang,
+      'Tell me your budget and what matters most — I’ll tell you honestly whether this one fits, and show you the alternatives if it doesn’t.',
+      '告诉我你的预算和最在意的条件。合不合适我会照实说；不合适的话，也会给你看其他选择。',
+    )}
     waMessage={waMsg}
   />
 </BaseLayout>

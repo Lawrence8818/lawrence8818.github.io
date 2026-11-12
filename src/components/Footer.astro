@@ -2,18 +2,31 @@
 import { url } from '../lib/url';
 import { SITE } from '../data/site';
 import GoldIcon from './GoldIcon.astro';
+import { langOf, pick, href } from '../i18n';
+
+const lang = langOf(Astro);
 
 const year = new Date().getFullYear();
 
-const quickLinks = [
-  { href: url('/allproperties'), label: 'Properties' },
-  { href: url('/guides/'), label: 'Buyer Guides' },
-  { href: url('/videos/'), label: 'Videos' },
-  { href: url('/areas/'), label: 'Areas' },
-  { href: url('/spasignings'), label: 'Testimonials' },
-  { href: url('/about/'), label: 'About' },
-  { href: url('/contact/'), label: 'Contact' },
-];
+const quickLinks =
+  lang === 'zh'
+    ? [
+        { href: href(lang, '/allproperties/'), label: '项目' },
+        { href: href(lang, '/guides/'), label: '买房指南' },
+        { href: href(lang, '/spasignings/'), label: '客户故事（英文）' },
+        { href: href(lang, '/about/'), label: '关于我' },
+        { href: url('/'), label: 'English' },
+      ]
+    : [
+        { href: url('/allproperties'), label: 'Properties' },
+        { href: url('/guides/'), label: 'Buyer Guides' },
+        { href: url('/videos/'), label: 'Videos' },
+        { href: url('/areas/'), label: 'Areas' },
+        { href: url('/spasignings'), label: 'Testimonials' },
+        { href: url('/about/'), label: 'About' },
+        { href: url('/contact/'), label: 'Contact' },
+        { href: url('/zh/'), label: '中文' },
+      ];
 
 const socialEntries = [
   { key: 'facebook', label: 'Facebook', href: SITE.socials.facebook },
@@ -27,7 +40,7 @@ const socialEntries = [
 <footer class="bg-navy-900 text-navy-100">
   <div class="container-site grid gap-10 py-14 text-[15px] sm:grid-cols-2 lg:grid-cols-[1.2fr_0.7fr_1.1fr] lg:gap-14">
     <div>
-      <p class="label-sm mb-3 text-gold-500">Contact</p>
+      <p class="label-sm mb-3 text-gold-500">{pick(lang, 'Contact', '联系方式')}</p>
       <ul>
         <li>
           <a href={`https://wa.me/${SITE.whatsappNumber}`} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-2 transition-colors hover:text-gold-500" data-track="whatsapp_footer">
@@ -71,7 +84,7 @@ const socialEntries = [
     </div>
 
     <div>
-      <p class="label-sm mb-3 text-gold-500">Quick Links</p>
+      <p class="label-sm mb-3 text-gold-500">{pick(lang, 'Quick Links', '快速链接')}</p>
       <ul>
         {quickLinks.map((l) => (
           <li>
@@ -86,22 +99,21 @@ const socialEntries = [
     <div class="lg:text-right">
       <p class="font-display text-xl font-bold text-white">Lawrence Law {SITE.nameZh}</p>
       <p class="mt-2 leading-relaxed">
-        {SITE.tagline}. Serving the entire Malaysia New Properties.
+        {pick(lang, `${SITE.tagline}. Serving the entire Malaysia New Properties.`, '新盘专家，兼具二手房实战经验。服务全马新楼盘。')}
       </p>
-      <p class="label-sm mt-3 text-navy-100/70">{SITE.renNumber} · {SITE.agencyName}</p>
+      <p class="label-sm mt-3 text-navy-100/70">{SITE.renNumber} · {pick(lang, SITE.agencyName, '注册房地产谈判员')}</p>
     </div>
   </div>
 
   <div class="border-t border-white/10">
     <div class="container-site py-5 text-center text-[13px] text-navy-100/60">
       <p>
-        Content on this site is for general reference only and does not constitute investment or
-        legal advice.
+        {pick(lang, 'Content on this site is for general reference only and does not constitute investment or legal advice.', '本站内容仅供一般参考，不构成投资或法律建议。')}
       </p>
       <p class="mt-1">
-        © {year} Lawrence Law Property™ · All Rights Reserved ·
-        <a href={url('/privacy/')} class="hover:text-gold-500">Privacy Policy</a> |
-        <a href={url('/terms/')} class="hover:text-gold-500">Terms of Service</a>
+        © {year} Lawrence Law Property™ · {pick(lang, 'All Rights Reserved', '版权所有')} ·
+        <a href={url('/privacy/')} class="hover:text-gold-500">{pick(lang, 'Privacy Policy', '隐私政策（英文）')}</a> |
+        <a href={url('/terms/')} class="hover:text-gold-500">{pick(lang, 'Terms of Service', '服务条款（英文）')}</a>
       </p>
     </div>
   </div>

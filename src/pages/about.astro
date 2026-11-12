@@ -9,6 +9,12 @@ import { SITE } from '../data/site';
 import { url } from '../lib/url';
 import JsonLd from '../components/JsonLd.astro';
 import { profileSchema } from '../lib/schema';
+import { langOf, pick } from '../i18n';
+import { introParasZh, INTRO_CLOSING_ZH, TAGLINE_ZH, AWARDS_ZH } from '../i18n/copy-zh';
+
+// 这个模板同时出英文页(/about/)和中文页(/zh/about/)
+const lang = langOf(Astro);
+const zh = lang === 'zh';
 
 const description =
   'From subsales to new property, a decade of hands-on experience you can count on. Trusted by 2,000+ buyers over the years, since 2015. Registered estate negotiator (REN 26610) serving KL, Selangor, Johor and Penang.';
@@ -16,8 +22,12 @@ const siteUrl = Astro.site?.href ?? 'https://www.lawrencelawproperty.com/';
 ---
 
 <BaseLayout
-  title="About Lawrence Law — New Property Specialist with Subsales Expertise"
-  description={description}
+  title={pick(lang, 'About Lawrence Law — New Property Specialist with Subsales Expertise', `关于 ${SITE.name} ${SITE.nameZh} — 新盘专家，兼具二手房经验`)}
+  description={pick(
+    lang,
+    description,
+    `从二手房到新盘，十年实战经验。自 ${SITE.since} 年起累计获得 2,000 多位买家的信任。马来西亚注册房地产谈判员（${SITE.renNumber}），服务吉隆坡、雪兰莪、柔佛和槟城。`,
+  )}
 >
   <JsonLd
     slot="head"
@@ -36,15 +46,19 @@ const siteUrl = Astro.site?.href ?? 'https://www.lawrencelawproperty.com/';
         <img
           src={url('/images/lawrence-portrait.jpg')}
           onerror={`this.onerror=null;this.src='${url('/images/placeholders/lawrence-about.svg')}'`}
-          alt="Lawrence Law, New Property Specialist"
+          alt={pick(lang, 'Lawrence Law, New Property Specialist', 'Lawrence Law 刘智权，新盘专家')}
           class="aspect-[4/5] w-full rounded-lg border border-gold-500/50 object-cover shadow-card"
         />
       </div>
       <div>
-        <h1 class="text-[32px] text-white sm:text-[52px]">Hi! I’m Lawrence Law</h1>
-        <p class="mt-2 font-display text-[22px] font-semibold text-gold-500 sm:text-[30px]">{SITE.tagline}</p>
+        <h1 class="text-[32px] text-white sm:text-[52px]">{pick(lang, 'Hi! I’m Lawrence Law', `你好！我是 ${SITE.name} ${SITE.nameZh}`)}</h1>
+        <p class="mt-2 font-display text-[22px] font-semibold text-gold-500 sm:text-[30px]">{pick(lang, SITE.tagline, TAGLINE_ZH)}</p>
         <div class="gold-rule mt-5"></div>
         <div class="space-y-4 text-navy-100">
+          {zh && introParasZh('font-bold text-gold-500').map((html) => <p set:html={html} />)}
+          {zh && <p class="text-white">{INTRO_CLOSING_ZH}</p>}
+          {!zh && (
+          <>
           <p>
             From subsales to new property — a decade of hands-on experience you can count on.
             Guiding young couples and families toward the right home
@@ -72,6 +86,8 @@ const siteUrl = Astro.site?.href ?? 'https://www.lawrencelawproperty.com/';
           <p class="text-white">
             If you’re looking for honest, no-pressure advice to make the right property move — let’s talk.
           </p>
+          </>
+          )}
         </div>
       </div>
     </div>
@@ -86,17 +102,17 @@ const siteUrl = Astro.site?.href ?? 'https://www.lawrencelawproperty.com/';
   {/* ===== Awards ===== */}
   <section class="section-pad bg-cream">
     <div class="container-site">
-      <h2 class="section-heading">Awards & Recognition</h2>
+      <h2 class="section-heading">{pick(lang, 'Awards & Recognition', '奖项与肯定')}</h2>
       <div class="gold-rule"></div>
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {AWARDS.map((a) => (
+        {AWARDS.map((a, i) => (
           <figure class="card">
             <div class="relative aspect-[4/3] overflow-hidden rounded-lg bg-navy-900">
               {a.image ? (
                 <img
                   src={url(a.image)}
                   onerror={a.fallbackImage ? `this.onerror=null;this.src='${url(a.fallbackImage)}'` : undefined}
-                  alt={a.title}
+                  alt={zh ? AWARDS_ZH[i] : a.title}
                   loading="lazy"
                   class="h-full w-full object-cover"
                 />
@@ -113,8 +129,8 @@ const siteUrl = Astro.site?.href ?? 'https://www.lawrencelawproperty.com/';
               )}
             </div>
             <figcaption class="mt-3">
-              <p class="font-semibold text-navy-900">{a.title}</p>
-              <p class="text-sm text-ink/60">{a.org} · {a.year}</p>
+              <p class="font-semibold text-navy-900">{zh ? AWARDS_ZH[i] : a.title}</p>
+              <p class="text-sm text-ink/60">{zh ? a.year : `${a.org} · ${a.year}`}</p>
             </figcaption>
           </figure>
         ))}
@@ -123,8 +139,8 @@ const siteUrl = Astro.site?.href ?? 'https://www.lawrencelawproperty.com/';
   </section>
 
   <CTASection
-    heading="Looking for honest, no-pressure advice?"
-    sub="Tell me your budget and your plans — whether to buy, when to buy, where to buy is always your call."
-    waMessage="Hi Lawrence, I read your story on the website and would like some advice on my property plans."
+    heading={pick(lang, 'Looking for honest, no-pressure advice?', '想听实话、不被催促的建议？')}
+    sub={pick(lang, 'Tell me your budget and your plans — whether to buy, when to buy, where to buy is always your call.', '把你的预算和计划告诉我。买不买、什么时候买、买在哪里，决定权永远在你手上。')}
+    waMessage={pick(lang, 'Hi Lawrence, I read your story on the website and would like some advice on my property plans.', '你好 Lawrence，我在网站上看了你的故事，想请你给我的买房计划一些建议。')}
   />
 </BaseLayout>

@@ -6,6 +6,8 @@ import JsonLd from '../components/JsonLd.astro';
 import { articleSchema, breadcrumbSchema } from '../lib/schema';
 import { url } from '../lib/url';
 import { waContextMessage } from '../lib/whatsapp';
+import { langOf, pick, href } from '../i18n';
+import { GUIDE_CATEGORY_ZH } from '../i18n/guides';
 
 interface Props {
   title: string;
@@ -18,40 +20,42 @@ interface Props {
 
 const { title, description, category, publishDate, updatedDate, faqs = [] } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const dateFmt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' });
+const lang = langOf(Astro);
+const dateFmt = new Intl.DateTimeFormat(pick(lang, 'en-GB', 'zh-CN'), { dateStyle: 'long', timeZone: 'UTC' });
+const categoryLabel = pick(lang, category, GUIDE_CATEGORY_ZH[category] ?? category);
 ---
 
-<BaseLayout title={title} description={description} ogType="article" waMessage={waContextMessage(title)}>
+<BaseLayout title={title} description={description} ogType="article" waMessage={waContextMessage(title, lang)}>
   <JsonLd
     slot="head"
-    data={articleSchema({ title, description, url: canonical, datePublished: publishDate, dateModified: updatedDate })}
+    data={articleSchema({ title, description, url: canonical, datePublished: publishDate, dateModified: updatedDate, lang })}
   />
   <JsonLd
     slot="head"
     data={breadcrumbSchema([
-      { name: 'Home', url: new URL(url('/'), Astro.site).href },
-      { name: 'Buyer Guides', url: new URL(url('/guides/'), Astro.site).href },
+      { name: pick(lang, 'Home', '首页'), url: new URL(href(lang, '/'), Astro.site).href },
+      { name: pick(lang, 'Buyer Guides', '买房指南'), url: new URL(href(lang, '/guides/'), Astro.site).href },
       { name: title, url: canonical },
     ])}
   />
 
   <article class="container-site max-w-3xl py-10 sm:py-14">
     <nav class="mb-6 text-sm text-ink/60" aria-label="Breadcrumb">
-      <a href={url('/guides/')} class="hover:text-gold-600">Buyer Guides</a>
+      <a href={href(lang, '/guides/')} class="hover:text-gold-600">{pick(lang, 'Buyer Guides', '买房指南')}</a>
       <span class="mx-2">/</span>
-      <span>{category}</span>
+      <span>{categoryLabel}</span>
     </nav>
 
     <header class="mb-8">
       <span class="mb-3 inline-block rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold text-gold-600">
-        {category}
+        {categoryLabel}
       </span>
       <h1 class="text-3xl sm:text-4xl">{title}</h1>
       <p class="mt-4 text-lg text-ink/70">{description}</p>
       <p class="mt-3 text-sm text-ink/50">
-        Published {dateFmt.format(publishDate)}
-        {updatedDate && ` · Updated ${dateFmt.format(updatedDate)}`}
-        · by Lawrence Law
+        {pick(lang, 'Published', '发布于')} {dateFmt.format(publishDate)}
+        {updatedDate && pick(lang, ` · Updated ${dateFmt.format(updatedDate)}`, ` · 更新于 ${dateFmt.format(updatedDate)}`)}
+        {pick(lang, '· by Lawrence Law', '· 作者 Lawrence Law')}
       </p>
       <div class="gold-rule mt-6 mb-0"></div>
     </header>
@@ -67,10 +71,10 @@ const dateFmt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' });
     )}
 
     <div class="mt-10 rounded-xl border border-gold-500/40 bg-gold-100/40 p-6 text-center">
-      <p class="font-medium text-navy-900">Did this article help?</p>
-      <p class="mt-1 text-sm text-ink/70">Everyone’s situation is different — just tell me yours and I’ll give you advice tailored to it.</p>
+      <p class="font-medium text-navy-900">{pick(lang, 'Did this article help?', '这篇文章对你有帮助吗？')}</p>
+      <p class="mt-1 text-sm text-ink/70">{pick(lang, 'Everyone’s situation is different — just tell me yours and I’ll give you advice tailored to it.', '每个人的情况都不一样。把你的情况告诉我，我按你的情况给建议。')}</p>
     </div>
   </article>
 
-  <CTASection waMessage={waContextMessage(title)} />
+  <CTASection waMessage={waContextMessage(title, lang)} />
 </BaseLayout>

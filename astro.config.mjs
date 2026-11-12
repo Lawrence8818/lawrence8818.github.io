@@ -21,6 +21,12 @@ export default defineConfig({
   site,
   base,
   trailingSlash: 'ignore',
+  // 英文是默认语言,网址不变;中文版在 /zh/ 下面(见 src/i18n/index.ts)。
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'zh'],
+    routing: { prefixDefaultLocale: false },
+  },
   integrations: [sitemap({ customPages: landingPages })],
   vite: {
     plugins: [tailwindcss()],

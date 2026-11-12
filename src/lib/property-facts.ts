@@ -210,3 +210,199 @@ export function propertyOneLine(d: PropertyFacts): string {
     .filter(Boolean)
     .join(' · ');
 }
+
+// ════════════════════════════════════════════════════════════════════
+// 中文版。和上面的英文版一一对应:同样的栏位、同样的规矩(不写售价、
+// 没有月供数字就不提金额、不拿售价推算)。项目名称和地名保留英文原文,
+// 只在句子里补上城市 / 州属的中文名。
+// ════════════════════════════════════════════════════════════════════
+
+const MONTHS: Record<string, number> = {
+  jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+};
+
+/** "Jun 2029" → "2029 年 6 月";"Q4 2027" → "2027 年第 4 季";认不出的原样返回 */
+export function zhDate(text: string): string {
+  const t = text.trim();
+  let m: RegExpMatchArray | null;
+  if ((m = t.match(/^Q([1-4])\s+(\d{4})$/i))) return `${m[2]} 年第 ${m[1]} 季`;
+  if ((m = t.match(/^(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s+(\d{4})$/)) && MONTHS[m[2].toLowerCase()])
+    return `${m[3]} 年 ${MONTHS[m[2].toLowerCase()]} 月 ${+m[1]} 日`;
+  if ((m = t.match(/^([A-Za-z]{3})[a-z]*\s+(\d{4})$/)) && MONTHS[m[1].toLowerCase()])
+    return `${m[2]} 年 ${MONTHS[m[1].toLowerCase()]} 月`;
+  if ((m = t.match(/^(\d{4})$/))) return `${m[1]} 年`;
+  if ((m = t.match(/^(\d{4})\s*[–-]\s*(\d{4})$/))) return `${m[1]}–${m[2]} 年`;
+  return t;
+}
+
+/** 规格表里「完工」一格的中文写法 */
+export function completionZh(completion: string): string {
+  const c = completion.trim();
+  let m: RegExpMatchArray | null;
+  if (/^completed$/i.test(c)) return '已完工';
+  if ((m = c.match(/^completed\s+(.+)$/i))) return `已完工（${zhDate(m[1])}）`;
+  if (/^(tba|tbc)$/i.test(c)) return '待公布';
+  if ((m = c.match(/^(\d+)\s+months?\s+from\s+SPA$/i))) return `签署 SPA 后 ${m[1]} 个月`;
+  if ((m = c.match(/^(\d+)\s+months?\s+after\s+APDL$/i))) return `获批 APDL 后 ${m[1]} 个月`;
+  if ((m = c.match(/^est\.?\s+(.+)$/i))) return `预计 ${zhDate(m[1])}`;
+  return zhDate(c);
+}
+
+/** "Leasehold (to Aug 2123)" → "租赁地契（至 2123 年 8 月）" */
+export function tenureZh(tenure: string): string {
+  const t = tenure.trim();
+  if (/tbc|tba/i.test(t)) return '地契待确认';
+  const m = t.match(/^(Freehold|Leasehold)\s*(?:\((.+)\))?$/i);
+  if (!m) return t;
+  const kind = /^free/i.test(m[1]) ? '永久地契' : '租赁地契';
+  if (!m[2]) return kind;
+  const to = m[2].match(/^to\s+(.+)$/i);
+  return `${kind}（${to ? '至 ' + zhDate(to[1]) : m[2]}）`;
+}
+
+const sizeZh = (s: string) => s.replace(/\bsf\b/g, '平方尺').replace(/\bacres?\b/gi, '英亩');
+const maintenanceZh = (d: PropertyFacts) => `每平方尺 ${(d.maintenance ?? '').replace(/\s*psf\b/, '')}`;
+
+/** 地名保留英文,后面补上城市 / 州属的中文名,例如 "Taman Desa, KL（吉隆坡）" */
+export function placeZh(d: PropertyFacts): string {
+  const loc = d.location;
+  const zh = /Kuala Lumpur|\bKL\b|KLCC/.test(loc) || d.region === 'klcc'
+    ? '吉隆坡'
+    : /Petaling Jaya|\bPJ\b/.test(loc)
+      ? '雪兰莪八打灵再也'
+      : /Selangor/.test(loc)
+        ? '雪兰莪'
+        : /Johor/.test(loc)
+          ? '柔佛'
+          : /Penang/.test(loc)
+            ? '槟城'
+            : '';
+  return zh ? `${loc}（${zh}）` : loc;
+}
+
+/** 中英文之间留一个空格;但前面已经是全角括号时不用 */
+const gap = (s: string) => (/[）)]$/.test(s) ? '' : ' ');
+
+/** 卡片和页首那个大字金额(中文) */
+export function instalmentDisplayZh(d: { monthly?: string; soldOut?: boolean }): {
+  text: string;
+  amount: boolean;
+} {
+  if (d.soldOut) return { text: '已售完', amount: false };
+  if (isRm(d.monthly)) return { text: d.monthly!, amount: true };
+  return { text: '月供请洽询', amount: false };
+}
+
+function completionSentenceZh(d: PropertyFacts): string {
+  const c = d.completion.trim();
+  let m: RegExpMatchArray | null;
+  if (/^completed$/i.test(c)) return `${d.name} 已经完工。`;
+  if ((m = c.match(/^completed\s+(.+)$/i))) return `${d.name} 已于 ${zhDate(m[1])}完工。`;
+  if (/^(tba|tbc)$/i.test(c)) return `${d.name} 的完工日期还没有公布。`;
+  if (/months/i.test(c)) return `${d.name} 预计在${completionZh(c)}完工。`;
+  if ((m = c.match(/^est\.?\s+(.+)$/i))) return `${d.name} 预计在 ${zhDate(m[1])}完工。`;
+  return `${d.name} 的目标完工日期是 ${zhDate(c)}。`;
+}
+
+function layoutSentenceZh(d: PropertyFacts, withName: boolean): string {
+  if (!d.layoutSize) return '';
+  const subject = withName ? `${d.name} 的单位面积` : '单位面积';
+  const range = d.layoutSize.match(/^([\d,]+)–([\d,]+)\s*sf$/);
+  return range
+    ? `${subject}介于 ${range[1]} 至 ${range[2]} 平方尺。`
+    : `${subject}是 ${sizeZh(d.layoutSize)}。`;
+}
+
+function instalmentSentenceZh(d: PropertyFacts): string {
+  if (d.soldOut || !isRm(d.monthly)) return '';
+  return `${d.name} 的预估月供从约 ${d.monthly} 起。`;
+}
+
+export function propertySummaryZh(d: PropertyFacts): string {
+  const land = landPhrase(d);
+  return [
+    `${d.name} 是位于 ${placeZh(d)}${gap(placeZh(d))}的${d.soldOut ? '已售完' : ''}房产项目。`,
+    tenureKnown(d)
+      ? `地契属于${tenureZh(d.tenure)}${land ? `，土地面积 ${sizeZh(land)}` : ''}。`
+      : `地契类型还有待确认${land ? `，土地面积 ${sizeZh(land)}` : ''}。`,
+    layoutSentenceZh(d, false),
+    instalmentSentenceZh(d),
+    hasMaintenance(d) ? `管理费是${maintenanceZh(d)}。` : '',
+    completionSentenceZh(d),
+  ]
+    .filter(Boolean)
+    .join('');
+}
+
+export function propertyFaqsZh(d: PropertyFacts): { question: string; answer: string }[] {
+  const phone = `+${SITE.whatsappNumber}`;
+  const faqs: { question: string; answer: string }[] = [];
+  const instalment = instalmentSentenceZh(d);
+
+  faqs.push(
+    d.soldOut
+      ? { question: `${d.name} 还有单位吗？`, answer: `没有，${d.name} 已经售完。` }
+      : {
+          question: `${d.name} 的月供大概多少？`,
+          answer: instalment
+            ? `${instalment}实际数额取决于你的贷款额、利率和年限。`
+            : `${d.name} 的月供要看你选的单位，以及你的贷款额、利率和年限。可以 WhatsApp ${SITE.name}（${phone}），按你的情况估算。`,
+        },
+  );
+
+  faqs.push({ question: `${d.name} 在哪里？`, answer: `${d.name} 位于 ${placeZh(d)}。` });
+
+  faqs.push({
+    question: `${d.name} 是永久地契还是租赁地契？`,
+    answer: tenureKnown(d) ? `${d.name} 是${tenureZh(d.tenure)}。` : `${d.name} 的地契类型还有待确认。`,
+  });
+
+  faqs.push({
+    question: /^completed/i.test(d.completion) ? `${d.name} 完工了吗？` : `${d.name} 什么时候完工？`,
+    answer: completionSentenceZh(d),
+  });
+
+  if (d.layoutSize) {
+    faqs.push({ question: `${d.name} 有哪些面积的单位？`, answer: layoutSentenceZh(d, true) });
+  }
+
+  if (hasMaintenance(d)) {
+    faqs.push({ question: `${d.name} 的管理费是多少？`, answer: `${d.name} 的管理费是${maintenanceZh(d)}。` });
+  }
+
+  if (!d.soldOut) {
+    faqs.push({
+      question: `怎样拿到 ${d.name} 的户型图和价目表？`,
+      answer: `WhatsApp 联系 ${SITE.name}（${phone}）。他是马来西亚注册房地产谈判员（${SITE.renNumber}），会把 ${d.name} 的户型图、价目表和目前还有哪些单位发给你。`,
+    });
+  }
+
+  return faqs;
+}
+
+/** 规格表(中文):名称 + 值 */
+export function specsZh(d: PropertyFacts): { k: string; v: string }[] {
+  const blank = (v?: string) => !v || /^[-—]$/.test(v.trim());
+  return [
+    { k: '地契', v: tenureZh(d.tenure) },
+    { k: '土地面积', v: blank(d.landSize) ? d.landSize : sizeZh(d.landSize) },
+    ...(d.layoutSize ? [{ k: '单位面积', v: sizeZh(d.layoutSize) }] : []),
+    ...(hasMaintenance(d) ? [{ k: '管理费', v: maintenanceZh(d) }] : []),
+    { k: '完工', v: completionZh(d.completion) },
+  ];
+}
+
+/** 卡片左上角的标签 */
+export const LABEL_ZH: Record<string, string> = {
+  'FAMILY-ORIENTED': '适合家庭',
+  'INVESTMENT PICK': '投资之选',
+};
+
+export const REGION_LABEL_ZH: Record<string, string> = {
+  'kuala-lumpur': '吉隆坡',
+  klcc: 'KLCC',
+  'petaling-jaya': '八打灵再也',
+  selangor: '雪兰莪',
+  johor: '柔佛',
+  penang: '槟城',
+};

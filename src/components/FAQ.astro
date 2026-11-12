@@ -1,6 +1,7 @@
 ---
 import JsonLd from './JsonLd.astro';
 import { faqSchema } from '../lib/schema';
+import { langOf, pick } from '../i18n';
 
 interface Props {
   faqs: { question: string; answer: string }[];
@@ -8,7 +9,8 @@ interface Props {
   /** 默认输出 FAQPage JSON-LD;同页已有其他 FAQPage 时可关掉避免重复 */
   withSchema?: boolean;
 }
-const { faqs, heading = 'Frequently asked questions', withSchema = true } = Astro.props;
+const lang = langOf(Astro);
+const { faqs, heading = pick(lang, 'Frequently asked questions', '常见问题'), withSchema = true } = Astro.props;
 ---
 
 {faqs.length > 0 && (
