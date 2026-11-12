@@ -1,6 +1,10 @@
 ---
 import { TRUST_STATS } from '../data/awards';
 import { SITE } from '../data/site';
+import { langOf, pick } from '../i18n';
+import { TRUST_LABELS_ZH } from '../i18n/copy-zh';
+
+const lang = langOf(Astro);
 ---
 
 <section class="stat-section border-y border-border bg-white">
@@ -10,12 +14,12 @@ import { SITE } from '../data/site';
         <p class="text-[40px] leading-none font-extrabold tracking-tight text-navy-900 sm:text-[64px]">
           {stat.prefix}<span class="stat-num" data-count={stat.num}>{stat.num.toLocaleString('en-US')}</span>{stat.suffix}
         </p>
-        <p class="label-sm mt-3 text-gold-600">{stat.label}</p>
+        <p class="label-sm mt-3 text-gold-600">{pick(lang, stat.label, TRUST_LABELS_ZH[i])}</p>
       </div>
     ))}
   </div>
   <div class="label-sm border-t border-border py-3 text-center text-ink/50">
-    {SITE.renNumber} · {SITE.agencyName} · BOVAEA Malaysia
+    {pick(lang, `${SITE.renNumber} · ${SITE.agencyName} · BOVAEA Malaysia`, `${SITE.renNumber} · 注册房地产谈判员 · 马来西亚 BOVAEA`)}
   </div>
 </section>
 

@@ -3,6 +3,11 @@
 // three expertise pillars + the first-deal story with the certificate photo.
 import GoldIcon from './GoldIcon.astro';
 import { url } from '../lib/url';
+import { langOf, pick } from '../i18n';
+import { PILLARS_ZH, FIRST_DEAL_ZH } from '../i18n/copy-zh';
+
+const lang = langOf(Astro);
+const zh = lang === 'zh';
 
 // The 2015 certificate lives here, independent of the awards roster.
 const firstDealAward = {
@@ -33,12 +38,12 @@ const pillars = [
 <section class="section-pad bg-cream">
   <div class="container-site">
     <div class="grid gap-6 lg:grid-cols-3">
-      {pillars.map((p) => (
+      {pillars.map((p, i) => (
         <div class="card">
           <span class="text-gold-500"><GoldIcon name={p.icon} size={32} /></span>
-          <h2 class="mt-4 font-sans text-xl leading-snug font-semibold sm:text-2xl">{p.title}</h2>
+          <h2 class="mt-4 font-sans text-xl leading-snug font-semibold sm:text-2xl">{zh ? PILLARS_ZH[i].title : p.title}</h2>
           <div class="gold-rule mt-3 mb-4 !w-10"></div>
-          <p class="text-[15px] leading-relaxed text-ink sm:text-[17px]">{p.body}</p>
+          <p class="text-[15px] leading-relaxed text-ink sm:text-[17px]">{zh ? PILLARS_ZH[i].body : p.body}</p>
         </div>
       ))}
     </div>
@@ -52,17 +57,23 @@ const pillars = [
       <img
         src={url(firstDealAward.image)}
         onerror={firstDealAward.fallbackImage ? `this.onerror=null;this.src='${url(firstDealAward.fallbackImage)}'` : undefined}
-        alt="First Sales Achievement Award — Top Sales July 2015"
+        alt={pick(lang, 'First Sales Achievement Award — Top Sales July 2015', FIRST_DEAL_ZH.alt)}
         loading="lazy"
         class="plx w-full rounded-lg border border-gold-500/60 shadow-card"
       />
       <figcaption class="label-sm mt-3 text-center text-navy-100/80">
-        First Sales Achievement Award · Top Sales (July 2015)
+        {pick(lang, 'First Sales Achievement Award · Top Sales (July 2015)', FIRST_DEAL_ZH.caption)}
       </figcaption>
     </figure>
     <div>
-      <h2 class="text-[26px] text-gold-500 sm:text-4xl">The Story Behind My First Deal</h2>
+      <h2 class="text-[26px] text-gold-500 sm:text-4xl">{pick(lang, 'The Story Behind My First Deal', FIRST_DEAL_ZH.heading)}</h2>
       <div class="gold-rule mt-4"></div>
+      {zh && (
+        <div class="space-y-4 text-navy-100">
+          {FIRST_DEAL_ZH.paras('font-bold text-gold-500').map((html) => <p set:html={html} />)}
+        </div>
+      )}
+      {!zh && (
       <div class="space-y-4 text-navy-100">
         <p>
           In July 2015, during my early days in real estate, I closed my first property sale — a
@@ -84,6 +95,7 @@ const pillars = [
           real estate.
         </p>
       </div>
+      )}
     </div>
   </div>
 </section>

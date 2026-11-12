@@ -3,9 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import CTASection from '../../components/CTASection.astro';
-import { url } from '../../lib/url';
+import { langOf, pick, href } from '../../i18n';
+import { GUIDE_CATEGORY_ZH } from '../../i18n/guides';
 
-const guides = (await getCollection('guides', ({ data }) => !data.draft))
+// 这个模板同时出英文页(/guides/)和中文页(/zh/guides/)
+const lang = langOf(Astro);
+const guides = (await getCollection(lang === 'zh' ? 'guidesZh' : 'guides', ({ data }) => !data.draft))
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 
 const categories = ['The Buying Process', 'Avoiding Pitfalls', 'Loans & Financing', 'Buying Basics'] as const;
@@ -15,15 +18,22 @@ const byCategory = categories
 ---
 
 <BaseLayout
-  title="Buyer Guides: Property Know-How, Pitfalls & Loan Tips in Malaysia"
-  description="A complete knowledge base for buying property in Malaysia: the buying process, SPA pitfalls, DSR loan tips, handover inspection. Practical guides for first-time buyers and upgraders, updated regularly."
+  title={pick(lang, 'Buyer Guides: Property Know-How, Pitfalls & Loan Tips in Malaysia', '买房指南：马来西亚买房知识、避坑与贷款攻略')}
+  description={pick(
+    lang,
+    'A complete knowledge base for buying property in Malaysia: the buying process, SPA pitfalls, DSR loan tips, handover inspection. Practical guides for first-time buyers and upgraders, updated regularly.',
+    '马来西亚买房的完整知识库：购房流程、签 SPA 的坑、DSR 与贷款、收楼验屋。写给首购族和换屋族的实用指南。',
+  )}
 >
   <section class="bg-navy-900 py-12 text-white">
     <div class="container-site">
-      <h1 class="text-3xl sm:text-4xl text-white">Buyer Guides</h1>
+      <h1 class="text-3xl sm:text-4xl text-white">{pick(lang, 'Buyer Guides', '买房指南')}</h1>
       <p class="mt-3 max-w-2xl text-navy-100">
-        This is the know-how I usually explain to clients one on one. I’m writing it up free — because
-        an informed buyer is a good client.
+        {pick(
+          lang,
+          'This is the know-how I usually explain to clients one on one. I’m writing it up free — because an informed buyer is a good client.',
+          '这些是我平时一对一讲给客户听的内容，现在免费写出来——因为懂行的买家，才是好客户。',
+        )}
       </p>
     </div>
   </section>
@@ -32,13 +42,13 @@ const byCategory = categories
     <div class="container-site space-y-14">
       {byCategory.map(({ cat, items }) => (
         <div>
-          <SectionHeading title={cat} />
+          <SectionHeading title={pick(lang, cat, GUIDE_CATEGORY_ZH[cat])} />
           <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((g) => (
-              <a href={url(`/guides/${g.id}/`)} class="card group block">
+              <a href={href(lang, `/guides/${g.id}/`)} class="card group block">
                 <h2 class="text-lg leading-snug group-hover:text-gold-600">{g.data.title}</h2>
                 <p class="mt-2 line-clamp-3 text-sm text-ink/70">{g.data.description}</p>
-                <p class="mt-4 text-sm font-semibold text-gold-600">Read more →</p>
+                <p class="mt-4 text-sm font-semibold text-gold-600">{pick(lang, 'Read more →', '阅读全文 →')}</p>
               </a>
             ))}
           </div>
@@ -48,7 +58,7 @@ const byCategory = categories
   </section>
 
   <CTASection
-    heading="Your question not covered by an article?"
-    sub="Just ask me. Your question might well be the topic of my next article or next video."
+    heading={pick(lang, 'Your question not covered by an article?', '你的问题这里没写到？')}
+    sub={pick(lang, 'Just ask me. Your question might well be the topic of my next article or next video.', '直接问我就好。你的问题，说不定就是我下一篇文章或下一支视频的题目。')}
   />
 </BaseLayout>

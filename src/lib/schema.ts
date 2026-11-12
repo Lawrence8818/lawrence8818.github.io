@@ -93,6 +93,7 @@ export function articleSchema(opts: {
   datePublished: Date;
   dateModified?: Date;
   image?: string;
+  lang?: 'en' | 'zh';
 }) {
   return {
     '@context': 'https://schema.org',
@@ -102,7 +103,7 @@ export function articleSchema(opts: {
     url: opts.url,
     datePublished: opts.datePublished.toISOString(),
     dateModified: (opts.dateModified ?? opts.datePublished).toISOString(),
-    inLanguage: 'en',
+    inLanguage: opts.lang === 'zh' ? 'zh-Hans' : 'en',
     author: {
       '@type': 'Person',
       '@id': personId(opts.url),
@@ -126,6 +127,7 @@ export function propertyListingSchema(opts: {
   locality: string;
   image?: string;
   specs: { name: string; value: string }[];
+  lang?: 'en' | 'zh';
 }) {
   return {
     '@context': 'https://schema.org',
@@ -134,7 +136,7 @@ export function propertyListingSchema(opts: {
     url: opts.url,
     name: `${opts.name}, ${opts.locality}`,
     description: opts.description,
-    inLanguage: 'en',
+    inLanguage: opts.lang === 'zh' ? 'zh-Hans' : 'en',
     ...(opts.image ? { image: opts.image } : {}),
     mainEntity: {
       '@type': 'Place',

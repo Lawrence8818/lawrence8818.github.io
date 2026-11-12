@@ -360,3 +360,27 @@
     @apply bg-navy-900 text-white;
   }
 }
+
+/* ============ 中文版排版 ============
+   英文标题用 Playfair Display(衬线)、全大写、字距收紧;这些对中文都不合适:
+   中文会退回系统的宋体,在 Windows 上很难看。中文页面一律用黑体系的无衬线字,
+   字距归零,行高放宽。字体用系统自带的,不另外下载(中文字体文件非常大)。 */
+:lang(zh-Hans) {
+  --font-sans: 'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
+    'Noto Sans SC', 'Source Han Sans SC', system-ui, sans-serif;
+  --font-display: var(--font-sans);
+}
+:lang(zh-Hans) h1,
+:lang(zh-Hans) h2,
+:lang(zh-Hans) h3 {
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+:lang(zh-Hans) .label-sm {
+  letter-spacing: 0.08em;
+}
+:lang(zh-Hans) p,
+:lang(zh-Hans) li,
+:lang(zh-Hans) blockquote {
+  line-height: 1.85;
+}

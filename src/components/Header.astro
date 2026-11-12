@@ -1,27 +1,48 @@
 ---
 import { url } from '../lib/url';
-import { waLink } from '../lib/whatsapp';
+import { waLink, WA_DEFAULT_ZH } from '../lib/whatsapp';
 import { SITE } from '../data/site';
+import { langOf, pick, href, hasZh, barePath } from '../i18n';
 
 // Internal links. These used to be absolute https://lawrencelawproperty.com/…
 // URLs from the days the pages were pasted one by one into the old CMS; now
 // that this site serves the domain itself, that only cost every click a
 // redirect (apex → www, then → trailing slash).
 // Section links (#areas) land on the main page.
-const navItems = [
-  { href: url('/'), label: 'Home' },
-  { href: url('/allproperties/'), label: 'Properties' },
-  { href: url('/buyerguide/'), label: 'Buyer Guides' },
-  { href: url('/#areas'), label: 'Areas' },
-  { href: url('/spasignings/'), label: 'Client Stories' },
-  { href: url('/about/'), label: 'About' },
-  { href: waLink(), label: 'Contact', external: true },
-];
+const lang = langOf(Astro);
+const wa = waLink(pick(lang, undefined, WA_DEFAULT_ZH));
+// 中文菜单只列已经有中文版的页面,外加「客户故事」(保留客户原话,所以是英文页)。
+const navItems =
+  lang === 'zh'
+    ? [
+        { href: href(lang, '/'), label: '首页' },
+        { href: href(lang, '/allproperties/'), label: '项目' },
+        { href: href(lang, '/guides/'), label: '买房指南' },
+        { href: href(lang, '/spasignings/'), label: '客户故事（英文）' },
+        { href: href(lang, '/about/'), label: '关于我' },
+        { href: wa, label: '联系我', external: true },
+      ]
+    : [
+        { href: url('/'), label: 'Home' },
+        { href: url('/allproperties/'), label: 'Properties' },
+        { href: url('/buyerguide/'), label: 'Buyer Guides' },
+        { href: url('/#areas'), label: 'Areas' },
+        { href: url('/spasignings/'), label: 'Client Stories' },
+        { href: url('/about/'), label: 'About' },
+        { href: waLink(), label: 'Contact', external: true },
+      ];
+
+// 语言切换:去同一页的另一种语言;这一页没有中文版时,去中文首页。
+const bare = barePath(Astro.url.pathname);
+const switchTo =
+  lang === 'zh'
+    ? { href: url(bare), label: 'EN', hreflang: 'en', title: 'English' }
+    : { href: url('/zh' + (hasZh(bare) ? bare : '/')), label: '中文', hreflang: 'zh-Hans', title: '中文版' };
 ---
 
 <header class="sticky top-0 z-40 bg-navy-900">
   <div class="container-site flex h-[72px] items-center justify-between gap-3">
-    <a href={url('/')} class="flex min-w-0 items-center gap-3" aria-label="LLP Property — home">
+    <a href={href(lang, '/')} class="flex min-w-0 items-center gap-3" aria-label={pick(lang, 'LLP Property — home', 'LLP Property — 首页')}>
       {/* Gold emblem image + the LLP PROPERTY wordmark recreated in type,
           matching Lawrence's logo lockup (crisp at any size) */}
       <img
@@ -38,7 +59,17 @@ const navItems = [
 
     <div class="flex flex-none items-center gap-2 sm:gap-3">
       <a
-        href={waLink()}
+        href={switchTo.href}
+        hreflang={switchTo.hreflang}
+        lang={switchTo.hreflang}
+        title={switchTo.title}
+        class="hidden h-11 min-w-11 items-center justify-center rounded-md border border-white/25 px-2.5 text-sm font-semibold text-white transition-colors hover:border-gold-500 hover:text-gold-500 sm:flex"
+        data-track="language_switch"
+      >
+        {switchTo.label}
+      </a>
+      <a
+        href={wa}
         target="_blank"
         rel="noopener"
         class="btn-gold !px-4 !py-2 !text-sm sm:!px-5 sm:!py-2.5"
@@ -52,7 +83,9 @@ const navItems = [
       <button
         id="menu-toggle"
         class="flex h-11 w-11 items-center justify-center rounded-md text-white transition-colors hover:text-gold-500"
-        aria-label="Open menu"
+        aria-label={pick(lang, 'Open menu', '打开菜单')}
+        data-label-open={pick(lang, 'Open menu', '打开菜单')}
+        data-label-close={pick(lang, 'Close menu', '关闭菜单')}
         aria-expanded="false"
         aria-controls="site-menu"
       >
@@ -70,7 +103,7 @@ const navItems = [
   </div>
 
   {/* Collapsed menu — opens on click, all screen sizes */}
-  <nav id="site-menu" class="hidden border-t border-gold-500/30 bg-navy-900" aria-label="Site menu">
+  <nav id="site-menu" class="hidden border-t border-gold-500/30 bg-navy-900" aria-label={pick(lang, 'Site menu', '网站菜单')}>
     <div class="container-site py-4">
       <div class="grid gap-1 sm:grid-cols-2">
         {navItems.map((item) => (
@@ -85,6 +118,16 @@ const navItems = [
           </a>
         ))}
       </div>
+      {/* 手机上顶栏放不下语言切换,放在菜单里 */}
+      <a
+        href={switchTo.href}
+        hreflang={switchTo.hreflang}
+        lang={switchTo.hreflang}
+        class="mt-3 flex min-h-11 items-center justify-center rounded-md border border-white/25 px-3 py-3 text-base font-semibold text-white transition-colors hover:border-gold-500 hover:text-gold-500 sm:hidden"
+        data-track="language_switch"
+      >
+        {lang === 'zh' ? 'English' : '中文版'}
+      </a>
       <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-white/10 pt-4 text-sm text-navy-100">
         <span>+6019-9939 860</span>
         <span>{SITE.email}</span>
@@ -106,7 +149,7 @@ const navItems = [
       iconOpen.classList.toggle('hidden', open);
       iconClose.classList.toggle('hidden', !open);
       btn.setAttribute('aria-expanded', String(open));
-      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      btn.setAttribute('aria-label', open ? btn.getAttribute('data-label-close') : btn.getAttribute('data-label-open'));
     }
     btn.addEventListener('click', function () {
       setOpen(menu.classList.contains('hidden'));

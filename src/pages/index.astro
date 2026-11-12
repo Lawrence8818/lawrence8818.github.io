@@ -15,8 +15,14 @@ import { SERVICES } from '../data/services';
 import { SITE } from '../data/site';
 import { url } from '../lib/url';
 import { landingHref } from '../lib/landing';
-import { instalmentDisplay } from '../lib/property-facts';
-import { waLink, waContextMessage } from '../lib/whatsapp';
+import { instalmentDisplay, instalmentDisplayZh, LABEL_ZH } from '../lib/property-facts';
+import { waLink, waContextMessage, WA_DEFAULT_ZH, WA_LEADMAGNET_ZH } from '../lib/whatsapp';
+import { langOf, pick, href } from '../i18n';
+import { introParasZh, INTRO_CLOSING_ZH, MARQUEE_ZH, SERVICES_ZH } from '../i18n/copy-zh';
+
+// 这个模板同时出英文首页(/)和中文首页(/zh/)
+const lang = langOf(Astro);
+const zh = lang === 'zh';
 
 const videos = (await getCollection('videos'))
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
@@ -34,13 +40,21 @@ const featuredProperties = [...properties.filter((p) => p.data.featured), ...pro
 
 const testimonials = (await getCollection('testimonials')).slice(0, 6);
 
-const marqueeItems =
+const marqueeItems = zh ? MARQUEE_ZH :
   'KUALA LUMPUR · SELANGOR · JOHOR · PENANG · A DECADE OF EXPERIENCE · TOP 47 NATIONWIDE · PRIMARY MARKET 2025 · TRUSTED BY 2,000+ BUYERS · 1,500+ HOMEOWNERS SERVED · SINCE 2015 · ';
 ---
 
 <BaseLayout
-  title={`${SITE.name} | New Property Specialist with Subsales Expertise — KL, Selangor, Johor & Penang`}
-  description="Full coverage of every new launch in KL & Selangor, plus Johor and Penang. 10 years in real estate, 2,000+ happy buyers. Honest, no-pressure advice — free consultation on WhatsApp."
+  title={pick(
+    lang,
+    `${SITE.name} | New Property Specialist with Subsales Expertise — KL, Selangor, Johor & Penang`,
+    `${SITE.name} ${SITE.nameZh}｜新盘专家，兼具二手房经验 — 吉隆坡、雪兰莪、柔佛、槟城`,
+  )}
+  description={pick(
+    lang,
+    'Full coverage of every new launch in KL & Selangor, plus Johor and Penang. 10 years in real estate, 2,000+ happy buyers. Honest, no-pressure advice — free consultation on WhatsApp.',
+    '吉隆坡和雪兰莪的新盘全面覆盖，也做柔佛和槟城。入行十年，2,000 多位买家的信任。说实话、不催促——WhatsApp 免费咨询。',
+  )}
   noTitleTemplate
 >
   {/* ===== Hero: editorial, oversized type ===== */}
@@ -48,26 +62,30 @@ const marqueeItems =
     <div class="hero-grid container-site py-14 sm:py-20">
       <div class="hero-top">
         <p class="label-sm mb-6 text-gold-500">
-          {SITE.renNumber} · KL / PJ / SELANGOR / JOHOR / PENANG
+          {SITE.renNumber} · {pick(lang, 'KL / PJ / SELANGOR / JOHOR / PENANG', '吉隆坡 / 八打灵再也 / 雪兰莪 / 柔佛 / 槟城')}
         </p>
         <h1 class="text-[clamp(2.6rem,8vw,5.5rem)] leading-[1.02] tracking-tight text-white uppercase">
           Lawrence<br />Law <span class="text-gold-500">刘智权</span>
         </h1>
         <p class="mt-6 text-sm font-bold tracking-[3px] text-white uppercase sm:text-base">
-          New Property Specialist <span class="text-gold-500">/</span> Subsales Expertise
+          {pick(lang, 'New Property Specialist', '新盘专家')} <span class="text-gold-500">/</span> {pick(lang, 'Subsales Expertise', '二手房实战经验')}
         </p>
       </div>
       <div class="hero-photo mx-auto w-full max-w-xs lg:max-w-sm">
         <img
           src={url('/images/lawrence-portrait.jpg')}
           onerror={`this.onerror=null;this.src='${url('/images/placeholders/lawrence-portrait.svg')}'`}
-          alt="Lawrence Law, New Property Specialist"
+          alt={pick(lang, 'Lawrence Law, New Property Specialist', 'Lawrence Law 刘智权，新盘专家')}
           class="plx aspect-[4/5] w-full object-cover"
           fetchpriority="high"
         />
       </div>
       <div class="hero-body">
         <div class="max-w-xl space-y-4 text-navy-100">
+          {zh && introParasZh('font-bold text-white').map((html) => <p set:html={html} />)}
+          {zh && <p class="text-white">{INTRO_CLOSING_ZH}</p>}
+          {!zh && (
+          <>
           <p>
             From subsales to new property — a decade of hands-on experience you can count on.
             Guiding young couples and families toward the right home
@@ -95,13 +113,15 @@ const marqueeItems =
           <p class="text-white">
             If you’re looking for honest, no-pressure advice to make the right property move — let’s talk.
           </p>
+          </>
+          )}
         </div>
         <div class="mt-10 flex flex-col gap-3 sm:flex-row">
-          <a href={waLink()} target="_blank" rel="noopener" class="btn-gold" data-track="whatsapp_hero">
-            Let’s Talk
+          <a href={waLink(pick(lang, undefined, WA_DEFAULT_ZH))} target="_blank" rel="noopener" class="btn-gold" data-track="whatsapp_hero">
+            {pick(lang, 'Let’s Talk', '聊一聊')}
           </a>
-          <a href={waLink(SITE.leadMagnetMessage)} target="_blank" rel="noopener" class="btn-gold-outline text-white" data-track="whatsapp_hero_leadmagnet">
-            Free Buyer’s Guide
+          <a href={waLink(pick(lang, SITE.leadMagnetMessage, WA_LEADMAGNET_ZH))} target="_blank" rel="noopener" class="btn-gold-outline text-white" data-track="whatsapp_hero_leadmagnet">
+            {pick(lang, 'Free Buyer’s Guide', '免费买房指南')}
           </a>
         </div>
       </div>
@@ -157,9 +177,9 @@ const marqueeItems =
   <section class="section-pad bg-white">
     <div class="container-site">
       <div class="flex flex-wrap items-end justify-between gap-4">
-        <SectionHeading title="Featured Properties" sub="Premium Developments · Kuala Lumpur & Selangor" />
-        <a href={url('/allproperties/')} class="btn-gold-outline mb-8 hidden text-navy-900 sm:inline-flex">
-          View ALL Properties
+        <SectionHeading title={pick(lang, 'Featured Properties', '精选项目')} sub={pick(lang, 'Premium Developments · Kuala Lumpur & Selangor', '优质发展项目 · 吉隆坡与雪兰莪')} />
+        <a href={href(lang, '/allproperties/')} class="btn-gold-outline mb-8 hidden text-navy-900 sm:inline-flex">
+          {pick(lang, 'View ALL Properties', '查看全部项目')}
         </a>
       </div>
     </div>
@@ -169,7 +189,7 @@ const marqueeItems =
           <div class="flex gap-6 pr-6 pl-0" aria-hidden={copy > 0 ? 'true' : undefined}>
             {featuredProperties.map((p) => (
               <div class="group w-[280px] sm:w-[340px] lg:w-[400px]">
-                <a href={landingHref(p.data.landingUrl) || url(`/properties/${p.id}/`)} class="block" tabindex={copy > 0 ? -1 : undefined}>
+                <a href={(zh ? href(lang, `/properties/${p.id}/`) : landingHref(p.data.landingUrl) || url(`/properties/${p.id}/`))} class="block" tabindex={copy > 0 ? -1 : undefined}>
                   <div class="relative aspect-[4/3] overflow-hidden bg-navy-900">
                     <img
                       src={url(p.data.image)}
@@ -180,7 +200,7 @@ const marqueeItems =
                     />
                     {p.data.label && (
                       <span class="label-sm absolute top-3 left-3 bg-gold-500 px-3 py-1 text-navy-900">
-                        {p.data.label}
+                        {zh ? (LABEL_ZH[p.data.label] ?? p.data.label) : p.data.label}
                       </span>
                     )}
                     {p.data.placeholder && (
@@ -197,17 +217,17 @@ const marqueeItems =
                   </div>
                   <p class="flex-none font-bold text-navy-900">
                     {(() => {
-                      const i = instalmentDisplay(p.data);
-                      return i.amount ? `From ${i.text}/mo` : i.text;
+                      const i = zh ? instalmentDisplayZh(p.data) : instalmentDisplay(p.data);
+                      return i.amount ? pick(lang, `From ${i.text}/mo`, `月供 ${i.text} 起`) : i.text;
                     })()} <span class="text-gold-500">→</span>
                   </p>
                 </div>
                 <div class="mt-1 flex gap-5 text-sm">
-                  <a href={waLink(waContextMessage(p.data.name))} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4" data-track="whatsapp_property" tabindex={copy > 0 ? -1 : undefined}>
-                    Contact Us
+                  <a href={waLink(waContextMessage(p.data.name, lang))} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4" data-track="whatsapp_property" tabindex={copy > 0 ? -1 : undefined}>
+                    {pick(lang, 'Contact Us', '联系我')}
                   </a>
-                  <a href={landingHref(p.data.landingUrl) || url(`/properties/${p.id}/`)} class="inline-flex min-h-11 items-center font-semibold text-ink/60 hover:text-navy-900" tabindex={copy > 0 ? -1 : undefined}>
-                    Details
+                  <a href={(zh ? href(lang, `/properties/${p.id}/`) : landingHref(p.data.landingUrl) || url(`/properties/${p.id}/`))} class="inline-flex min-h-11 items-center font-semibold text-ink/60 hover:text-navy-900" tabindex={copy > 0 ? -1 : undefined}>
+                    {pick(lang, 'Details', '详情')}
                   </a>
                 </div>
               </div>
@@ -217,27 +237,29 @@ const marqueeItems =
       </div>
     </div>
     <div class="container-site mt-8 text-center sm:hidden">
-      <a href={url('/allproperties/')} class="btn-gold-outline text-navy-900">View ALL Properties</a>
+      <a href={href(lang, '/allproperties/')} class="btn-gold-outline text-navy-900">{pick(lang, 'View ALL Properties', '查看全部项目')}</a>
     </div>
   </section>
 
   {/* ===== Services ===== */}
   <section class="section-pad border-t border-border bg-white">
     <div class="container-site">
-      <SectionHeading title="How I Can Help" sub="Services" />
+      <SectionHeading title={pick(lang, 'How I Can Help', '我能帮你什么')} sub={pick(lang, 'Services', '服务项目')} />
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {SERVICES.map((s) => (
+        {SERVICES.map((s, i) => (
           <div class="card">
             <span class="text-gold-500"><GoldIcon name={s.icon} size={32} /></span>
-            <h3 class="mt-4 text-lg tracking-tight uppercase">{s.title}</h3>
-            <p class="mt-2 text-[15px] text-ink/80">{s.description}</p>
+            <h3 class="mt-4 text-lg tracking-tight uppercase">{zh ? SERVICES_ZH[i].title : s.title}</h3>
+            <p class="mt-2 text-[15px] text-ink/80">{zh ? SERVICES_ZH[i].description : s.description}</p>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  {/* ===== Videos ===== */}
+  {/* ===== Videos =====
+      中文版暂时不出这一区:视频页还没有中文版,点进去会是英文页。 */}
+  {!zh && (
   <section id="videos" class="section-pad scroll-mt-20 border-t border-border bg-white">
     <div class="container-site">
       <div class="flex flex-wrap items-end justify-between gap-4">
@@ -265,6 +287,7 @@ const marqueeItems =
       </a>
     </div>
   </section>
+  )}
 
   {/* ===== Testimonials: navy band =====
       Prev/next arrows mirror the Featured Properties rail: without JS they are
@@ -273,10 +296,13 @@ const marqueeItems =
       scroll buttons plus a gentle auto-advance that pauses on interaction. */}
   <section id="testimonials" class="section-pad scroll-mt-20 bg-navy-900">
     <div class="container-site">
-      <SectionHeading title="What others are saying" sub="Testimonials" tone="light" />
+      <SectionHeading title={pick(lang, 'What others are saying', '客户怎么说')} sub={pick(lang, 'Testimonials', '客户见证')} tone="light" />
       <p class="-mt-4 max-w-2xl text-navy-100">
-        The 222 Blueprint is my structured home-buying advisory method — helping buyers clarify
-        needs, budget and location before they commit.
+        {pick(
+          lang,
+          'The 222 Blueprint is my structured home-buying advisory method — helping buyers clarify needs, budget and location before they commit.',
+          '222 Blueprint 是我自己的一套买房咨询方法：在下决定之前，先帮买家把需求、预算和地点理清楚。以下是客户的原话，保留英文原文。',
+        )}
       </p>
     </div>
 
@@ -318,11 +344,13 @@ const marqueeItems =
     </div>
 
     <div class="container-site mt-6 text-center">
-      <a href={url('/spasignings/')} class="btn-gold-outline text-white">More Client Stories</a>
+      <a href={url('/spasignings/')} class="btn-gold-outline text-white">{pick(lang, 'More Client Stories', '更多客户故事（英文）')}</a>
     </div>
   </section>
 
-  {/* ===== Areas ===== */}
+  {/* ===== Areas =====
+      中文版暂时不出这一区:区域页还没有中文版。 */}
+  {!zh && (
   <section id="areas" class="section-pad scroll-mt-20 bg-white">
     <div class="container-site">
       <SectionHeading title="Areas I Serve" sub="Coverage" />
@@ -348,6 +376,7 @@ const marqueeItems =
       </div>
     </div>
   </section>
+  )}
 
   <CTASection />
 </BaseLayout>

@@ -1,18 +1,20 @@
 ---
-import { waLink } from '../lib/whatsapp';
+import { waLink, WA_DEFAULT_ZH } from '../lib/whatsapp';
+import { langOf, pick } from '../i18n';
 
 interface Props {
   /** 按页面定制的预填消息 */
   message?: string;
 }
 const { message } = Astro.props;
+const lang = langOf(Astro);
 ---
 
 <a
-  href={waLink(message)}
+  href={waLink(message ?? pick(lang, undefined, WA_DEFAULT_ZH))}
   target="_blank"
   rel="noopener"
-  aria-label="Chat with Lawrence on WhatsApp"
+  aria-label={pick(lang, 'Chat with Lawrence on WhatsApp', '用 WhatsApp 联系 Lawrence')}
   data-track="whatsapp_fab"
   class="wa-pulse fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-wa shadow-lg transition-transform hover:scale-105 sm:right-6 sm:bottom-6"
 >
