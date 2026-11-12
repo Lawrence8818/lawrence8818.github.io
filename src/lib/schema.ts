@@ -154,6 +154,56 @@ export function propertyListingSchema(opts: {
   };
 }
 
+/**
+ * 客户故事页。35 个故事分两种,标法不一样:
+ *
+ * - 客户自己的话(ownWords)→ Review,作者是客户,评的是 Lawrence。
+ * - Lawrence 代写的个案 → CreativeWork,作者是 Lawrence,不冒充客户的原话。
+ *
+ * 不写星级(reviewRating / aggregateRating):页面上的五颗星是版面设计,
+ * 不是客户逐条打的分数,写进结构化数据就成了编造的评分。
+ */
+export function clientStoriesSchema(opts: {
+  siteUrl: string;
+  url: string;
+  stories: { title: string; body: string; name: string; role: string; ownWords?: boolean }[];
+}) {
+  const plain = (t: string) => t.replace(/^[“"]|[”"]$/g, '');
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': opts.url,
+    url: opts.url,
+    name: `Client stories — ${SITE.name}`,
+    inLanguage: 'en',
+    about: { '@id': agentId(opts.siteUrl) },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: opts.stories.length,
+      itemListElement: opts.stories.map((s, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: s.ownWords
+          ? {
+              '@type': 'Review',
+              name: plain(s.title),
+              reviewBody: s.body,
+              author: { '@type': 'Person', name: s.name, ...(s.role ? { jobTitle: s.role } : {}) },
+              itemReviewed: { '@id': agentId(opts.siteUrl) },
+            }
+          : {
+              '@type': 'CreativeWork',
+              genre: 'Client case story',
+              name: plain(s.title),
+              text: s.body,
+              author: { '@id': personId(opts.siteUrl) },
+              about: { '@id': agentId(opts.siteUrl) },
+            },
+      })),
+    },
+  };
+}
+
 export function videoSchema(opts: {
   name: string;
   description: string;

@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { SITE } from '../data/site';
 import { propertyOneLine } from '../lib/property-facts';
 import { landingHref } from '../lib/landing';
+import { STORIES } from '../data/client-stories';
 
 // llms.txt —— 给 AI 助手看的网站说明书(格式见 llmstxt.org)。
 // 一份纯文字的目录:这个网站是谁的、每一页讲什么、每个项目的关键数字。
@@ -37,7 +38,7 @@ export const GET: APIRoute = async ({ site }) => {
     '## About',
     '',
     `- [About ${SITE.name}](${abs('/about/')}): background, credentials (${SITE.renNumber}) and awards`,
-    `- [Client Stories](${abs('/spasignings/')}): first-hand accounts from buyers he has advised`,
+    `- [Client Stories](${abs('/spasignings/')}): ${STORIES.length} buyer stories — ${STORIES.filter((s) => s.ownWords).length} in the buyers' own words, the rest written up by ${SITE.name} as case notes`,
     `- [Contact](${abs('/contact/')}): how to reach him, plus common questions about working with him`,
     '',
     '## Buyer guides',
