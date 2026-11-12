@@ -41,25 +41,9 @@ const NOT_PUBLISHED = new Set([
 // 没有这一层,每日同步会把网站改回 CSV 的旧值。
 // CSV 补上之后(值变得一样),同步会提示哪几条可以从这里删掉。
 const SITE_OVERRIDES = {
-  // Lawrence 2026-11-11 给的正确地点
-  // Quaver 连筛选分组也一起移到 Selangor(原本归在 kuala-lumpur)
-  'quaver-residence': { location: 'Seri Kembangan, Selangor', region: 'selangor' },
-  'colonial-infinite': { location: 'Subang Jaya, Selangor' },
-  'd-evia': { location: 'Kwasa Damansara, Selangor' },
-  'd-nuri': { location: 'Kwasa Damansara, Selangor' },
-  daya: { location: 'Kwasa Damansara, Selangor' },
-  linari: { location: 'Kwasa Damansara, Selangor' },
-  'ria-sunsuria': { location: 'Kwasa Damansara, Selangor' },
-  'tujuh-residences': { location: 'Kwasa Damansara, Selangor' },
-  'zenia-condovilla': { location: 'ParkCity Damansara, Selangor' },
-  'zenia-parkhomes': { location: 'ParkCity Damansara, Selangor' },
-  'aster-hill': { location: 'Sri Petaling, Kuala Lumpur' },
-  'aurum-2': { location: 'Sri Petaling, Kuala Lumpur' },
-  'pavilion-square': { location: 'Bukit Bintang, Kuala Lumpur' },
-  'avantro-residence': { location: 'Puchong BK5, Selangor' },
-  'atwater-corporate-tower': { location: 'Petaling Jaya, Selangor' },
-  tessera: { location: 'Damansara Perdana, Selangor' },
-  'grand-damansara': { location: 'Bandar Utama, Selangor' },
+  // 目前没有。2026-11-11 那批地点更正(17 个项目)和 Quaver 的分组,
+  // Project-Info-Master 已在 2026-11-12 跟上,所以这里清空了。
+  // 写法示例:'some-slug': { location: 'Kwasa Damansara, Selangor' },
 };
 
 if (!existsSync(CSV)) {
