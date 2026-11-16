@@ -103,7 +103,17 @@ const AREA_PAGE: Record<string, { slug: string; name: string }> = {
   johor: { slug: 'johor', name: 'Johor' },
   penang: { slug: 'penang', name: 'Penang' },
 };
-const areaPage = !zh && d.region ? AREA_PAGE[d.region] : undefined;
+// 地段有自己的对比页的(目前是 Bukit Jalil)优先连到那一页
+const localityPage = (await getCollection('areas')).find(
+  (a) => a.data.locality && d.location.toLowerCase().startsWith(a.data.locality.toLowerCase()),
+);
+const areaPage = zh
+  ? undefined
+  : localityPage
+    ? { slug: localityPage.id, name: localityPage.data.name }
+    : d.region
+      ? AREA_PAGE[d.region]
+      : undefined;
 
 // 和这个项目最相关的三篇指南:地契是租赁的先放地契那篇,否则放查发展商那篇
 const guideIds = [
@@ -324,7 +334,7 @@ const waMsg = zh
           </a>
           {areaPage && (
             <a href={url(`/areas/${areaPage.slug}/`)} class="btn-gold-outline text-navy-900">
-              Buying in {areaPage.name}: Area Guide
+              {localityPage ? `Compare all ${areaPage.name} projects` : `Buying in ${areaPage.name}: Area Guide`}
             </a>
           )}
         </div>

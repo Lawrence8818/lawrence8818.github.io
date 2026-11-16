@@ -62,6 +62,8 @@ const areas = defineCollection({
     name: z.string(),
     nameEn: z.string(),
     region: z.enum(['klang-valley', 'johor', 'penang']),
+    /** 可选:按地段取项目(项目地点以这个名字开头),页面会出对比表。例如 "Bukit Jalil" */
+    locality: z.string().optional(),
     heroImage: z.string(),
     intro: z.string(),
     highlights: z.array(z.string()),
