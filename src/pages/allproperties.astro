@@ -1,10 +1,12 @@
 ---
+import JsonLd from '../components/JsonLd.astro';
+import { itemListSchema, breadcrumbSchema } from '../lib/schema';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PropertyCard from '../components/PropertyCard.astro';
 import CTASection from '../components/CTASection.astro';
 import { monthlyNumber, REGION_LABEL_ZH } from '../lib/property-facts';
-import { langOf, pick } from '../i18n';
+import { langOf, pick, href } from '../i18n';
 
 // 这个模板同时出英文页(/allproperties/)和中文页(/zh/allproperties/)
 const lang = langOf(Astro);
@@ -84,20 +86,46 @@ const SIZE_MAX = 5000;
 const SIZE_STEP = 50;
 
 const PAGE_SIZE = 9;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <BaseLayout
-  title={pick(lang, 'Featured Properties: Curated New Launches in KL, Selangor, Johor & Penang', '精选项目：吉隆坡、雪兰莪、柔佛、槟城的新盘')}
+  title={pick(lang, 'All Properties: New Launches in KL & Selangor', '全部项目：吉隆坡与雪兰莪新盘')}
   description={pick(
     lang,
     'Browse new-launch projects Lawrence recommends across Kuala Lumpur, Selangor, Johor and Penang — filter by region and page through the full list. Every listing personally vetted.',
     '浏览 Lawrence 在吉隆坡、雪兰莪、柔佛和槟城推荐的新盘，可按地区和单位面积筛选。每一个项目都经过他亲自了解。',
   )}
 >
+  {/* 给搜索引擎和 AI 看的项目目录:这一页是全部项目的清单 */}
+  <JsonLd
+    slot="head"
+    data={itemListSchema({
+      url: canonical,
+      name: pick(lang, 'All Properties — new-launch projects covered by Lawrence Law', '全部项目 — Lawrence Law 负责的新盘'),
+      description: pick(
+        lang,
+        `${liveProps.length} new-launch projects currently available across Kuala Lumpur, KLCC, Petaling Jaya and Selangor, each with its estimated monthly instalment, layout sizes, tenure and completion date.`,
+        `目前在售的 ${liveProps.length} 个新盘，分布在吉隆坡、KLCC、八打灵再也和雪兰莪，每个项目都列出预估月供、户型面积、地契和完工日期。`,
+      ),
+      lang,
+      items: properties.map((x) => ({
+        name: x.data.name,
+        url: new URL(href(lang, `/properties/${x.id}/`), Astro.site).href,
+      })),
+    })}
+  />
+  <JsonLd
+    slot="head"
+    data={breadcrumbSchema([
+      { name: pick(lang, 'Home', '首页'), url: new URL(href(lang, '/'), Astro.site).href },
+      { name: pick(lang, 'All Properties', '全部项目'), url: canonical },
+    ])}
+  />
   <section class="bg-navy-900 pt-14 pb-4 text-white sm:pt-20 sm:pb-6">
     <div class="container-site">
       <div class="flex items-start justify-between gap-4">
-        <h1 class="mb-4 text-[32px] leading-tight text-white sm:text-5xl">{pick(lang, 'Featured Properties', '精选项目')}</h1>
+        <h1 class="mb-4 text-[32px] leading-tight text-white sm:text-5xl">{pick(lang, 'All Properties', '全部项目')}</h1>
         <button
           id="view-toggle"
           type="button"

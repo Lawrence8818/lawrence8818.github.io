@@ -1,5 +1,6 @@
 ---
 title: "The 5 Main Reasons a Home Loan Gets Rejected: How Exactly Is DSR Calculated?"
+seoTitle: "Why Home Loans Get Rejected: How DSR Is Calculated"
 description: "Your income isn't low, yet the bank rejected your loan? 90% of the time the problem lies in DSR, CCRIS records and document preparation. This teaches you how to self-check before applying."
 category: Loans & Financing
 publishDate: 2026-07-01

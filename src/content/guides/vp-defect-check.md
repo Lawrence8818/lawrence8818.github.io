@@ -1,5 +1,6 @@
 ---
 title: "The Complete Handover & Inspection Guide: Defects You Must Get the Developer to Fix Within the DLP"
+seoTitle: "Handover & Defect Inspection Guide (VP & DLP)"
 description: "Getting the keys isn't the finish line — it's the start of your golden window to claim. How to use the 24-month defect liability period, what to inspect, and how to submit the report, all in one article."
 category: The Buying Process
 publishDate: 2026-07-08

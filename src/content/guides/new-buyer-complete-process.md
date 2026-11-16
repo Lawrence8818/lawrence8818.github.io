@@ -1,5 +1,6 @@
 ---
 title: "The Complete Process of Buying a New Development in Malaysia: Every Step from Viewing to Keys"
+seoTitle: "Buying a New Development in Malaysia: Step by Step"
 description: "First time buying a developer's new project? This breaks the whole process into 8 steps — what to do at each stage, what fees to pay, and what pitfalls to watch — all explained in one go."
 category: The Buying Process
 publishDate: 2026-07-01

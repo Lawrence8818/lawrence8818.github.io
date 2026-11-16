@@ -7,6 +7,7 @@ import JsonLd from '../../components/JsonLd.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 import { url } from '../../lib/url';
 import { waContextMessage } from '../../lib/whatsapp';
+import { instalmentDisplay } from '../../lib/property-facts';
 
 export async function getStaticPaths() {
   const areas = await getCollection('areas');
@@ -17,6 +18,21 @@ const { area } = Astro.props;
 const { Content } = await render(area);
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const waMsg = waContextMessage(`buying property in ${area.data.name}`);
+
+// 这一区在售的全部项目(KLCC 归在 Kuala Lumpur 这一页)
+const REGIONS_OF: Record<string, string[]> = {
+  kl: ['kuala-lumpur', 'klcc'],
+  'petaling-jaya': ['petaling-jaya'],
+  selangor: ['selangor'],
+  johor: ['johor'],
+  penang: ['penang'],
+};
+const areaProjects = (await getCollection('properties'))
+  .filter((p) => !p.data.soldOut && (REGIONS_OF[area.id] ?? []).includes(p.data.region ?? ''))
+  .sort((a, b) => a.data.order - b.data.order);
+const guides = (await getCollection('guides', ({ data }) => !data.draft))
+  .sort((a, b) => Number(b.data.featured) - Number(a.data.featured) || b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, 3);
 ---
 
 <BaseLayout
@@ -77,6 +93,50 @@ const waMsg = waContextMessage(`buying property in ${area.data.name}`);
           </div>
         </div>
       )}
+
+      {areaProjects.length > 0 && (
+        <div class="mt-12">
+          <h2 class="mb-2 text-xl sm:text-2xl">All {areaProjects.length} projects I cover in {area.data.name}</h2>
+          <p class="mb-5 text-[15px] text-ink/70">
+            Monthly instalments are estimates. Open any project for its layouts, tenure, completion date and common questions.
+          </p>
+          <ul class="divide-y divide-border border-y border-border">
+            {areaProjects.map((p) => {
+              const i = instalmentDisplay(p.data);
+              return (
+                <li>
+                  <a href={url(`/properties/${p.id}/`)} class="group flex min-h-14 flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-3">
+                    <span>
+                      <span class="font-semibold text-navy-900 group-hover:text-gold-600">{p.data.name}</span>
+                      <span class="text-sm text-ink/60"> · {p.data.location}</span>
+                    </span>
+                    <span class="text-sm font-semibold text-navy-900">{i.amount ? `From ${i.text}/mo` : i.text}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+          <p class="mt-5">
+            <a href={`${url('/allproperties/')}?region=${(REGIONS_OF[area.id] ?? [])[0]}`} class="font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4">
+              Filter these by size and monthly instalment →
+            </a>
+          </p>
+        </div>
+      )}
+
+      <div class="mt-12">
+        <h2 class="mb-4 text-xl sm:text-2xl">Guides worth reading first</h2>
+        <ul class="divide-y divide-border border-y border-border">
+          {guides.map((g) => (
+            <li>
+              <a href={url(`/guides/${g.id}/`)} class="group flex min-h-14 items-center justify-between gap-4 py-3 font-semibold text-navy-900 hover:text-gold-600">
+                <span>{g.data.title}</span>
+                <span class="flex-none text-gold-500" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {area.data.faqs && (
         <div class="mt-12">

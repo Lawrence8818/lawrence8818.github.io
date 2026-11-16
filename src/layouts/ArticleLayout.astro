@@ -8,9 +8,14 @@ import { url } from '../lib/url';
 import { waContextMessage } from '../lib/whatsapp';
 import { langOf, pick, href } from '../i18n';
 import { GUIDE_CATEGORY_ZH } from '../i18n/guides';
+import { getCollection } from 'astro:content';
 
 interface Props {
   title: string;
+  /** 给搜索结果用的短标题;页面上的大标题仍是 title */
+  seoTitle?: string;
+  /** 这篇文章的文件名,用来在「相关文章」里排除自己 */
+  slug?: string;
   description: string;
   category: string;
   publishDate: Date;
@@ -18,14 +23,23 @@ interface Props {
   faqs?: { question: string; answer: string }[];
 }
 
-const { title, description, category, publishDate, updatedDate, faqs = [] } = Astro.props;
+const { title, seoTitle, slug, description, category, publishDate, updatedDate, faqs = [] } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const lang = langOf(Astro);
 const dateFmt = new Intl.DateTimeFormat(pick(lang, 'en-GB', 'zh-CN'), { dateStyle: 'long', timeZone: 'UTC' });
 const categoryLabel = pick(lang, category, GUIDE_CATEGORY_ZH[category] ?? category);
+
+// 相关文章:同一分类的排前面,再用其他文章补到三篇
+const others = (await getCollection(lang === 'zh' ? 'guidesZh' : 'guides', ({ data }) => !data.draft))
+  .filter((g) => g.id !== slug)
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+const relatedGuides = [
+  ...others.filter((g) => g.data.category === category),
+  ...others.filter((g) => g.data.category !== category),
+].slice(0, 3);
 ---
 
-<BaseLayout title={title} description={description} ogType="article" waMessage={waContextMessage(title, lang)}>
+<BaseLayout title={seoTitle ?? title} description={description} ogType="article" waMessage={waContextMessage(title, lang)}>
   <JsonLd
     slot="head"
     data={articleSchema({ title, description, url: canonical, datePublished: publishDate, dateModified: updatedDate, lang })}
@@ -74,6 +88,33 @@ const categoryLabel = pick(lang, category, GUIDE_CATEGORY_ZH[category] ?? catego
       <p class="font-medium text-navy-900">{pick(lang, 'Did this article help?', '这篇文章对你有帮助吗？')}</p>
       <p class="mt-1 text-sm text-ink/70">{pick(lang, 'Everyone’s situation is different — just tell me yours and I’ll give you advice tailored to it.', '每个人的情况都不一样。把你的情况告诉我，我按你的情况给建议。')}</p>
     </div>
+
+    {relatedGuides.length > 0 && (
+      <nav class="mt-12" aria-label={pick(lang, 'Related guides', '相关文章')}>
+        <h2 class="font-sans text-xl font-bold text-navy-900">{pick(lang, 'Keep reading', '接着读')}</h2>
+        <ul class="mt-4 divide-y divide-border border-y border-border">
+          {relatedGuides.map((g) => (
+            <li>
+              <a href={href(lang, `/guides/${g.id}/`)} class="group flex min-h-14 items-center justify-between gap-4 py-3 font-semibold text-navy-900 hover:text-gold-600">
+                <span>{g.data.title}</span>
+                <span class="flex-none text-gold-500" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="mt-5 text-[15px] text-ink/80">
+          {pick(lang, 'Ready to look at actual projects? ', '想看实际的项目？')}
+          <a href={href(lang, '/allproperties/')} class="font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4">
+            {pick(lang, 'Browse all properties by monthly instalment', '按月供浏览全部项目')}
+          </a>
+          {pick(lang, ', or ', '，或者')}
+          <a href={href(lang, '/guides/')} class="font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4">
+            {pick(lang, 'see every guide', '看全部指南')}
+          </a>
+          {pick(lang, '.', '。')}
+        </p>
+      </nav>
+    )}
   </article>
 
   <CTASection waMessage={waContextMessage(title, lang)} />

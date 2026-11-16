@@ -250,3 +250,32 @@ export function breadcrumbSchema(items: { name: string; url: string }[]) {
     })),
   };
 }
+
+/** 清单页(例如 All Properties):告诉搜索引擎和 AI 这一页列的是哪些页面 */
+export function itemListSchema(opts: {
+  url: string;
+  name: string;
+  description: string;
+  lang?: 'en' | 'zh';
+  items: { name: string; url: string }[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': opts.url,
+    url: opts.url,
+    name: opts.name,
+    description: opts.description,
+    inLanguage: opts.lang === 'zh' ? 'zh-Hans' : 'en',
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: opts.items.length,
+      itemListElement: opts.items.map((it, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: it.name,
+        url: it.url,
+      })),
+    },
+  };
+}

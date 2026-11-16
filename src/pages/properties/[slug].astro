@@ -28,6 +28,7 @@ import {
   specsZh,
 } from '../../lib/property-facts';
 import { langOf, pick, href } from '../../i18n';
+import { fitTitle } from '../../lib/seo';
 
 export async function getStaticPaths() {
   const all = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
@@ -85,9 +86,52 @@ const specs = zh
     ];
 
 // Same-region projects give the buyer somewhere to go next instead of leaving
-const related = all
-  .filter((x) => x.id !== p.id && x.data.region === d.region && !x.data.soldOut)
-  .slice(0, 3);
+// 同一个地段(地点逗号前那一段,例如 "Bukit Jalil")的排前面,不够再用同区的补
+const locality = (x: typeof p) => x.data.location.split(',')[0].trim().toLowerCase();
+const sameRegion = all.filter((x) => x.id !== p.id && x.data.region === d.region && !x.data.soldOut);
+const related = [
+  ...sameRegion.filter((x) => locality(x) === locality(p)),
+  ...sameRegion.filter((x) => locality(x) !== locality(p)),
+].slice(0, 3);
+
+// 区域页只有英文版;KLCC 归在 Kuala Lumpur 那一页
+const AREA_PAGE: Record<string, { slug: string; name: string }> = {
+  'kuala-lumpur': { slug: 'kl', name: 'Kuala Lumpur' },
+  klcc: { slug: 'kl', name: 'Kuala Lumpur' },
+  'petaling-jaya': { slug: 'petaling-jaya', name: 'Petaling Jaya' },
+  selangor: { slug: 'selangor', name: 'Selangor' },
+  johor: { slug: 'johor', name: 'Johor' },
+  penang: { slug: 'penang', name: 'Penang' },
+};
+const areaPage = !zh && d.region ? AREA_PAGE[d.region] : undefined;
+
+// 和这个项目最相关的三篇指南:地契是租赁的先放地契那篇,否则放查发展商那篇
+const guideIds = [
+  /lease/i.test(d.tenure) ? 'leasehold-freehold' : 'developer-background-check',
+  'new-buyer-complete-process',
+  'first-time-buyer-costs',
+];
+const allGuides = await getCollection(zh ? 'guidesZh' : 'guides', ({ data }) => !data.draft);
+const guideLinks = guideIds
+  .map((id) => allGuides.find((g) => g.id === id))
+  .filter((g) => !!g)
+  .map((g) => ({ title: g!.data.title, to: href(lang, `/guides/${g!.id}/`) }));
+
+// 标题按「最想用的排前面」给,取第一个在搜索结果里显示得完整的
+const pageTitle = zh
+  ? fitTitle([
+      `${d.name}（${d.location}）— 月供、户型与完工日期｜Lawrence Law`,
+      `${d.name}（${d.location}）— 月供与户型`,
+      `${d.name}（${d.location}）`,
+      `${d.name} — 月供与户型`,
+    ])
+  : fitTitle([
+      `${d.name}, ${d.location} — Instalment & Layouts | Lawrence Law`,
+      `${d.name}, ${d.location} — Instalment & Layouts`,
+      `${d.name}, ${d.location} | Lawrence Law`,
+      `${d.name}, ${d.location}`,
+      `${d.name} — Instalment & Layouts`,
+    ]);
 
 const waMsg = zh
   ? `你好 Lawrence，我对 ${d.name}（${d.location}）有兴趣，可以把户型图、价目表和目前还有哪些单位发给我吗？`
@@ -95,11 +139,8 @@ const waMsg = zh
 ---
 
 <BaseLayout
-  title={pick(
-    lang,
-    `${d.name}, ${d.location} — Instalment, Layouts & Completion`,
-    `${d.name}（${d.location}）— 月供、户型与完工日期`,
-  )}
+  title={pageTitle}
+  noTitleTemplate
   description={pick(
     lang,
     `${d.name} in ${d.location}. ${descFacts}. Personally vetted by Lawrence Law — ask me anything on WhatsApp.`,
@@ -261,11 +302,54 @@ const waMsg = zh
             <PropertyCard {...r.data} slug={r.id} />
           ))}
         </div>
-        <div class="mt-10">
+        {sameRegion.length > related.length && (
+          <div class="mt-10 max-w-4xl">
+            <h3 class="font-sans text-base font-bold text-navy-900">
+              {pick(lang, `All ${sameRegion.length + 1} projects I cover in ${regionLabel}`, `${regionLabel}我负责的全部 ${sameRegion.length + 1} 个项目`)}
+            </h3>
+            <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[15px]">
+              {sameRegion.map((r) => (
+                <li>
+                  <a href={href(lang, `/properties/${r.id}/`)} class="inline-flex min-h-9 items-center text-navy-900 underline decoration-gold-500/60 underline-offset-4 hover:decoration-gold-500">
+                    {r.data.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <div class="mt-10 flex flex-wrap gap-3">
           <a href={href(lang, '/allproperties/')} class="btn-gold-outline text-navy-900">
             {pick(lang, 'Browse All Properties', '浏览全部项目')}
           </a>
+          {areaPage && (
+            <a href={url(`/areas/${areaPage.slug}/`)} class="btn-gold-outline text-navy-900">
+              Buying in {areaPage.name}: Area Guide
+            </a>
+          )}
         </div>
+      </div>
+    </section>
+  )}
+
+  {/* ===== Guides worth reading before deciding ===== */}
+  {guideLinks.length > 0 && (
+    <section class="border-t border-border bg-cream py-12 sm:py-16">
+      <div class="container-site max-w-3xl">
+        <p class="label-sm mb-3 text-gold-600">{pick(lang, 'Before You Decide', '决定之前')}</p>
+        <h2 class="font-sans text-xl font-bold text-navy-900 sm:text-2xl">
+          {pick(lang, 'Guides worth reading first', '先读这几篇指南')}
+        </h2>
+        <ul class="mt-5 divide-y divide-border border-y border-border">
+          {guideLinks.map((g) => (
+            <li>
+              <a href={g.to} class="group flex min-h-14 items-center justify-between gap-4 py-3 text-[17px] font-semibold text-navy-900 hover:text-gold-600">
+                <span>{g.title}</span>
+                <span class="flex-none text-gold-500" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )}

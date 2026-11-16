@@ -13,6 +13,8 @@ const { Content } = await render(guide);
 
 <ArticleLayout
   title={guide.data.title}
+  seoTitle={guide.data.seoTitle}
+  slug={guide.id}
   description={guide.data.description}
   category={guide.data.category}
   publishDate={guide.data.publishDate}
