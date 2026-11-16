@@ -1,5 +1,6 @@
 ---
 title: "How Much Money Does a First-Time Buyer Actually Need? The Full List of Costs Beyond the Down Payment"
+seoTitle: "First-Time Buyer Costs in Malaysia: The Full List"
 description: "The down payment is only the start. Legal fees, stamp duty, loan-related fees, renovation, moving… this gives you a complete cost checklist so you're not \"able to sign but unable to live.\""
 category: Loans & Financing
 publishDate: 2026-07-06

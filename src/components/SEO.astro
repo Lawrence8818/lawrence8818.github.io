@@ -2,6 +2,7 @@
 import { url } from '../lib/url';
 import { SITE } from '../data/site';
 import { langOf, pick, hasZh, barePath } from '../i18n';
+import { brandTitle, clipDescription } from '../lib/seo';
 
 interface Props {
   title: string;
@@ -20,13 +21,9 @@ const {
 } = Astro.props;
 
 const lang = langOf(Astro);
-const fullTitle = noTitleTemplate
-  ? title
-  : pick(
-      lang,
-      `${title} | ${SITE.name} · Malaysia Property Consultant`,
-      `${title} | ${SITE.name} ${SITE.nameZh} · 马来西亚房产顾问`,
-    );
+// 标题和描述都收在搜索结果显示得下的长度内(见 src/lib/seo.ts)
+const fullTitle = noTitleTemplate ? title : brandTitle(lang, title);
+const metaDescription = clipDescription(description);
 
 // 这一页的另一种语言在哪里。有中文版的页面才输出,告诉搜索引擎两页是同一内容的
 // 两种语言,不会互相抢排名。
@@ -43,14 +40,14 @@ const ogImageUrl = new URL(url(ogImage), Astro.site).href;
 ---
 
 <title>{fullTitle}</title>
-<meta name="description" content={description} />
+<meta name="description" content={metaDescription} />
 <link rel="canonical" href={canonical} />
 {alternates && <link rel="alternate" hreflang="en" href={alternates.en} />}
 {alternates && <link rel="alternate" hreflang="zh-Hans" href={alternates.zh} />}
 {alternates && <link rel="alternate" hreflang="x-default" href={alternates.en} />}
 
 <meta property="og:title" content={fullTitle} />
-<meta property="og:description" content={description} />
+<meta property="og:description" content={metaDescription} />
 <meta property="og:type" content={ogType} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImageUrl} />
@@ -59,5 +56,5 @@ const ogImageUrl = new URL(url(ogImage), Astro.site).href;
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={ogImageUrl} />

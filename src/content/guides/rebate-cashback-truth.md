@@ -1,5 +1,6 @@
 ---
 title: "The Truth About \"Zero Down Payment\" and \"High Rebates\": Who's Really Paying for Rebate and Cashback?"
+seoTitle: "Zero Down Payment & Rebates: Who Really Pays?"
 description: "New-project ads are full of rebates, cashback and zero down payment — where does the money actually come from? This explains how these packages work, when they're reasonable, and when they're a trap."
 category: Avoiding Pitfalls
 publishDate: 2026-07-07

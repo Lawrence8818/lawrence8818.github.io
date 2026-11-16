@@ -1,5 +1,6 @@
 ---
 title: "New Development vs Subsale: Which One Actually Suits You?"
+seoTitle: "New Development vs Subsale: Which Suits You?"
 description: "One has a low down payment, the other you can buy and move into right away. This doesn't take sides — it lays out the real pros and cons of both to help you decide based on your own situation."
 category: Buying Basics
 publishDate: 2026-07-03

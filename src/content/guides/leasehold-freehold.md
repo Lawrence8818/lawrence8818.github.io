@@ -1,5 +1,6 @@
 ---
 title: "Leasehold vs Freehold: Can You Actually Buy a Property with a 99-Year Lease?"
+seoTitle: "Leasehold vs Freehold in Malaysia: Which to Buy?"
 description: "Is \"don't touch Leasehold\" a truth or a prejudice? This explains the difference between the two title types, their impact on loans and resale, and when Leasehold is actually worth buying."
 category: Buying Basics
 publishDate: 2026-07-04

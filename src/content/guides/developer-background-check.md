@@ -1,5 +1,6 @@
 ---
 title: "How to Check a Developer's Background? 4 Free Ways to Avoid Abandoned Projects"
+seoTitle: "How to Check a Developer's Background in Malaysia"
 description: "An abandoned project is the biggest nightmare of buying property under construction. This teaches you to use official channels to check a developer's licence, blacklist records and past handover reputation for free — basic due diligence done in 10 minutes."
 category: Avoiding Pitfalls
 publishDate: 2026-07-05

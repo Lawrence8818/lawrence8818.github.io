@@ -3,6 +3,8 @@ import { glob, file } from 'astro/loaders';
 
 const guideSchema = z.object({
   title: z.string(),
+  /** 可选:给搜索结果用的短标题(60 个字符内)。不填就用 title;页面上的大标题永远是 title */
+  seoTitle: z.string().optional(),
   description: z.string(),
   category: z.enum(['Buying Basics', 'Avoiding Pitfalls', 'Loans & Financing', 'The Buying Process']),
   publishDate: z.coerce.date(),

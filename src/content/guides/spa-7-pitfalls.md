@@ -1,5 +1,6 @@
 ---
 title: "Must-Read Before Signing the SPA: The 7 Most Common Pitfalls When Buying a New Project"
+seoTitle: "7 SPA Pitfalls to Know Before You Sign (Malaysia)"
 description: "Once the Sale and Purchase Agreement is signed, backing out is hard. Every one of these 7 pitfalls I've seen a real buyer fall into — spend 10 minutes reading this before you sign."
 category: Avoiding Pitfalls
 publishDate: 2026-07-02
