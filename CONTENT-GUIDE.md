@@ -134,6 +134,18 @@
   并且带有项目清单标记,让搜索引擎和 AI 读得出这是全部项目的目录。
 - **落地页的标题和描述是各页手写的**,不受上面的自动规则管。
 
+### 12. 地段对比页(Bukit Jalil,2026-11-16 上线)
+
+- 网址 `/areas/bukit-jalil/`:把 Bukit Jalil 在售的项目并排比较(月供、面积、地契、完工),按月供从低到高排。
+- **对比表、标题里的项目数、前 5 个问答都是自动的**,跟着项目资料变;已售完的项目自动从这一页消失。
+- 手写的部分(开头介绍、三个重点、正文、后 3 个问答)在 `src/content/areas/bukit-jalil.md`。
+- **想给别的地段也做一页**(例如 KLCC、Bangsar、Kwasa Damansara):在 `src/content/areas/` 加一个文件,
+  写上 `locality: "地段名"`(项目地点以这个名字开头的都会被列进去),其余照 Bukit Jalil 那个文件的格式。
+- 区域页顶部的背景:占位图上有「待替换」字样,所以不显示;换成真实照片(`heroImage`)后才会显示。
+- **项目售完了**:最好在 Project-Info-Master 把 status 改成 `fully-sold`。如果先告诉了 Claude,
+  会暂时记在 `scripts/sync-from-master.mjs` 的 `SITE_OVERRIDES`(例如 2026-11-16 的 Kingswoodz),
+  资料仓库跟上后再删掉。
+
 ### 还没做完的
 
 - **26 个项目没有月供数字**,目前显示 `Instalment on request`。有数字就发给 Claude。
