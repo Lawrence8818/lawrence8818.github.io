@@ -1,4 +1,5 @@
 ---
+import Picture from '../../components/Picture.astro';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
@@ -144,9 +145,10 @@ const waMsg = zh
 
       <div class="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div class="relative overflow-hidden rounded-[4px] bg-navy-950">
-          <img
-            src={url(d.image)}
-            onerror={d.fallbackImage ? `this.onerror=null;this.src='${url(d.fallbackImage)}'` : undefined}
+          <Picture
+            src={d.image}
+            fallback={d.fallbackImage}
+            sizes="(min-width: 1024px) 50vw, 100vw"
             alt={pick(lang, `${d.name} — building facade`, `${d.name} 外观图`)}
             class="plx-cover aspect-[4/3] w-full object-cover object-top"
             fetchpriority="high"

@@ -22,3 +22,5 @@ npm-debug.log*
 /public/queenswoodzexsim/
 /public/renbukitjalil/
 /public/vividzexsim/
+# 构建时生成的小尺寸 WebP(scripts/optimize-images.mjs)
+/public/images/opt/

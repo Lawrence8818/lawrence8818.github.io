@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/stage-landing-pages.mjs && astro build && node scripts/enrich-landing-pages.mjs",
+    "build": "node scripts/optimize-images.mjs && node scripts/stage-landing-pages.mjs && astro build && node scripts/enrich-landing-pages.mjs",
     "preview": "astro preview",
     "check": "astro check"
   },

@@ -11,8 +11,8 @@ interface Props {
 }
 const lang = langOf(Astro);
 const {
-  heading = pick(lang, 'Click the button to contact us now!', '想了解更多？现在就联系我'),
-  sub = pick(lang, 'Get the most updated information on real estate.', '第一时间拿到最新的房产资讯。'),
+  heading = pick(lang, 'Tell me your budget — I’ll shortlist 3 projects that fit.', '告诉我你的预算，我帮你挑出 3 个合适的项目'),
+  sub = pick(lang, 'Free, no obligation. I compare the options side by side and give you a straight opinion.', '免费，没有任何约束。我把几个选择摆在一起比较，直接告诉你我的看法。'),
   waMessage,
 } = Astro.props;
 ---
@@ -23,7 +23,7 @@ const {
       <h2 class="text-[26px] text-white sm:text-4xl">{heading}</h2>
       <p class="max-w-xl text-navy-100">{sub}</p>
       <a href={waLink(waMessage ?? pick(lang, undefined, WA_DEFAULT_ZH))} target="_blank" rel="noopener" class="btn-gold" data-track="whatsapp_cta_section">
-        {pick(lang, 'CONTACT US NOW!', '马上联系我')}
+        {pick(lang, 'WhatsApp Me', 'WhatsApp 联系我')}
       </a>
       <p class="text-sm text-navy-100">
         {pick(lang, 'Prefer email?', '想用电邮？')} <a href={`mailto:${SITE.email}`} class="font-semibold text-gold-500 underline decoration-gold-500/50 underline-offset-4 hover:decoration-gold-500">{SITE.email}</a>

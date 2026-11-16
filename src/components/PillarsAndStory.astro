@@ -1,6 +1,7 @@
 ---
 // Self-introduction block shared by the home page and the About page:
 // three expertise pillars + the first-deal story with the certificate photo.
+import Picture from './Picture.astro';
 import GoldIcon from './GoldIcon.astro';
 import { url } from '../lib/url';
 import { langOf, pick } from '../i18n';
@@ -54,9 +55,10 @@ const pillars = [
 <section class="section-pad bg-navy-900 text-white">
   <div class="container-site grid items-center gap-10 lg:grid-cols-[2fr_3fr]">
     <figure class="mx-auto w-full max-w-sm">
-      <img
-        src={url(firstDealAward.image)}
-        onerror={firstDealAward.fallbackImage ? `this.onerror=null;this.src='${url(firstDealAward.fallbackImage)}'` : undefined}
+      <Picture
+        src={firstDealAward.image}
+        fallback={firstDealAward.fallbackImage}
+        sizes="(min-width: 640px) 384px, 90vw"
         alt={pick(lang, 'First Sales Achievement Award — Top Sales July 2015', FIRST_DEAL_ZH.alt)}
         loading="lazy"
         class="plx w-full rounded-lg border border-gold-500/60 shadow-card"
