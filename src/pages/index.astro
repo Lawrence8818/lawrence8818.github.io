@@ -4,11 +4,9 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TrustBar from '../components/TrustBar.astro';
 import PillarsAndStory from '../components/PillarsAndStory.astro';
-import ComebackStory from '../components/ComebackStory.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import GoldIcon from '../components/GoldIcon.astro';
 import VideoCard from '../components/VideoCard.astro';
-import AreaCard from '../components/AreaCard.astro';
 import CTASection from '../components/CTASection.astro';
 import MatchQuiz from '../components/MatchQuiz.astro';
 import StarRating from '../components/StarRating.astro';
@@ -19,7 +17,7 @@ import { landingHref } from '../lib/landing';
 import { instalmentDisplay, instalmentDisplayZh, LABEL_ZH, monthlyNumber, REGION_LABEL, REGION_LABEL_ZH } from '../lib/property-facts';
 import { waLink, waContextMessage, WA_DEFAULT_ZH, WA_LEADMAGNET_ZH } from '../lib/whatsapp';
 import { langOf, pick, href } from '../i18n';
-import { introParasZh, INTRO_CLOSING_ZH, MARQUEE_ZH, SERVICES_ZH } from '../i18n/copy-zh';
+import { HERO_SHORT_ZH, MARQUEE_SHORT_ZH, SERVICES_ZH } from '../i18n/copy-zh';
 
 // 这个模板同时出英文首页(/)和中文首页(/zh/)
 const lang = langOf(Astro);
@@ -67,8 +65,9 @@ const quickLinks = [
 
 const testimonials = (await getCollection('testimonials')).slice(0, 6);
 
-const marqueeItems = zh ? MARQUEE_ZH :
-  'KUALA LUMPUR · SELANGOR · JOHOR · PENANG · A DECADE OF EXPERIENCE · TOP 47 NATIONWIDE · PRIMARY MARKET 2025 · TRUSTED BY 2,000+ BUYERS · 1,500+ HOMEOWNERS SERVED · SINCE 2015 · ';
+// 滚动字条只放服务范围;年资、买家数、排名这些数字只在下面的数据条出现一次
+const marqueeItems = zh ? MARQUEE_SHORT_ZH :
+  'KUALA LUMPUR · SELANGOR · JOHOR · PENANG · NEW LAUNCH ADVISORY · LOAN PLANNING · VIEWING ARRANGEMENTS · END-TO-END SUPPORT · HONEST, NO-PRESSURE ADVICE · ';
 ---
 
 <BaseLayout
@@ -98,7 +97,7 @@ const marqueeItems = zh ? MARQUEE_ZH :
           {pick(lang, 'New Property Specialist', '新盘专家')} <span class="text-gold-500">/</span> {pick(lang, 'Subsales Expertise', '二手房实战经验')}
         </p>
       </div>
-      <div class="hero-photo mx-auto w-full max-w-xs lg:max-w-sm">
+      <div class="hero-photo mx-auto w-full max-w-[240px] sm:max-w-xs lg:max-w-sm">
         <Picture
           src={'/images/lawrence-portrait.jpg'}
           fallback="/images/placeholders/lawrence-portrait.svg"
@@ -109,42 +108,22 @@ const marqueeItems = zh ? MARQUEE_ZH :
         />
       </div>
       <div class="hero-body">
-        <div class="max-w-xl space-y-4 text-navy-100">
-          {zh && introParasZh('font-bold text-white').map((html) => <p set:html={html} />)}
-          {zh && <p class="text-white">{INTRO_CLOSING_ZH}</p>}
-          {!zh && (
-          <>
-          <p>
-            From subsales to new property — a decade of hands-on experience you can count on.
-            Guiding young couples and families toward the right home
-            <strong class="font-bold text-white">since 2015</strong>.
-          </p>
-          <p>
-            My real estate journey began at university, where I started out in the subsales market —
-            helping clients buy, sell and rent with confidence. Over my first four years, I built the
-            trust of a growing community of <strong class="font-bold text-white">1,500+ homeowners</strong>.
-          </p>
-          <p>
-            In 2019, I moved into new property sales, combining hands-on subsales experience with
-            in-depth project knowledge — bringing my journey to a full decade in the industry.
-          </p>
-          <p>
-            Today, trusted by <strong class="font-bold text-white">2,000+ buyers</strong> over the
-            years, I specialise in helping families upgrade, first-time homebuyers choose the right
-            location, and busy professionals find practical, future-ready homes.
-          </p>
-          <p>
-            Most recently ranked <strong class="font-bold text-white">Top 47 nationwide</strong> (Primary
-            Market, 2025) and a <strong class="font-bold text-white">Million Dollar Achiever Club —
-            Diamond</strong> member at the IQI Prestige Awards.
-          </p>
-          <p class="text-white">
-            If you’re looking for honest, no-pressure advice to make the right property move — let’s talk.
-          </p>
-          </>
+        {/* 首屏只留一句定位 + 奖项一行;完整的个人介绍在 About 页 */}
+        <p class="max-w-xl text-[17px] leading-relaxed text-white sm:text-lg">
+          {pick(
+            lang,
+            'I help young couples, families and first-time buyers choose the right new home in KL & Selangor — honest, no-pressure advice from someone who has worked both subsales and new projects.',
+            HERO_SHORT_ZH.lead,
           )}
-        </div>
-        <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+        </p>
+        <p class="mt-4 max-w-xl border-l-2 border-gold-500 pl-4 text-sm leading-relaxed text-navy-100">
+          {pick(
+            lang,
+            'Top 47 nationwide (Primary Market, 2025) · Million Dollar Achiever Club — Diamond, IQI Prestige Awards',
+            HERO_SHORT_ZH.awards,
+          )}
+        </p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
           <a href={waLink(pick(lang, undefined, WA_DEFAULT_ZH))} target="_blank" rel="noopener" class="btn-gold" data-track="whatsapp_hero">
             {pick(lang, 'Let’s Talk', '聊一聊')}
           </a>
@@ -152,17 +131,22 @@ const marqueeItems = zh ? MARQUEE_ZH :
             {pick(lang, 'Free Buyer’s Guide', '免费买房指南')}
           </a>
         </div>
+        <p class="mt-5">
+          <a href={href(lang, '/about/')} class="inline-flex min-h-11 items-center text-sm font-semibold text-gold-500 hover:text-gold-600">
+            {pick(lang, 'Read my full story →', HERO_SHORT_ZH.story)}
+          </a>
+        </p>
       </div>
     </div>
   </section>
 
   <style is:global>
-    /* Hero layout: stacked on mobile (name → photo → intro → buttons),
+    /* Hero layout: stacked on mobile (name → intro → buttons → photo),
        side-by-side on desktop (text left, portrait right, vertically centred). */
     .hero-grid {
       display: grid;
       gap: 2.5rem;
-      grid-template-areas: 'top' 'photo' 'body';
+      grid-template-areas: 'top' 'body' 'photo';
     }
     .hero-top { grid-area: top; }
     .hero-photo { grid-area: photo; }
@@ -359,9 +343,7 @@ const marqueeItems = zh ? MARQUEE_ZH :
   </section>
 
   {/* ===== Self-introduction: pillars + first-deal story (shared with About) ===== */}
-  <PillarsAndStory />
-
-  <ComebackStory showStoryLink />
+  <PillarsAndStory brief />
 
   {/* ===== Videos =====
       中文版暂时不出这一区:视频页还没有中文版,点进去会是英文页。 */}
@@ -401,24 +383,20 @@ const marqueeItems = zh ? MARQUEE_ZH :
   <section id="areas" class="section-pad scroll-mt-20 bg-white">
     <div class="container-site">
       <SectionHeading title="Areas I Serve" sub="Coverage" />
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {/* The dedicated Bukit Jalil intro page was retired with the old CMS,
-            so this card now opens the project list instead of a dead link */}
-        <a href={url('/allproperties/')} class="card group block border-gold-500/50 transition-colors hover:border-gold-500">
-          <p class="text-xl font-bold tracking-tight text-navy-900 uppercase group-hover:text-gold-600">Bukit Jalil</p>
-          <div class="gold-rule mt-3 mb-4 !w-10"></div>
-          <p class="text-sm leading-relaxed text-ink/80">
-            KL's fastest-growing township — parks, stadiums, Pavilion Bukit Jalil and a wave of new launches. Browse every project I cover here.
-          </p>
-        </a>
-        {areas.map((a) => (
-          <AreaCard
-            slug={a.id}
-            name={a.data.name}
-            nameEn={a.data.nameEn}
-            intro={a.data.intro}
-            heroImage={a.data.heroImage}
-          />
+      {/* 精简成一排入口:区域介绍在各自的区域页里,首页只负责带路。
+          Bukit Jalil 的独立介绍页已随旧系统下线,所以它带到项目列表。 */}
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {[
+          { name: 'Bukit Jalil', to: url('/allproperties/'), main: true },
+          ...areas.map((a) => ({ name: a.data.name, to: url(`/areas/${a.id}/`), main: false })),
+        ].map((a) => (
+          <a
+            href={a.to}
+            class={`group flex min-h-16 items-center justify-between gap-2 rounded-[4px] border px-4 py-3 transition-colors hover:border-gold-500 ${a.main ? 'border-gold-500/60' : 'border-border'}`}
+          >
+            <span class="text-[15px] leading-tight font-bold tracking-tight text-navy-900 uppercase group-hover:text-gold-600">{a.name}</span>
+            <span class="flex-none text-gold-500" aria-hidden="true">→</span>
+          </a>
         ))}
       </div>
     </div>

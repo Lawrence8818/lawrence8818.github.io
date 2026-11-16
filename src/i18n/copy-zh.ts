@@ -131,3 +131,28 @@ export const QUIZ_ZH = {
     unsure: '还不确定',
   },
 };
+
+/** 首页首屏的短介绍(完整版在 About 页) */
+export const HERO_SHORT_ZH = {
+  lead: '我帮年轻夫妻、家庭和首次买房的人，在吉隆坡和雪兰莪挑到合适的新房。二手房和新盘我都做过——说实话，不催促。',
+  awards: '2025 年新盘市场全国第 47 名 · Million Dollar Achiever Club 钻石级',
+  story: '看我的完整故事 →',
+};
+
+/** 首页滚动字条:只放服务范围,数字留给下面的数据条 */
+export const MARQUEE_SHORT_ZH =
+  '吉隆坡 · 雪兰莪 · 柔佛 · 槟城 · 新盘咨询 · 贷款规划 · 安排看房 · 全程陪同 · 说实话 · 不催促 · ';
+
+/** 首页的精简版:三大支柱第一张卡 + 合并后的个人故事 */
+export const PILLAR1_BRIEF_ZH =
+  '二手房和新盘我都做过，所以两边的门道我的客户都听得到。我专注于地点好、适合家庭、发展商信誉可靠的房子，看重的是住得舒服和长期合不合适，而不是短期炒作。';
+export const STORY_BRIEF_ZH = {
+  heading: '我是怎么走到今天的',
+  paras: (strong: string) => {
+    const b = (t: string) => `<strong class="${strong}">${t}</strong>`;
+    return [
+      `2015 年 7 月，我成交了第一单：Quadro Residence KLCC 的一间 penthouse，成交价超过 ${b('RM2 million')}。当时一位联卖中介当着我的面想抢走买家，但买家因为我的态度和用心留了下来，我也因此拿到 ${b('First Sales Achievement Award')}。`,
+      '后来我离开去做电商，学会了数码营销和用数据说话；2024 年底回到房地产，把这套方法用在帮客户选房上。',
+    ];
+  },
+};
