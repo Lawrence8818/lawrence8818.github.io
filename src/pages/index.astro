@@ -1,4 +1,5 @@
 ---
+import Picture from '../components/Picture.astro';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TrustBar from '../components/TrustBar.astro';
@@ -15,7 +16,7 @@ import { SERVICES } from '../data/services';
 import { SITE } from '../data/site';
 import { url } from '../lib/url';
 import { landingHref } from '../lib/landing';
-import { instalmentDisplay, instalmentDisplayZh, LABEL_ZH } from '../lib/property-facts';
+import { instalmentDisplay, instalmentDisplayZh, LABEL_ZH, monthlyNumber, REGION_LABEL, REGION_LABEL_ZH } from '../lib/property-facts';
 import { waLink, waContextMessage, WA_DEFAULT_ZH, WA_LEADMAGNET_ZH } from '../lib/whatsapp';
 import { langOf, pick, href } from '../i18n';
 import { introParasZh, INTRO_CLOSING_ZH, MARQUEE_ZH, SERVICES_ZH } from '../i18n/copy-zh';
@@ -37,6 +38,32 @@ const properties = (await getCollection('properties')).sort((a, b) => a.data.ord
 const featuredProperties = [...properties.filter((p) => p.data.featured), ...properties]
   .filter((p, i, arr) => arr.indexOf(p) === i)
   .slice(0, 6);
+
+// 精选项目下面的快捷入口:按月供、按区域。数字是在售项目里实际符合的个数,
+// 和 All Properties 页的筛选用同一套规则(没有月供数字的项目不算进月供档)。
+const live = properties.filter((p) => !p.data.soldOut);
+const monthlyOf = (p: (typeof properties)[number]) => monthlyNumber(p.data.monthly);
+const inBand = (lo: number, hi: number) =>
+  live.filter((p) => { const m = monthlyOf(p); return !!m && m >= lo && m <= hi; }).length;
+const quickLinks = [
+  {
+    title: pick(lang, 'By monthly instalment', '按月供'),
+    items: [
+      { label: pick(lang, 'Under RM2,000', 'RM2,000 以下'), q: 'mmax=2000', n: inBand(0, 2000) },
+      { label: 'RM2,000 – 3,500', q: 'mmin=2000&mmax=3500', n: inBand(2000, 3500) },
+      { label: 'RM3,500 – 6,000', q: 'mmin=3500&mmax=6000', n: inBand(3500, 6000) },
+      { label: pick(lang, 'Above RM6,000', 'RM6,000 以上'), q: 'mmin=6000', n: inBand(6000, Infinity) },
+    ],
+  },
+  {
+    title: pick(lang, 'By area', '按区域'),
+    items: (['kuala-lumpur', 'klcc', 'petaling-jaya', 'selangor', 'johor', 'penang'] as const).map((r) => ({
+      label: zh ? REGION_LABEL_ZH[r] : REGION_LABEL[r],
+      q: `region=${r}`,
+      n: live.filter((p) => p.data.region === r).length,
+    })),
+  },
+].map((row) => ({ ...row, items: row.items.filter((c) => c.n > 0) }));
 
 const testimonials = (await getCollection('testimonials')).slice(0, 6);
 
@@ -72,9 +99,10 @@ const marqueeItems = zh ? MARQUEE_ZH :
         </p>
       </div>
       <div class="hero-photo mx-auto w-full max-w-xs lg:max-w-sm">
-        <img
-          src={url('/images/lawrence-portrait.jpg')}
-          onerror={`this.onerror=null;this.src='${url('/images/placeholders/lawrence-portrait.svg')}'`}
+        <Picture
+          src={'/images/lawrence-portrait.jpg'}
+          fallback="/images/placeholders/lawrence-portrait.svg"
+          sizes="(min-width: 1024px) 384px, 320px"
           alt={pick(lang, 'Lawrence Law, New Property Specialist', 'Lawrence Law 刘智权，新盘专家')}
           class="plx aspect-[4/5] w-full object-cover"
           fetchpriority="high"
@@ -163,14 +191,6 @@ const marqueeItems = zh ? MARQUEE_ZH :
   {/* ===== Stats: white editorial ===== */}
   <TrustBar />
 
-  {/* ===== 30-second property match quiz ===== */}
-  <MatchQuiz />
-
-  {/* ===== Self-introduction: pillars + first-deal story (shared with About) ===== */}
-  <PillarsAndStory />
-
-  <ComebackStory showStoryLink />
-
   {/* ===== Featured Properties: auto-playing card marquee =====
       Pure CSS (same technique as the text strip) so it runs even on
       platforms that strip JS. Pauses on hover / touch-hold / focus. */}
@@ -191,9 +211,10 @@ const marqueeItems = zh ? MARQUEE_ZH :
               <div class="group w-[280px] sm:w-[340px] lg:w-[400px]">
                 <a href={(zh ? href(lang, `/properties/${p.id}/`) : landingHref(p.data.landingUrl) || url(`/properties/${p.id}/`))} class="block" tabindex={copy > 0 ? -1 : undefined}>
                   <div class="relative aspect-[4/3] overflow-hidden bg-navy-900">
-                    <img
-                      src={url(p.data.image)}
-                      onerror={p.data.fallbackImage ? `this.onerror=null;this.src='${url(p.data.fallbackImage)}'` : undefined}
+                    <Picture
+                      src={p.data.image}
+                      fallback={p.data.fallbackImage}
+                      sizes="(min-width: 1024px) 400px, (min-width: 640px) 340px, 280px"
                       alt={p.data.name}
                       loading="lazy"
                       class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
@@ -236,8 +257,88 @@ const marqueeItems = zh ? MARQUEE_ZH :
         ))}
       </div>
     </div>
+    {/* 快捷入口:直接带到 All Properties 页对应的筛选(月供 / 区域) */}
+    <div class="container-site mt-8 space-y-4">
+      {quickLinks.map((row) => (
+        <div class="flex flex-wrap items-center gap-2.5">
+          <span class="label-sm w-full text-ink/60 sm:w-auto sm:pr-2">{row.title}</span>
+          {row.items.map((c) => (
+            <a
+              href={`${href(lang, '/allproperties/')}?${c.q}`}
+              class="label-sm inline-flex min-h-11 items-center rounded-full border border-navy-900/25 px-4 py-2 text-navy-900 transition hover:border-gold-500 hover:bg-gold-500"
+              data-track="home_quick_filter"
+            >
+              {c.label} <span class="ml-1 opacity-60">({c.n})</span>
+            </a>
+          ))}
+        </div>
+      ))}
+    </div>
     <div class="container-site mt-8 text-center sm:hidden">
       <a href={href(lang, '/allproperties/')} class="btn-gold-outline text-navy-900">{pick(lang, 'View ALL Properties', '查看全部项目')}</a>
+    </div>
+  </section>
+
+  {/* ===== 30-second property match quiz ===== */}
+  <MatchQuiz />
+
+  {/* ===== Testimonials: navy band =====
+      Prev/next arrows mirror the Featured Properties rail: without JS they are
+      anchor links that scroll the rail card by card via :target + :has()
+      (works on platforms that strip scripts); with JS they upgrade to smooth
+      scroll buttons plus a gentle auto-advance that pauses on interaction. */}
+  <section id="testimonials" class="section-pad scroll-mt-20 bg-navy-900">
+    <div class="container-site">
+      <SectionHeading title={pick(lang, 'What others are saying', '客户怎么说')} sub={pick(lang, 'Testimonials', '客户见证')} tone="light" />
+      <p class="-mt-4 max-w-2xl text-navy-100">
+        {pick(
+          lang,
+          'The 222 Blueprint is my structured home-buying advisory method — helping buyers clarify needs, budget and location before they commit.',
+          '222 Blueprint 是我自己的一套买房咨询方法：在下决定之前，先帮买家把需求、预算和地点理清楚。以下是客户的原话，保留英文原文。',
+        )}
+      </p>
+    </div>
+
+    <div class="card-marquee mt-8 pb-4">
+      <div class="card-marquee-track cm-reverse" style="--cm-dur: 88s">
+        {[0, 1, 2].map((copy) => (
+          <div class="flex gap-6 pr-6" aria-hidden={copy > 0 ? 'true' : undefined}>
+            {testimonials.map((t) => (
+              <figure class="flex w-[280px] flex-col overflow-hidden rounded-[4px] bg-white/10 backdrop-blur-sm sm:w-[340px] lg:w-[368px]">
+                <div class="relative aspect-[4/3] flex-none overflow-hidden bg-navy-950">
+                  <Picture
+                    src={t.data.image}
+                    fallback={t.data.fallbackImage}
+                    sizes="(min-width: 1024px) 368px, (min-width: 640px) 340px, 280px"
+                    alt={`${t.data.name} — happy buyer`}
+                    loading="lazy"
+                    class="h-full w-full object-cover"
+                  />
+                  {t.data.placeholder && (
+                    <span class="absolute top-2 right-2 rounded bg-navy-900/85 px-2 py-0.5 text-xs text-white">
+                      等待 · Photo pending
+                    </span>
+                  )}
+                </div>
+                <div class="flex flex-1 flex-col p-6 pt-5">
+                  <p class="text-[17px] leading-snug font-bold text-white">“{t.data.title}”</p>
+                  <blockquote class="mt-2 line-clamp-6 flex-1 text-[15px] leading-relaxed text-navy-100">
+                    {t.data.quote}
+                  </blockquote>
+                  <figcaption class="mt-4">
+                    <span class="label-sm text-gold-500">{t.data.name}{t.data.role && ` · ${t.data.role}`}</span>
+                    <StarRating size={14} class="mt-1" />
+                  </figcaption>
+                </div>
+              </figure>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="container-site mt-6 text-center">
+      <a href={url('/spasignings/')} class="btn-gold-outline text-white">{pick(lang, 'More Client Stories', '更多客户故事（英文）')}</a>
     </div>
   </section>
 
@@ -256,6 +357,11 @@ const marqueeItems = zh ? MARQUEE_ZH :
       </div>
     </div>
   </section>
+
+  {/* ===== Self-introduction: pillars + first-deal story (shared with About) ===== */}
+  <PillarsAndStory />
+
+  <ComebackStory showStoryLink />
 
   {/* ===== Videos =====
       中文版暂时不出这一区:视频页还没有中文版,点进去会是英文页。 */}
@@ -288,65 +394,6 @@ const marqueeItems = zh ? MARQUEE_ZH :
     </div>
   </section>
   )}
-
-  {/* ===== Testimonials: navy band =====
-      Prev/next arrows mirror the Featured Properties rail: without JS they are
-      anchor links that scroll the rail card by card via :target + :has()
-      (works on platforms that strip scripts); with JS they upgrade to smooth
-      scroll buttons plus a gentle auto-advance that pauses on interaction. */}
-  <section id="testimonials" class="section-pad scroll-mt-20 bg-navy-900">
-    <div class="container-site">
-      <SectionHeading title={pick(lang, 'What others are saying', '客户怎么说')} sub={pick(lang, 'Testimonials', '客户见证')} tone="light" />
-      <p class="-mt-4 max-w-2xl text-navy-100">
-        {pick(
-          lang,
-          'The 222 Blueprint is my structured home-buying advisory method — helping buyers clarify needs, budget and location before they commit.',
-          '222 Blueprint 是我自己的一套买房咨询方法：在下决定之前，先帮买家把需求、预算和地点理清楚。以下是客户的原话，保留英文原文。',
-        )}
-      </p>
-    </div>
-
-    <div class="card-marquee mt-8 pb-4">
-      <div class="card-marquee-track cm-reverse" style="--cm-dur: 88s">
-        {[0, 1, 2].map((copy) => (
-          <div class="flex gap-6 pr-6" aria-hidden={copy > 0 ? 'true' : undefined}>
-            {testimonials.map((t) => (
-              <figure class="flex w-[280px] flex-col overflow-hidden rounded-[4px] bg-white/10 backdrop-blur-sm sm:w-[340px] lg:w-[368px]">
-                <div class="relative aspect-[4/3] flex-none overflow-hidden bg-navy-950">
-                  <img
-                    src={url(t.data.image)}
-                    onerror={t.data.fallbackImage ? `this.onerror=null;this.src='${url(t.data.fallbackImage)}'` : undefined}
-                    alt={`${t.data.name} — happy buyer`}
-                    loading="lazy"
-                    class="h-full w-full object-cover"
-                  />
-                  {t.data.placeholder && (
-                    <span class="absolute top-2 right-2 rounded bg-navy-900/85 px-2 py-0.5 text-xs text-white">
-                      等待 · Photo pending
-                    </span>
-                  )}
-                </div>
-                <div class="flex flex-1 flex-col p-6 pt-5">
-                  <p class="text-[17px] leading-snug font-bold text-white">“{t.data.title}”</p>
-                  <blockquote class="mt-2 line-clamp-6 flex-1 text-[15px] leading-relaxed text-navy-100">
-                    {t.data.quote}
-                  </blockquote>
-                  <figcaption class="mt-4">
-                    <span class="label-sm text-gold-500">{t.data.name}{t.data.role && ` · ${t.data.role}`}</span>
-                    <StarRating size={14} class="mt-1" />
-                  </figcaption>
-                </div>
-              </figure>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-
-    <div class="container-site mt-6 text-center">
-      <a href={url('/spasignings/')} class="btn-gold-outline text-white">{pick(lang, 'More Client Stories', '更多客户故事（英文）')}</a>
-    </div>
-  </section>
 
   {/* ===== Areas =====
       中文版暂时不出这一区:区域页还没有中文版。 */}

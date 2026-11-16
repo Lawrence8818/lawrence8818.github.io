@@ -1,4 +1,5 @@
 ---
+import Picture from './Picture.astro';
 import { url } from '../lib/url';
 import { waLink, waContextMessage } from '../lib/whatsapp';
 import { landingHref } from '../lib/landing';
@@ -86,18 +87,20 @@ const labelText = label ? pick(lang, label, LABEL_ZH[label] ?? label) : undefine
   <div class="pc-media relative aspect-[3/2] overflow-hidden bg-navy-900">
     {detailHref ? (
       <a href={detailHref} aria-label={pick(lang, `View ${name} details`, `查看 ${name} 详情`)} class="block h-full w-full">
-        <img
-          src={url(image)}
-          onerror={fallbackImage ? `this.onerror=null;this.src='${url(fallbackImage)}'` : undefined}
+        <Picture
+          src={image}
+          fallback={fallbackImage}
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           alt={name}
           loading="lazy"
           class="h-full w-full object-cover object-top transition-transform duration-500 hover:scale-[1.04]"
         />
       </a>
     ) : (
-      <img
-        src={url(image)}
-        onerror={fallbackImage ? `this.onerror=null;this.src='${url(fallbackImage)}'` : undefined}
+      <Picture
+        src={image}
+        fallback={fallbackImage}
+        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         alt={name}
         loading="lazy"
         class="h-full w-full object-cover object-top"

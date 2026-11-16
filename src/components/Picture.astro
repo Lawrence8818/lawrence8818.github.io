@@ -1,0 +1,38 @@
+---
+// 照片统一从这里出:有较小的 WebP(scripts/optimize-images.mjs 构建前生成)
+// 就让浏览器按屏幕宽度挑一张,没有就退回原图。<img src> 永远是原图,
+// 所以旧浏览器、图片加载失败时的 onerror 备用图都和以前一样。
+import { existsSync } from 'node:fs';
+import { url } from '../lib/url';
+
+interface Props {
+  /** 以 / 开头的站内路径,例如 /images/property-oaka.jpg */
+  src: string;
+  fallback?: string;
+  alt: string;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  /** 这张图在页面上大概多宽,例如 "(min-width: 1024px) 400px, 80vw" */
+  sizes?: string;
+}
+const { src, fallback, alt, class: cls, loading, fetchpriority, sizes = '100vw' } = Astro.props;
+
+const WIDTHS = [480, 960];
+const m = src.match(/^\/images\/([^/]+)\.(jpe?g|png)$/i);
+const PUB = new URL('../../public', import.meta.url).pathname;
+const have = m ? WIDTHS.filter((w) => existsSync(`${PUB}/images/opt/${m[1]}-${w}.webp`)) : [];
+const srcset = have.map((w) => `${url(`/images/opt/${m![1]}-${w}.webp`)} ${w}w`).join(', ');
+---
+
+<picture class="contents">
+  {srcset && <source type="image/webp" srcset={srcset} sizes={sizes} />}
+  <img
+    src={url(src)}
+    onerror={fallback ? `this.onerror=null;var p=this.parentNode;if(p&&p.firstElementChild!==this)p.removeChild(p.firstElementChild);this.src='${url(fallback)}'` : undefined}
+    alt={alt}
+    class={cls}
+    loading={loading}
+    fetchpriority={fetchpriority}
+  />
+</picture>
