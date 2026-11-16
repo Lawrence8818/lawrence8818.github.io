@@ -34,6 +34,7 @@ const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.dat
 const properties = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
 // Home rail shows a short curated set only; the full paginated list lives at /properties/.
 const featuredProperties = [...properties.filter((p) => p.data.featured), ...properties]
+  .filter((p) => !p.data.soldOut)
   .filter((p, i, arr) => arr.indexOf(p) === i)
   .slice(0, 6);
 

@@ -44,6 +44,10 @@ const SITE_OVERRIDES = {
   // 目前没有。2026-11-11 那批地点更正(17 个项目)和 Quaver 的分组,
   // Project-Info-Master 已在 2026-11-12 跟上,所以这里清空了。
   // 写法示例:'some-slug': { location: 'Kwasa Damansara, Selangor' },
+  // 售完也可以先记在这里:'some-slug': { soldOut: true }
+
+  // 2026-11-16 Lawrence 告知 Kingswoodz 已售完;CSV 的 status 还是 active
+  kingswoodz: { soldOut: true },
 };
 
 if (!existsSync(CSV)) {
@@ -130,12 +134,15 @@ for (const line of lines) {
   if (override) {
     overrideSlugsSeen.add(slug);
     for (const [k, val] of Object.entries(override)) {
+      if (k === 'soldOut') continue; // 售完状态在下面单独处理
       if (!(k in want)) { problems.push(slug + ': SITE_OVERRIDES 里的栏位 "' + k + '" 不存在'); continue; }
       if (want[k] === val) redundant.push(slug + '.' + k);
       want[k] = val;
     }
   }
-  const soldOut = v('status') === 'fully-sold';
+  const csvSoldOut = v('status') === 'fully-sold';
+  if (override && 'soldOut' in override && override.soldOut === csvSoldOut) redundant.push(slug + '.soldOut');
+  const soldOut = override && 'soldOut' in override ? override.soldOut : csvSoldOut;
   const penthouse = v('penthouse') === 'yes';
 
   const path = PROPS + slug + '.md';
