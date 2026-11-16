@@ -12,6 +12,7 @@ landingUrl: "https://lawrencelawproperty.com/kingswoodzexsim"
 completion: "Q4 2028"
 image: /images/property-kingswoodz.jpg
 fallbackImage: /images/placeholders/property-05.svg
+soldOut: true
 order: 5
 placeholder: false
 ---
