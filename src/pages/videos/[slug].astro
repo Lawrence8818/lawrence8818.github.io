@@ -17,14 +17,22 @@ export async function getStaticPaths() {
 }
 
 const { video } = Astro.props;
+const astroLang = Astro.currentLocale === 'zh' ? 'zh' : 'en';
 // 这个模板同时出英文页(/videos/…)和中文页(/zh/videos/…)
 const lang = langOf(Astro);
 const zh = lang === 'zh';
 const title = zh && video.data.titleZh ? video.data.titleZh : video.data.title;
 const blurb = zh ? (video.data.descriptionZh ?? '') : video.data.description;
 const catLabel = zh ? (VIDEO_CATEGORY_ZH[video.data.category] ?? video.data.category) : video.data.category;
-const { Content, headings } = await render(video);
-const hasNotes = video.body && video.body.replace(/<!--[\s\S]*?-->/g, '').trim().length > 0;
+// 英文页的正文在这支视频自己的档里;中文页的正文(重点整理 + 文字稿)在 src/content/videos-zh/ 同名的档里
+const zhNotes = (await getCollection('videosZh')).find((x) => x.id === video.id);
+const notes = astroLang === 'zh' ? zhNotes : video;
+const { Content } = notes ? await render(notes) : { Content: null };
+const hasNotes = !!notes?.body && notes.body.replace(/<!--[\s\S]*?-->/g, '').trim().length > 0;
+// 文字稿原文(中文),放进结构化数据
+const transcript = zhNotes?.body
+  ? zhNotes.body.split(/^## 文字稿\s*$/m)[1]?.replace(/\s+/g, ' ').trim()
+  : undefined;
 
 const all = (await getCollection('videos'))
   .filter((v) => v.id !== video.id && v.data.category === video.data.category)
@@ -60,6 +68,8 @@ const dateFmt = new Intl.DateTimeFormat(pick(lang, 'en-GB', 'zh-CN'), { dateStyl
       uploadDate: video.data.publishDate,
       embedUrl: realYtId ? `https://www.youtube-nocookie.com/embed/${realYtId}` : undefined,
       contentUrl: video.data.videoUrl,
+      transcript,
+      spokenLanguage: transcript ? 'zh' : undefined,
     })}
   />
   <JsonLd
@@ -93,15 +103,24 @@ const dateFmt = new Intl.DateTimeFormat(pick(lang, 'en-GB', 'zh-CN'), { dateStyl
       thumbnail={video.data.thumbnail}
     />
 
-    {hasNotes && !zh && (
-      <div class="prose-zh mt-10">
+    {blurb && <p class="mt-8 text-lg text-ink/80">{blurb}</p>}
+
+    {hasNotes && Content && (
+      <div class="prose-zh mt-8">
         <Content />
       </div>
     )}
 
-    {(!hasNotes || zh) && blurb && (
-      <p class="mt-8 text-lg text-ink/80">{blurb}</p>
+    {/* 视频是用中文讲的:英文页连到中文原话,中文页连到英文翻译 */}
+    {zhNotes && (
+      <p class="mt-6 text-[15px] text-ink/70">
+        {pick(lang, 'The video is in Mandarin. ', '')}
+        <a href={zh ? url(`/videos/${video.id}/`) : url(`/zh/videos/${video.id}/`)} class="font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4">
+          {pick(lang, 'Read the original transcript in Chinese →', 'Read this in English →')}
+        </a>
+      </p>
     )}
+
 
     {all.length > 0 && (
       <div class="mt-14">
