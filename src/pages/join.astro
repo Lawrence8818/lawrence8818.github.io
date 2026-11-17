@@ -1,0 +1,304 @@
+---
+// 招募页:/join/(英文)和 /zh/join/(中文)共用这个模板。
+//
+// 2026-11-17 Lawrence 确认的内容:给新人 leads、广告支持、工具和素材;欢迎兼职;
+// 页面不写所属公司、不写佣金和费用的数字、不写第一单要多久;只用 WhatsApp 申请;
+// 暂时不放队员见证(以后有了再加一段)。
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TrustBar from '../components/TrustBar.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import FAQ from '../components/FAQ.astro';
+import Picture from '../components/Picture.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { breadcrumbSchema } from '../lib/schema';
+import { AWARDS } from '../data/awards';
+import { SITE } from '../data/site';
+import { waLink } from '../lib/whatsapp';
+import { langOf, pick, href } from '../i18n';
+import { AWARDS_ZH } from '../i18n/copy-zh';
+
+const lang = langOf(Astro);
+const zh = lang === 'zh';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+const applyMsg = pick(
+  lang,
+  'Hi Lawrence, I saw your Join My Team page and would like to find out more.\n\nName:\nCurrent job:\nFull-time or part-time:\nExperience in property (if any):',
+  '你好 Lawrence，我看了你的招募页面，想进一步了解。\n\n姓名：\n目前的工作：\n全职还是兼职：\n房地产经验（如果有）：',
+);
+const apply = waLink(applyMsg);
+
+const who = zh
+  ? [
+      { tag: '刚入行', title: '你从来没卖过房子', body: '欢迎应届毕业生和转行的人。我自己是大学时期入行的，当时一个人脉都没有，所以我知道第一年是什么感觉，也知道什么才真的有帮助。' },
+      { tag: '已经是中介', title: '你很努力，但没有一套系统', body: '你会成交，但客户来源靠运气，跟进全记在脑子里。我可以让你看我是怎么用数据、内容和一套可以重复的流程来做的。' },
+      { tag: '想多一份收入', title: '你想先从兼职开始', body: '老实告诉我你有多少时间。我宁愿照你真实的时间来规划，也不想答应你一个只有全职才做得到的结果。' },
+    ]
+  : [
+      { tag: 'New to property', title: 'You have never sold a home', body: 'Fresh graduates and career switchers are welcome. I started in this industry at university with no contacts, so I know what the first year is like and what actually helps.' },
+      { tag: 'Already an agent', title: 'You work hard but have no system', body: 'You can close, but your leads depend on luck and your follow-up lives in your head. I can show you how I run mine with data, content and a repeatable process.' },
+      { tag: 'Building a second income', title: 'You want to start part-time', body: 'Tell me honestly how many hours you have. I would rather plan around your real schedule than promise you something that only works full-time.' },
+    ];
+
+const offer = zh
+  ? [
+      { title: '直接跟我学', body: '不是上课，也不是一个整天喊口号的群组。你会旁听我的咨询、跟我去看房，听我怎么回答那些不好答的问题。' },
+      { title: '市场的两边都懂', body: '我先做了四年二手房，才转做新盘。你会学到怎么帮一个正在比较新盘和二手单位的买家做分析，这是多数新盘中介做不到的。' },
+      { title: '数码化的做事方式', body: '我曾经离开房地产几年去做电商，带回来的是营销、数据和系统。这个网站、项目页和买房指南都是其中一部分，你会学到它们怎么带来询问。' },
+      { title: '现成的项目资料', body: '吉隆坡和雪兰莪 80 多个项目，我都有整理好的笔记：月供、面积、地契、完工时间、适合什么人。你不用从一个空的文件夹开始。' },
+      { title: '诚实的销售方式', body: '我的客户留下来，是因为项目不适合时我会直说。你学到的是先给建议、再谈成交。如果这不是你想要的做法，这个团队就不适合你。' },
+      { title: 'Leads、广告和现成的工具', body: '你不用每一个客户都自己找。我会把询问分给你跟进，支持你的广告，也把我自己在用的落地页、项目素材和跟进话术交给你。' },
+    ]
+  : [
+      { title: 'You learn from me directly', body: 'Not a classroom and not a group chat full of slogans. You sit in on my consultations, come along to viewings and hear how I answer the hard questions.' },
+      { title: 'Both sides of the market', body: 'I spent four years in subsales before moving to new projects. You learn how to advise a buyer who is comparing a new launch against a subsale unit, which most new-project agents cannot do.' },
+      { title: 'A digital way of working', body: 'I left property for a few years to build an e-commerce business. What I brought back was marketing, data and systems. This website, the project pages and the buyer guides are part of that, and you learn how they bring enquiries in.' },
+      { title: 'Project knowledge, ready to use', body: 'I keep working notes on more than 80 projects across Kuala Lumpur and Selangor: monthly instalment, sizes, tenure, completion and who each one suits. You do not start from an empty folder.' },
+      { title: 'An honest way to sell', body: 'My clients stay because I tell them when a project does not fit. You will be taught to advise first and close second. If that is not how you want to work, this is not the right team.' },
+      { title: 'Leads, ads and ready-made tools', body: 'You are not left to find every client alone. I share enquiries for you to follow up, support your advertising, and hand you the landing pages, project material and follow-up scripts I use myself.' },
+    ];
+
+const steps = zh
+  ? [
+      { title: '发讯息给我', body: '用 WhatsApp 简单说一下你是谁、现在做什么。这个阶段不需要履历。' },
+      { title: '我们聊一聊', body: '通电话或喝杯咖啡。我问你的情况，你想问什么都可以，然后我们一起老实判断合不合适。' },
+      { title: '完成注册', body: '在马来西亚当房地产谈判员必须先注册。课程和文件我会一步一步带你办。' },
+      { title: '头 30 天', body: '旁听我的咨询和看房，把一个地区的项目学透，开始做你自己的内容。' },
+      { title: '你的第一单', body: '头几个案子我会陪着你，从第一条询问到签约，直到你可以自己跑完全程。' },
+    ]
+  : [
+      { title: 'Message me', body: 'Send a short WhatsApp with who you are and what you do now. No CV needed at this stage.' },
+      { title: 'We talk', body: 'A call or a coffee. I ask about your situation, you ask me anything, and we both decide honestly whether it fits.' },
+      { title: 'Get registered', body: 'To act as a negotiator in Malaysia you must be registered. I walk you through the course and the paperwork.' },
+      { title: 'Your first 30 days', body: 'Shadow my consultations and viewings, learn the projects in one area properly, and start your own content.' },
+      { title: 'Your first deal', body: 'I sit beside you through your first cases, from the first enquiry to the signing, until you can run it yourself.' },
+    ];
+
+const straight = zh
+  ? [
+      { title: '收入是按佣金计的。', body: '没有固定薪水。开始之前，先为头几个月准备好储蓄。' },
+      { title: '第一单需要时间。', body: '每个人都不一样，我不会向你保证几个星期就成交。我能保证的是，你不用一个人摸索。' },
+      { title: '我不会教你向人施压。', body: '项目不适合买家，我们就直说。转介绍就是这样来的。' },
+      { title: '你会注册在一间代理公司之下。', body: '马来西亚的每一位谈判员都必须注册在持牌公司之下。是哪一间、为什么，我们聊的时候我会说明。' },
+    ]
+  : [
+      { title: 'It is commission-based.', body: 'There is no fixed salary. Plan your savings for the first months before you start.' },
+      { title: 'The first deal takes time.', body: 'It is different for everyone, and I will not promise you a number of weeks. What I can promise is that you will not be working it out alone.' },
+      { title: 'I will not teach you to pressure people.', body: 'If a project does not suit the buyer, we say so. That is how the referrals come.' },
+      { title: 'You will be registered under an agency.', body: 'Every negotiator in Malaysia must be registered under a licensed firm. I will go through which one, and why, when we talk.' },
+    ];
+
+const faqs = zh
+  ? [
+      { question: '需要有房地产或销售经验吗？', answer: '不需要。我看重的是诚实、持续和愿意学。有销售经验当然有帮助，但会听的人往往比会讲的人做得更好。' },
+      { question: '可以先兼职吗？', answer: '可以，只要你老实告诉我你有多少时间。房地产看重的是持续，不是一时的冲劲；每个星期都出现的兼职，可以做得比不出现的全职更好。' },
+      { question: '收入是怎么来的？', answer: '房地产谈判员在成交完成后领取佣金，没有固定月薪，所以头几个月需要有财务规划。实际的制度，我们聊的时候我会跟你讲清楚。' },
+      { question: '入行需要什么费用吗？', answer: '成为注册谈判员需要缴注册费和课程费。在你决定任何事情之前，我会先告诉你目前的金额。' },
+      { question: '我会负责哪些地区？', answer: '主要是吉隆坡和雪兰莪，这两个地方的新盘我全面覆盖。你会先从一个地区开始，学透了再加下一个。' },
+      { question: '每个申请的人你都会收吗？', answer: '不会。我一次只能好好带少数几个人，所以我宁愿一开始就说不，也不想浪费你一年的时间。' },
+    ]
+  : [
+      { question: 'Do I need experience in property or sales?', answer: 'No. What I look for is honesty, consistency and a willingness to learn. Sales experience helps, but people who listen well often do better than people who talk well.' },
+      { question: 'Can I start part-time?', answer: 'Yes, as long as you tell me your real hours. Property rewards consistency more than intensity, and a part-timer who shows up every week can outperform a full-timer who does not.' },
+      { question: 'How do I earn?', answer: 'Property negotiators are paid by commission when a sale completes. There is no fixed monthly salary, so your first months need a financial plan. I will go through the actual structure with you when we talk.' },
+      { question: 'Is there any cost to get started?', answer: 'There are registration and course fees to become a registered negotiator. I will tell you the current amounts before you commit to anything.' },
+      { question: 'Which areas will I work in?', answer: 'Mainly Kuala Lumpur and Selangor, where I cover the full range of new launches. You start with one area and learn it properly before adding more.' },
+      { question: 'Do you take everyone who applies?', answer: 'No. I can only train a small number of people properly at a time, so I would rather say no early than waste your year.' },
+    ];
+---
+
+<BaseLayout
+  title={pick(lang, 'Join My Team — Property Career with Lawrence Law', '加入我的团队 — 跟 Lawrence Law 学做房地产')}
+  description={pick(
+    lang,
+    'Learn property the honest way. Direct mentorship from a negotiator with a decade in both subsales and new projects, in Kuala Lumpur and Selangor.',
+    '用诚实的方式学做房地产。由一位在二手房和新盘都有实战经验、入行十年的谈判员亲自带，地点在吉隆坡和雪兰莪。',
+  )}
+  waMessage={applyMsg}
+>
+  <JsonLd
+    slot="head"
+    data={breadcrumbSchema([
+      { name: pick(lang, 'Home', '首页'), url: new URL(href(lang, '/'), Astro.site).href },
+      { name: pick(lang, 'Join My Team', '加入我的团队'), url: canonical },
+    ])}
+  />
+
+  {/* ===== Hero ===== */}
+  <section class="bg-navy-900 text-white">
+    <div class="container-site grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[3fr_2fr]">
+      <div>
+        <p class="label-sm mb-5 text-gold-500">{pick(lang, 'Join My Team · Kuala Lumpur & Selangor', '加入我的团队 · 吉隆坡与雪兰莪')}</p>
+        <h1 class="text-[clamp(2.1rem,6vw,3.75rem)] leading-[1.08] tracking-tight text-white">
+          {zh ? (
+            <>跟一个<span class="text-gold-500">两边市场</span>都做过的人学做房地产。</>
+          ) : (
+            <>Learn property from someone who has worked <span class="text-gold-500">both sides</span> of the market.</>
+          )}
+        </h1>
+        <p class="mt-6 max-w-xl text-[17px] leading-relaxed text-navy-100 sm:text-lg">
+          {pick(
+            lang,
+            'I am looking for a small number of people to train properly. No hype and no income screenshots, only a clear way of working that has kept buyers coming back to me since 2015.',
+            '我想找少数几个人，好好地带。没有夸张的话，也没有收入截图，只有一套清楚的做事方法；从 2015 年到现在，买家就是因为这套方法一直回来找我。',
+          )}
+        </p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a href={apply} target="_blank" rel="noopener" class="btn-gold" data-track="whatsapp_join_hero">{pick(lang, 'Apply on WhatsApp', '用 WhatsApp 申请')}</a>
+          <a href="#how" class="btn-gold-outline text-white">{pick(lang, 'See How It Works', '看看流程')}</a>
+        </div>
+        <p class="mt-5 text-sm text-navy-100/80">
+          {SITE.renNumber} · {pick(lang, 'Replies personally, usually within the day', '本人亲自回复，通常当天内')}
+        </p>
+      </div>
+      <div class="mx-auto w-full max-w-[260px] sm:max-w-xs lg:max-w-sm">
+        <Picture
+          src="/images/lawrence-portrait.jpg"
+          fallback="/images/placeholders/lawrence-portrait.svg"
+          alt={pick(lang, 'Lawrence Law, New Property Specialist', 'Lawrence Law 刘智权，新盘专家')}
+          class="aspect-[4/5] w-full object-cover"
+          sizes="(min-width: 1024px) 384px, 260px"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </section>
+
+  <TrustBar />
+
+  {/* ===== Who this is for ===== */}
+  <section class="section-pad bg-white">
+    <div class="container-site">
+      <SectionHeading title={pick(lang, 'Who I’m Looking For', '我在找什么样的人')} sub={pick(lang, 'Is This You?', '这是你吗？')} />
+      <div class="grid gap-6 lg:grid-cols-3">
+        {who.map((w) => (
+          <div class="card">
+            <p class="label-sm text-gold-600">{w.tag}</p>
+            <h3 class="mt-3 font-sans text-xl leading-snug font-bold text-navy-900">{w.title}</h3>
+            <div class="gold-rule mt-3 mb-4 !w-10"></div>
+            <p class="text-[15px] leading-relaxed text-ink/80">{w.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* ===== What you get ===== */}
+  <section class="section-pad bg-navy-900 text-white">
+    <div class="container-site">
+      <SectionHeading title={pick(lang, 'What You Get', '你会得到什么')} sub={pick(lang, 'Working With Me', '跟我一起做')} tone="light" />
+      <ol class="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+        {offer.map((o, i) => (
+          <li class="border-t border-white/15 pt-5">
+            <p class="font-display text-2xl text-gold-500">{String(i + 1).padStart(2, '0')}</p>
+            <h3 class="mt-2 font-sans text-lg font-bold text-white">{o.title}</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-navy-100">{o.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  {/* ===== Track record ===== */}
+  <section class="section-pad bg-white">
+    <div class="container-site">
+      <SectionHeading title={pick(lang, 'Who You’d Be Learning From', '你会跟谁学')} sub={pick(lang, 'Track Record', '我的成绩')} />
+      <div class="grid gap-10 lg:grid-cols-[2fr_3fr]">
+        <div class="space-y-4 text-[17px] leading-relaxed text-ink/85">
+          <p>
+            {pick(
+              lang,
+              'I started in subsales while still at university and built a base of more than 1,500 homeowners over four years. In 2019 I moved into new projects.',
+              '我大学时期就开始做二手房，四年里累积了 1,500 多位屋主。2019 年，我转做新盘。',
+            )}
+          </p>
+          <p>
+            {pick(
+              lang,
+              'I then stepped away to build an e-commerce business, came back to property in late 2024, and finished 2025 ranked in the top 47 nationwide for the primary market.',
+              '之后我离开去做电商，2024 年底回到房地产，2025 年在新盘市场排名全国第 47。',
+            )}
+          </p>
+          <p>
+            <a href={href(lang, '/about/')} class="font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4">
+              {pick(lang, 'Read my full story →', '看我的完整故事 →')}
+            </a>
+          </p>
+        </div>
+        <ul class="divide-y divide-border border-y border-border">
+          {AWARDS.map((a, i) => (
+            <li class="flex items-baseline justify-between gap-6 py-4">
+              <span class="font-semibold text-navy-900">{zh ? (AWARDS_ZH[i] ?? a.title) : a.title}</span>
+              <span class="label-sm flex-none text-gold-600">{a.year}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* ===== How it works ===== */}
+  <section id="how" class="section-pad scroll-mt-20 bg-cream">
+    <div class="container-site">
+      <SectionHeading title={pick(lang, 'How It Works', '流程')} sub={pick(lang, 'From First Message to First Deal', '从第一条讯息到第一单')} />
+      <ol class="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        {steps.map((s, i) => (
+          <li class="card">
+            <p class="label-sm text-gold-600">{pick(lang, `Step ${i + 1}`, `第 ${i + 1} 步`)}</p>
+            <h3 class="mt-3 font-sans text-lg font-bold text-navy-900">{s.title}</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-ink/80">{s.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  {/* ===== Straight talk ===== */}
+  <section class="section-pad bg-navy-900 text-white">
+    <div class="container-site grid gap-10 lg:grid-cols-2">
+      <div>
+        <SectionHeading title={pick(lang, 'Before You Apply', '申请之前')} sub={pick(lang, 'Straight Talk', '先说清楚')} tone="light" />
+        <p class="max-w-xl text-[17px] leading-relaxed text-navy-100">
+          {pick(
+            lang,
+            'I give buyers honest advice, so I owe you the same. This is real work with real uncertainty, and it is better that you hear it from me now.',
+            '我对买家说实话，对你也应该一样。这是一份真实的工作，也有真实的不确定；这些话由我现在告诉你，比较好。',
+          )}
+        </p>
+      </div>
+      <ul class="space-y-5">
+        {straight.map((x) => (
+          <li class="border-l-2 border-gold-500 pl-5">
+            <p class="font-bold text-white">{x.title}</p>
+            <p class="mt-1 text-[15px] leading-relaxed text-navy-100">{x.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* ===== FAQ ===== */}
+  <section class="section-pad bg-white">
+    <div class="container-site max-w-3xl">
+      <FAQ faqs={faqs} heading={pick(lang, 'Questions People Ask Before Joining', '加入之前，大家常问的问题')} />
+    </div>
+  </section>
+
+  {/* ===== Apply ===== */}
+  <section class="bg-navy-900">
+    <div class="container-site py-14 sm:py-20">
+      <div class="mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-[4px] border border-white/15 bg-white/5 px-6 py-12 text-center sm:px-12">
+        <h2 class="text-[26px] text-white sm:text-4xl">{pick(lang, 'Tell me about yourself.', '跟我说说你自己。')}</h2>
+        <p class="max-w-xl text-navy-100">
+          {pick(
+            lang,
+            'Three lines are enough: who you are, what you do now, and whether you are thinking full-time or part-time. I read every message myself.',
+            '三行就够了：你是谁、现在做什么、想全职还是兼职。每一条讯息我都亲自看。',
+          )}
+        </p>
+        <a href={apply} target="_blank" rel="noopener" class="btn-gold" data-track="whatsapp_join_cta">{pick(lang, 'Apply on WhatsApp', '用 WhatsApp 申请')}</a>
+        <p class="text-sm text-navy-100/60">{pick(lang, 'No CV needed. No obligation after we talk.', '不需要履历。聊过之后没有任何约束。')}</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
