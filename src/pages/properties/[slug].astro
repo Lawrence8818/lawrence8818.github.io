@@ -106,9 +106,7 @@ const AREA_PAGE: Record<string, { slug: string; name: string }> = {
 };
 // 地段有自己的对比页的(目前是 Bukit Jalil)优先连到那一页
 const localityPage = (await getCollection('areas')).find((a) => inCompareArea(a.data, p));
-const areaPage = zh
-  ? undefined
-  : localityPage
+const areaPage = localityPage
     ? { slug: localityPage.id, name: localityPage.data.name }
     : d.region
       ? AREA_PAGE[d.region]
@@ -332,8 +330,8 @@ const waMsg = zh
             {pick(lang, 'Browse All Properties', '浏览全部项目')}
           </a>
           {areaPage && (
-            <a href={url(`/areas/${areaPage.slug}/`)} class="btn-gold-outline text-navy-900">
-              {localityPage ? `Compare all ${areaPage.name} projects` : `Buying in ${areaPage.name}: Area Guide`}
+            <a href={href(lang, `/areas/${areaPage.slug}/`)} class="btn-gold-outline text-navy-900">
+              {localityPage ? pick(lang, `Compare all ${areaPage.name} projects`, `比较 ${areaPage.name} 的全部项目`) : pick(lang, `Buying in ${areaPage.name}: Area Guide`, `${areaPage.name} 区域介绍`)}
             </a>
           )}
         </div>

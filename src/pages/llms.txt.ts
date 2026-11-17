@@ -44,7 +44,7 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     '## Buyer guides',
     '',
-    `- [Buyer Guide](${abs('/buyerguide/')}): overview of the home-buying process in Malaysia`,
+    `- [Videos](${abs('/videos/')}): short videos answering the questions Malaysian homebuyers ask most`,
     ...guides.map((g) => `- [${g.data.title}](${abs(`/guides/${g.id}/`)}): ${g.data.description}`),
     '',
     '## Areas',

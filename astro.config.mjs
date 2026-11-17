@@ -22,6 +22,8 @@ export default defineConfig({
   base,
   trailingSlash: 'ignore',
   // 英文是默认语言,网址不变;中文版在 /zh/ 下面(见 src/i18n/index.ts)。
+  // 旧的 Buyer Guide 页已并入 Videos 页;旧网址转过去,外面的旧链接不会变成死链接
+  redirects: { '/buyerguide': '/videos/' },
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'zh'],

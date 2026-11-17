@@ -1,0 +1,8 @@
+---
+// 中文版视频详情页:/zh/videos/<slug>/(和英文页共用同一个模板)
+import Page, { getStaticPaths as base } from '../../videos/[slug].astro';
+
+export const getStaticPaths = base;
+---
+
+<Page {...Astro.props} />

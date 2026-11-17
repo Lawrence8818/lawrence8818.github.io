@@ -3,9 +3,28 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import LeadMagnetForm from '../components/LeadMagnetForm.astro';
 import FAQ from '../components/FAQ.astro';
 import { SITE } from '../data/site';
-import { waLink } from '../lib/whatsapp';
+import { waLink, WA_DEFAULT_ZH, WA_LEADMAGNET_ZH } from '../lib/whatsapp';
+import { langOf, pick } from '../i18n';
 
-const contactFaqs = [
+// 这个模板同时出英文页(/contact/)和中文页(/zh/contact/)
+const lang = langOf(Astro);
+const zh = lang === 'zh';
+
+const contactFaqsZh = [
+  {
+    question: '咨询要收费吗？',
+    answer: '不收。前期咨询、贷款预估、项目比较都是免费的。我的收入来自发展商给的佣金，买家不用付我任何费用。',
+  },
+  {
+    question: '你会一直催我买吗？',
+    answer: '不会。我的做法是把资料和分析给你，买不买、什么时候买，由你决定。真正准备好的买家自己会回来；硬催出来的成交，从来不长久。',
+  },
+  {
+    question: '我在外州或国外，可以远程咨询吗？',
+    answer: '可以。视讯讲解项目、远程比较、代你安排看房都行。我不少柔佛、槟城的客户，还有人在新加坡的客户，都是这样和我配合的。',
+  },
+];
+const contactFaqsEn = [
   {
     question: 'Do you charge for consultation?',
     answer:
@@ -22,18 +41,26 @@ const contactFaqs = [
       'Yes. Video-call project briefings, remote comparisons and arranging viewings on your behalf all work — many of my Johor and Penang clients, and those based in Singapore, work with me this way.',
   },
 ];
+const contactFaqs = zh ? contactFaqsZh : contactFaqsEn;
 ---
 
 <BaseLayout
-  title="Contact Lawrence — Free Consultation on WhatsApp"
-  description="Free advice on buying property: chat directly on WhatsApp, or leave your details for Lawrence to reply. Covering KL, Selangor, Johor and Penang."
+  title={pick(lang, 'Contact Lawrence — Free Consultation on WhatsApp', '联系 Lawrence — WhatsApp 免费咨询')}
+  description={pick(
+    lang,
+    'Free advice on buying property: chat directly on WhatsApp, or leave your details for Lawrence to reply. Covering KL, Selangor, Johor and Penang.',
+    '买房免费咨询：直接用 WhatsApp 聊，或留下资料让 Lawrence 回复你。服务吉隆坡、雪兰莪、柔佛和槟城。',
+  )}
 >
   <section class="bg-navy-900 py-12 text-white">
     <div class="container-site">
-      <h1 class="text-3xl sm:text-4xl text-white">Contact me</h1>
+      <h1 class="text-3xl sm:text-4xl text-white">{pick(lang, 'Contact me', '联系我')}</h1>
       <p class="mt-3 max-w-2xl text-navy-100">
-        Ask whenever you have a question — no need to wait until you feel “ready.” The earlier you ask,
-        the fewer detours you take.
+        {pick(
+          lang,
+          'Ask whenever you have a question — no need to wait until you feel “ready.” The earlier you ask, the fewer detours you take.',
+          '有问题随时问，不用等到“准备好了”才来。越早问，弯路越少。',
+        )}
       </p>
     </div>
   </section>
@@ -41,33 +68,39 @@ const contactFaqs = [
   <section class="py-14">
     <div class="container-site grid gap-10 lg:grid-cols-2">
       <div>
-        <h2 class="text-2xl">Fastest way: WhatsApp</h2>
+        <h2 class="text-2xl">{pick(lang, 'Fastest way: WhatsApp', '最快的方式：WhatsApp')}</h2>
         <div class="gold-rule mt-3"></div>
         <p class="text-ink/80">
-          Just tap the button below and tell me three things:
-          <strong>your budget, the area you’re interested in, and own-stay or investment</strong>.
-          I reply personally — no bots — usually within 5 minutes.
+          {zh ? (
+            <>点下面的按钮，告诉我三件事：<strong>你的预算、想看的地区、自住还是投资</strong>。我本人回复，不是机器人，通常 5 分钟内。</>
+          ) : (
+            <>
+              Just tap the button below and tell me three things:
+              <strong>your budget, the area you’re interested in, and own-stay or investment</strong>.
+              I reply personally — no bots — usually within 5 minutes.
+            </>
+          )}
         </p>
-        <a href={waLink()} target="_blank" rel="noopener" class="btn-gold mt-6" data-track="whatsapp_contact_page">
-          Open WhatsApp chat
+        <a href={waLink(pick(lang, undefined, WA_DEFAULT_ZH))} target="_blank" rel="noopener" class="btn-gold mt-6" data-track="whatsapp_contact_page">
+          {pick(lang, 'Open WhatsApp chat', '打开 WhatsApp 聊天')}
         </a>
         <p class="mt-4 text-sm text-ink/70">
-          Prefer email? <a href={`mailto:${SITE.email}`} class="font-semibold text-gold-600 hover:underline">{SITE.email}</a>
+          {pick(lang, 'Prefer email?', '想用电邮？')} <a href={`mailto:${SITE.email}`} class="font-semibold text-gold-600 hover:underline">{SITE.email}</a>
         </p>
         <p class="mt-2 text-sm text-ink/60">
-          Or grab the free Buyer’s Guide first:
-          <a href={waLink(SITE.leadMagnetMessage)} target="_blank" rel="noopener" class="font-semibold text-gold-600 hover:underline" data-track="whatsapp_contact_leadmagnet">
-            get it here →
+          {pick(lang, 'Or grab the free Buyer’s Guide first:', '或者先拿免费的买房指南：')}
+          <a href={waLink(pick(lang, SITE.leadMagnetMessage, WA_LEADMAGNET_ZH))} target="_blank" rel="noopener" class="font-semibold text-gold-600 hover:underline" data-track="whatsapp_contact_leadmagnet">
+            {pick(lang, 'get it here →', '点这里拿 →')}
           </a>
         </p>
 
         <div class="mt-10">
-          <FAQ faqs={contactFaqs} heading="Before you reach out" />
+          <FAQ faqs={contactFaqs} heading={pick(lang, 'Before you reach out', '联系之前，你可能想知道')} />
         </div>
       </div>
 
       <div>
-        <h2 class="text-2xl">Or leave your details</h2>
+        <h2 class="text-2xl">{pick(lang, 'Or leave your details', '或者留下你的资料')}</h2>
         <div class="gold-rule mt-3"></div>
         <LeadMagnetForm />
       </div>

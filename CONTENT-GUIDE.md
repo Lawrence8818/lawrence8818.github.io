@@ -150,6 +150,16 @@
   会暂时记在 `scripts/sync-from-master.mjs` 的 `SITE_OVERRIDES`(例如 2026-11-16 的 Kingswoodz),
   资料仓库跟上后再删掉。
 
+### 13. 视频页合并、中文版第二批(2026-11-17)
+
+- **Buyer Guide 页和 Videos 列表页合并成一页**:`/videos/`。旧网址 `/buyerguide/` 会自动转过去。
+  菜单里 "Buyer Guides" 指的是文章(`/guides/`),"Videos" 指的是视频,不再混在一起。
+- **中文版第二批已上线**:区域页(列表 + 9 个区域 / 地段页)、视频页(列表 + 9 支)、联系页。
+  - 区域页的中文文字在 `src/content/areas-zh/`,文件名和英文版一一对应;对比表和自动问答会自己出中文。
+  - 视频的中文标题是 `titleZh`,中文简介是 `descriptionZh`,都写在 `src/content/videos/` 各自的文件里。
+  - 联系页和表格的中文直接写在 `src/pages/contact.astro`、`src/components/LeadMagnetForm.astro`。
+- **OAKA 落地页**不再出现 price 字样,改讲月供(2026-11-17)。
+
 ### 还没做完的
 
 - **待办事项不记在这份文件里。**这份文件放在公开的代码仓库,所以待补的月供数字、待更新的资料等
@@ -158,7 +168,7 @@
   `monthly_from` 栏填上,或在待办清单里直接填。
 - **Google 商家资料(Google Business Profile)**:开通并请老客户去留评价。这是 AEO 第 5 项里
   最有用的一步,只有你能做。开通后把链接给 Claude,会加进网站的身份资料里。
-- **中文版第二批**:区域页、视频页、Buyer Guide、联系页、9 个落地页还只有英文。
+- **还只有英文的页面**:9 个落地页、客户故事页、贷款计算器。
 
 ---
 
