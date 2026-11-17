@@ -1,0 +1,8 @@
+---
+// 中文版区域页:/zh/areas/<slug>/(和英文页共用同一个模板;中文文字在 src/content/areas-zh/)
+import Page, { getStaticPaths as base } from '../../areas/[slug].astro';
+
+export const getStaticPaths = base;
+---
+
+<Page {...Astro.props} />

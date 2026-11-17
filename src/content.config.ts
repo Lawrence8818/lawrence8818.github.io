@@ -41,6 +41,8 @@ const videos = defineCollection({
     /** optional Chinese title shown as a secondary bilingual line */
     titleZh: z.string().optional(),
     description: z.string().default(''),
+    /** 中文版的一句话简介(中文视频页用) */
+    descriptionZh: z.string().optional(),
     platform: z.enum(['youtube', 'tiktok', 'instagram', 'facebook']),
     /** YouTube 视频 ID(仅 platform=youtube 时需要,用于站内嵌入) */
     videoId: z.string().optional(),
@@ -56,9 +58,7 @@ const videos = defineCollection({
 });
 
 /** 区域落地页:src/content/areas/*.md,正文是该区域的长文 SEO 内容 */
-const areas = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/areas' }),
-  schema: z.object({
+const areaSchema = z.object({
     name: z.string(),
     nameEn: z.string(),
     region: z.enum(['klang-valley', 'johor', 'penang']),
@@ -84,7 +84,17 @@ const areas = defineCollection({
       .optional(),
     faqs: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
     order: z.number(),
-  }),
+  });
+
+const areas = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/areas' }),
+  schema: areaSchema,
+});
+
+/** 区域页的中文版:src/content/areas-zh/*.md,文件名和英文版一一对应。地名保留英文。 */
+const areasZh = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/areas-zh' }),
+  schema: areaSchema,
 });
 
 /** Featured properties: src/content/properties/*.md, one listing = one file */
@@ -148,4 +158,4 @@ const testimonials = defineCollection({
   }),
 });
 
-export const collections = { guides, guidesZh, videos, areas, properties, testimonials };
+export const collections = { guides, guidesZh, videos, areas, properties, testimonials, areasZh };

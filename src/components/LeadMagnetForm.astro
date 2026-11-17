@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../data/site';
+import { langOf } from '../i18n';
 
 /**
  * Contact form — fields mirror the official lawrencelawproperty.com form:
@@ -16,6 +17,25 @@ import { SITE } from '../data/site';
 const inputClass =
   'w-full rounded-md border border-border bg-white px-4 py-2.5 text-[15px] focus:border-gold-500 focus:outline-none';
 const hasEndpoint = Boolean(SITE.formspreeEndpoint);
+const zh = langOf(Astro) === 'zh';
+// 表格上的字,英文 / 中文各一套
+const L = zh
+  ? {
+      name: '称呼', namePh: '例如：陈先生', email: '电邮地址', phone: '电话号码', phonePh: '例如：012-3456789',
+      reason: '咨询事项', select: '请选择…', reasons: ['买新盘', '买二手房', '卖房', '租房', '其他'],
+      location: '你所在的地区', locationPh: '例如：Puchong / Bukit Jalil', subject: '主题', subjectPh: '想问什么？',
+      message: '留言', messagePh: '例如：月供预算大约 RM2,500，想找 Puchong 附近的新盘', submit: '提交',
+      noteEndpoint: '提交即表示你同意 Lawrence 联系你。', noteWa: '提交后会打开 WhatsApp，资料已经帮你填好，按发送就行。',
+      wa: { hi: '你好 Lawrence，我在你的网站留了资料：', name: '称呼', email: '电邮', phone: '电话', reason: '咨询事项', location: '所在地区', subject: '主题', message: '留言' },
+    }
+  : {
+      name: 'Preferred Name', namePh: 'e.g. Mr Tan', email: 'Email Address', phone: 'Phone Number', phonePh: 'e.g. 012-3456789',
+      reason: 'Inquiry Reason', select: 'Please select…', reasons: ['Buying a new project', 'Buying subsale', 'Selling', 'Renting', 'Others'],
+      location: 'Your Location', locationPh: 'e.g. Puchong / Bukit Jalil', subject: 'Subject', subjectPh: 'What is this about?',
+      message: 'Message', messagePh: 'e.g. Monthly budget around RM2,500, looking for a new project near Puchong', submit: 'SUBMIT',
+      noteEndpoint: 'By submitting, you agree to let Lawrence contact you.', noteWa: 'Submitting opens WhatsApp with your details pre-filled — just press send.',
+      wa: { hi: 'Hi Lawrence, enquiry from your website:', name: 'Name', email: 'Email', phone: 'Phone', reason: 'Inquiry Reason', location: 'Location', subject: 'Subject', message: 'Message' },
+    };
 ---
 
 <form
@@ -23,52 +43,49 @@ const hasEndpoint = Boolean(SITE.formspreeEndpoint);
   action={hasEndpoint ? SITE.formspreeEndpoint : undefined}
   method={hasEndpoint ? 'POST' : undefined}
   data-wa-number={hasEndpoint ? undefined : SITE.whatsappNumber}
+  data-wa-labels={JSON.stringify(L.wa)}
   class="card space-y-4"
 >
   <div class="grid gap-4 sm:grid-cols-2">
     <div>
-      <label for="f-name" class="mb-1 block text-sm font-medium text-navy-900">Preferred Name <span class="text-gold-600">*</span></label>
-      <input id="f-name" type="text" name="name" required class={inputClass} placeholder="e.g. Mr Tan" />
+      <label for="f-name" class="mb-1 block text-sm font-medium text-navy-900">{L.name} <span class="text-gold-600">*</span></label>
+      <input id="f-name" type="text" name="name" required class={inputClass} placeholder={L.namePh} />
     </div>
     <div>
-      <label for="f-email" class="mb-1 block text-sm font-medium text-navy-900">Email Address <span class="text-gold-600">*</span></label>
+      <label for="f-email" class="mb-1 block text-sm font-medium text-navy-900">{L.email} <span class="text-gold-600">*</span></label>
       <input id="f-email" type="email" name="email" required class={inputClass} placeholder="you@email.com" />
     </div>
     <div>
-      <label for="f-phone" class="mb-1 block text-sm font-medium text-navy-900">Phone Number <span class="text-gold-600">*</span></label>
-      <input id="f-phone" type="tel" name="phone" required class={inputClass} placeholder="e.g. 012-3456789" />
+      <label for="f-phone" class="mb-1 block text-sm font-medium text-navy-900">{L.phone} <span class="text-gold-600">*</span></label>
+      <input id="f-phone" type="tel" name="phone" required class={inputClass} placeholder={L.phonePh} />
     </div>
     <div>
-      <label for="f-reason" class="mb-1 block text-sm font-medium text-navy-900">Inquiry Reason <span class="text-gold-600">*</span></label>
+      <label for="f-reason" class="mb-1 block text-sm font-medium text-navy-900">{L.reason} <span class="text-gold-600">*</span></label>
       <select id="f-reason" name="inquiryReason" required class={inputClass}>
-        <option value="">Please select…</option>
-        <option>Buying a new project</option>
-        <option>Buying subsale</option>
-        <option>Selling</option>
-        <option>Renting</option>
-        <option>Others</option>
+        <option value="">{L.select}</option>
+        {L.reasons.map((x) => <option>{x}</option>)}
       </select>
     </div>
     <div>
-      <label for="f-location" class="mb-1 block text-sm font-medium text-navy-900">Your Location <span class="text-gold-600">*</span></label>
-      <input id="f-location" type="text" name="location" required class={inputClass} placeholder="e.g. Puchong / Bukit Jalil" />
+      <label for="f-location" class="mb-1 block text-sm font-medium text-navy-900">{L.location} <span class="text-gold-600">*</span></label>
+      <input id="f-location" type="text" name="location" required class={inputClass} placeholder={L.locationPh} />
     </div>
     <div>
-      <label for="f-subject" class="mb-1 block text-sm font-medium text-navy-900">Subject</label>
-      <input id="f-subject" type="text" name="subject" class={inputClass} placeholder="What is this about?" />
+      <label for="f-subject" class="mb-1 block text-sm font-medium text-navy-900">{L.subject}</label>
+      <input id="f-subject" type="text" name="subject" class={inputClass} placeholder={L.subjectPh} />
     </div>
   </div>
   <div>
-    <label for="f-msg" class="mb-1 block text-sm font-medium text-navy-900">Message</label>
-    <textarea id="f-msg" name="message" rows="4" class={inputClass} placeholder="e.g. Budget around RM500k, looking for a new project near Puchong"></textarea>
+    <label for="f-msg" class="mb-1 block text-sm font-medium text-navy-900">{L.message}</label>
+    <textarea id="f-msg" name="message" rows="4" class={inputClass} placeholder={L.messagePh}></textarea>
   </div>
   <div class="pt-1 text-center">
-    <button type="submit" class="btn-gold min-w-[220px]" data-track="whatsapp_form_submit">SUBMIT</button>
+    <button type="submit" class="btn-gold min-w-[220px]" data-track="whatsapp_form_submit">{L.submit}</button>
   </div>
   <p class="text-center text-xs text-ink/60">
     {hasEndpoint
-      ? 'By submitting, you agree to let Lawrence contact you.'
-      : 'Submitting opens WhatsApp with your details pre-filled — just press send.'}
+      ? L.noteEndpoint
+      : L.noteWa}
   </p>
 </form>
 
@@ -80,16 +97,19 @@ const hasEndpoint = Boolean(SITE.formspreeEndpoint);
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el && el.value ? el.value.trim() : ''; };
+        var T = {};
+        try { T = JSON.parse(form.dataset.waLabels || '{}'); } catch (err) {}
+        var sep = /[\u4e00-\u9fff]/.test(T.name || '') ? '：' : ': ';
         var lines = [
-          'Hi Lawrence, enquiry from your website:',
-          'Name: ' + v('name'),
-          'Email: ' + v('email'),
-          'Phone: ' + v('phone'),
-          'Inquiry Reason: ' + v('inquiryReason'),
-          'Location: ' + v('location'),
+          T.hi || 'Hi Lawrence, enquiry from your website:',
+          (T.name || 'Name') + sep + v('name'),
+          (T.email || 'Email') + sep + v('email'),
+          (T.phone || 'Phone') + sep + v('phone'),
+          (T.reason || 'Inquiry Reason') + sep + v('inquiryReason'),
+          (T.location || 'Location') + sep + v('location'),
         ];
-        if (v('subject')) lines.push('Subject: ' + v('subject'));
-        if (v('message')) lines.push('Message: ' + v('message'));
+        if (v('subject')) lines.push((T.subject || 'Subject') + sep + v('subject'));
+        if (v('message')) lines.push((T.message || 'Message') + sep + v('message'));
         var link = 'https://wa.me/' + form.dataset.waNumber + '?text=' + encodeURIComponent(lines.join('\n'));
         window.open(link, '_blank', 'noopener');
       });

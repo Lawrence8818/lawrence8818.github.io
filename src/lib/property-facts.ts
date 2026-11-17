@@ -260,7 +260,7 @@ export function tenureZh(tenure: string): string {
   return `${kind}（${to ? '至 ' + zhDate(to[1]) : m[2]}）`;
 }
 
-const sizeZh = (s: string) => s.replace(/\bsf\b/g, '平方尺').replace(/\bacres?\b/gi, '英亩');
+export const sizeZh = (s: string) => s.replace(/\bsf\b/g, '平方尺').replace(/\bacres?\b/gi, '英亩');
 const maintenanceZh = (d: PropertyFacts) => `每平方尺 ${(d.maintenance ?? '').replace(/\s*psf\b/, '')}`;
 
 /** 地名保留英文,后面补上城市 / 州属的中文名,例如 "Taman Desa, KL（吉隆坡）" */

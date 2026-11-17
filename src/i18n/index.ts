@@ -28,7 +28,12 @@ export function hasZh(path: string): boolean {
     p === '/allproperties/' ||
     p === '/guides/' ||
     /^\/guides\/[^/]+\/$/.test(p) ||
-    /^\/properties\/[^/]+\/$/.test(p)
+    /^\/properties\/[^/]+\/$/.test(p) ||
+    p === '/videos/' ||
+    /^\/videos\/[^/]+\/$/.test(p) ||
+    p === '/contact/' ||
+    p === '/areas/' ||
+    /^\/areas\/[^/]+\/$/.test(p)
   );
 }
 

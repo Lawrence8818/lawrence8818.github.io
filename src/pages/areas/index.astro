@@ -3,21 +3,30 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AreaCard from '../../components/AreaCard.astro';
 import CTASection from '../../components/CTASection.astro';
+import { langOf, pick } from '../../i18n';
 
-const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
+// 这个模板同时出英文页(/areas/)和中文页(/zh/areas/)
+const lang = langOf(Astro);
+const areas = (await getCollection(lang === 'zh' ? 'areasZh' : 'areas')).sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout
-  title="Areas I Cover: Klang Valley, Johor & Penang"
-  description="Lawrence covers the entire Klang Valley (all Kuala Lumpur + Selangor new projects), plus Johor Bahru and Penang. The market logic, hot spots and common buyer questions for each area — read first, then ask."
+  title={pick(lang, 'Areas I Cover: Klang Valley, Johor & Penang', '服务地区：巴生谷、柔佛、槟城')}
+  description={pick(
+    lang,
+    'Lawrence covers the entire Klang Valley (all Kuala Lumpur + Selangor new projects), plus Johor Bahru and Penang. The market logic, hot spots and common buyer questions for each area — read first, then ask.',
+    'Lawrence 负责整个巴生谷（吉隆坡和雪兰莪的全部新盘），也做新山和槟城。每一区的市场逻辑、热点和买家常见问题，先看再问。',
+  )}
 >
   <section class="bg-navy-900 py-12 text-white">
     <div class="container-site">
-      <h1 class="text-3xl sm:text-4xl text-white">Areas I serve</h1>
+      <h1 class="text-3xl sm:text-4xl text-white">{pick(lang, 'Areas I serve', '我服务的地区')}</h1>
       <p class="mt-3 max-w-2xl text-navy-100">
-        I can arrange projects across the entire Klang Valley — all new launches in KL and Selangor,
-        not tied to any single developer. I also track Johor and Penang closely, and out-of-state
-        buyers can work with me remotely.
+        {pick(
+          lang,
+          'I can arrange projects across the entire Klang Valley — all new launches in KL and Selangor, not tied to any single developer. I also track Johor and Penang closely, and out-of-state buyers can work with me remotely.',
+          '整个巴生谷的项目我都可以安排：吉隆坡和雪兰莪的全部新盘，不绑定任何一家发展商。柔佛和槟城我也一直在跟，外州的买家可以远程和我配合。',
+        )}
       </p>
     </div>
   </section>
@@ -37,7 +46,7 @@ const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.dat
   </section>
 
   <CTASection
-    heading="Not sure which area to look at?"
-    sub="Tell me your budget, where you work and your family needs, and I’ll narrow down the areas worth viewing."
+    heading={pick(lang, 'Not sure which area to look at?', '不确定该看哪一区？')}
+    sub={pick(lang, 'Tell me your budget, where you work and your family needs, and I’ll narrow down the areas worth viewing.', '告诉我你的预算、上班地点和家庭需要，我帮你把值得看的地区缩小范围。')}
   />
 </BaseLayout>

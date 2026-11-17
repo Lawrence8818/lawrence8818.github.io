@@ -346,15 +346,13 @@ const marqueeItems = zh ? MARQUEE_SHORT_ZH :
   {/* ===== Self-introduction: pillars + first-deal story (shared with About) ===== */}
   <PillarsAndStory brief />
 
-  {/* ===== Videos =====
-      中文版暂时不出这一区:视频页还没有中文版,点进去会是英文页。 */}
-  {!zh && (
+  {/* ===== Videos ===== */}
   <section id="videos" class="section-pad scroll-mt-20 border-t border-border bg-white">
     <div class="container-site">
       <div class="flex flex-wrap items-end justify-between gap-4">
-        <SectionHeading title="Watch First, Buy Smarter" sub="Videos" />
-        <a href={url('/videos/')} class="mb-8 hidden min-h-11 items-center text-sm font-semibold text-gold-600 hover:underline sm:inline-flex">
-          All videos →
+        <SectionHeading title={pick(lang, 'Watch First, Buy Smarter', '先看懂，再出手')} sub={pick(lang, 'Videos', '视频')} />
+        <a href={href(lang, '/videos/')} class="mb-8 hidden min-h-11 items-center text-sm font-semibold text-gold-600 hover:underline sm:inline-flex">
+          {pick(lang, 'All videos →', '全部视频 →')}
         </a>
       </div>
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -371,24 +369,21 @@ const marqueeItems = zh ? MARQUEE_SHORT_ZH :
           />
         ))}
       </div>
-      <a href={url('/videos/')} class="mt-6 inline-flex min-h-11 w-full items-center justify-center text-center text-sm font-semibold text-gold-600 hover:underline sm:hidden">
-        All videos →
+      <a href={href(lang, '/videos/')} class="mt-6 inline-flex min-h-11 w-full items-center justify-center text-center text-sm font-semibold text-gold-600 hover:underline sm:hidden">
+        {pick(lang, 'All videos →', '全部视频 →')}
       </a>
     </div>
   </section>
-  )}
 
-  {/* ===== Areas =====
-      中文版暂时不出这一区:区域页还没有中文版。 */}
-  {!zh && (
+  {/* ===== Areas ===== */}
   <section id="areas" class="section-pad scroll-mt-20 bg-white">
     <div class="container-site">
-      <SectionHeading title="Areas I Serve" sub="Coverage" />
+      <SectionHeading title={pick(lang, 'Areas I Serve', '我服务的地区')} sub={pick(lang, 'Coverage', '服务地区')} />
       {/* 精简成一排入口:区域介绍在各自的区域页里,首页只负责带路。
  */}
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {[
-          ...areas.map((a) => ({ name: a.data.name, to: url(`/areas/${a.id}/`), main: a.id === 'bukit-jalil' })),
+          ...areas.map((a) => ({ name: a.data.name, to: href(lang, `/areas/${a.id}/`), main: a.id === 'bukit-jalil' })),
         ].map((a) => (
           <a
             href={a.to}
@@ -401,7 +396,6 @@ const marqueeItems = zh ? MARQUEE_SHORT_ZH :
       </div>
     </div>
   </section>
-  )}
 
   <CTASection />
 </BaseLayout>
