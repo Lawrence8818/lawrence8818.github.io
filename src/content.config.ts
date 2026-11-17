@@ -33,6 +33,12 @@ const guidesZh = defineCollection({
   schema: guideSchema,
 });
 
+/** 视频的中文重点整理和文字稿:src/content/videos-zh/*.md,文件名和英文档相同;只有正文,没有栏位 */
+const videosZh = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/videos-zh' }),
+  schema: z.object({}),
+});
+
 /** 视频:src/content/videos/*.md,一支视频 = 一个文件,正文是 show notes(可空) */
 const videos = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/videos' }),
@@ -158,4 +164,4 @@ const testimonials = defineCollection({
   }),
 });
 
-export const collections = { guides, guidesZh, videos, areas, properties, testimonials, areasZh };
+export const collections = { guides, guidesZh, videos, areas, properties, testimonials, areasZh, videosZh };

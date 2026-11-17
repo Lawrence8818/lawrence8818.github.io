@@ -213,6 +213,10 @@ export function videoSchema(opts: {
   uploadDate: Date;
   embedUrl?: string;
   contentUrl?: string;
+  /** 视频里说的话(原文),给搜索引擎和 AI 读 */
+  transcript?: string;
+  /** 视频里说的语言,例如 'zh' */
+  spokenLanguage?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -223,6 +227,8 @@ export function videoSchema(opts: {
     uploadDate: opts.uploadDate.toISOString(),
     ...(opts.embedUrl ? { embedUrl: opts.embedUrl } : {}),
     ...(opts.contentUrl ? { contentUrl: opts.contentUrl } : {}),
+    ...(opts.spokenLanguage ? { inLanguage: opts.spokenLanguage } : {}),
+    ...(opts.transcript ? { transcript: opts.transcript } : {}),
   };
 }
 
