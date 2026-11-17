@@ -51,13 +51,8 @@ const {
 } = Astro.props;
 
 const lang = langOf(Astro);
-// 中文版的卡片一律进中文项目页(落地页只有英文)
-const detailHref =
-  lang === 'zh'
-    ? slug
-      ? href(lang, `/properties/${slug}/`)
-      : undefined
-    : landingHref(landingUrl) || (slug ? url(`/properties/${slug}/`) : undefined);
+// 有落地页的进落地页(中文版要有中文落地页才算),否则进项目详情页
+const detailHref = landingHref(landingUrl, lang) || (slug ? href(lang, `/properties/${slug}/`) : undefined);
 
 const specs =
   lang === 'zh'

@@ -74,7 +74,7 @@ const regionLabel = d.region ? pick(lang, REGION_LABEL, REGION_LABEL_ZH)[d.regio
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 // Only advertise the photo to crawlers once the real file has been uploaded
 const hasPhoto = existsSync(join(process.cwd(), 'public', d.image));
-const tourHref = landingHref(d.landingUrl);
+const tourHref = landingHref(d.landingUrl, lang);
 
 const specs = zh
   ? zhSpecs
@@ -257,7 +257,7 @@ const waMsg = zh
             </a>
             {tourHref && (
               <a href={tourHref} class="btn-gold-outline text-white">
-                {pick(lang, 'Full Project Tour', '完整项目介绍（英文）')}
+                {pick(lang, 'Full Project Tour', '完整项目介绍')}
               </a>
             )}
             {d.listingUrl && (

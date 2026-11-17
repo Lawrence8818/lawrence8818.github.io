@@ -194,7 +194,7 @@ const marqueeItems = zh ? MARQUEE_SHORT_ZH :
           <div class="flex gap-6 pr-6 pl-0" aria-hidden={copy > 0 ? 'true' : undefined}>
             {featuredProperties.map((p) => (
               <div class="group w-[280px] sm:w-[340px] lg:w-[400px]">
-                <a href={(zh ? href(lang, `/properties/${p.id}/`) : landingHref(p.data.landingUrl) || url(`/properties/${p.id}/`))} class="block" tabindex={copy > 0 ? -1 : undefined}>
+                <a href={(landingHref(p.data.landingUrl, lang) || href(lang, `/properties/${p.id}/`))} class="block" tabindex={copy > 0 ? -1 : undefined}>
                   <div class="relative aspect-[4/3] overflow-hidden bg-navy-900">
                     <Picture
                       src={p.data.image}
@@ -232,7 +232,7 @@ const marqueeItems = zh ? MARQUEE_SHORT_ZH :
                   <a href={waLink(waContextMessage(p.data.name, lang))} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4" data-track="whatsapp_property" tabindex={copy > 0 ? -1 : undefined}>
                     {pick(lang, 'Contact Us', '联系我')}
                   </a>
-                  <a href={(zh ? href(lang, `/properties/${p.id}/`) : landingHref(p.data.landingUrl) || url(`/properties/${p.id}/`))} class="inline-flex min-h-11 items-center font-semibold text-ink/60 hover:text-navy-900" tabindex={copy > 0 ? -1 : undefined}>
+                  <a href={(landingHref(p.data.landingUrl, lang) || href(lang, `/properties/${p.id}/`))} class="inline-flex min-h-11 items-center font-semibold text-ink/60 hover:text-navy-900" tabindex={copy > 0 ? -1 : undefined}>
                     {pick(lang, 'Details', '详情')}
                   </a>
                 </div>
