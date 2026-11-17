@@ -8,7 +8,7 @@ faqs:
   - question: "Can a non-Bumiputera buy a Bumi lot?"
     answer: "Not directly. A Bumi lot can only be sold to a Bumiputera buyer unless the state authority has officially released it from the quota. If a unit has been released, a non-Bumi can buy it, normally without the Bumi discount. Ask to see the release approval in writing."
   - question: "How much is the Bumi discount?"
-    answer: "It depends on the state. Commonly quoted figures for residential property are 7% in Selangor, 15% in Johor and 5% in Penang. For Kuala Lumpur, published sources quote 5% to 7%. The rate can also differ by property type, so confirm it with the developer for the specific project."
+    answer: "It depends on the state. Commonly quoted figures for residential property are 7% in Selangor, 15% in Johor and 5% in Penang. The rate can also differ by property type, so confirm it with the developer for the specific project."
   - question: "Is a Bumi lot the same as Malay Reserve land?"
     answer: "No. Malay Reserve land is a land status under state law and can only be owned by Malays as defined by that state. A Bumi lot is a quota condition placed on certain units in a development that sits on ordinary land. The rules and the chance of release are very different."
   - question: "How do I check whether a unit is a Bumi lot?"
@@ -32,7 +32,7 @@ Bumiputera generally means Malays, the natives of Sabah and Sarawak, and Orang A
 Both are set by each state, not by the federal government, and can also vary with the type of development.
 
 - **Quota**: 30% of the units is the figure you will hear most, but it is higher in some states and for some project types.
-- **Discount**: commonly quoted residential figures are 7% in Selangor, 15% in Johor and 5% in Penang. For Kuala Lumpur, published sources quote between 5% and 7%.
+- **Discount**: commonly quoted residential figures are 7% in Selangor, 15% in Johor and 5% in Penang.
 
 Treat these as a guide. The figure that counts is the one in the developer's approval for that specific project.
 
