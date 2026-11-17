@@ -29,6 +29,7 @@ import {
 } from '../../lib/property-facts';
 import { langOf, pick, href } from '../../i18n';
 import { fitTitle } from '../../lib/seo';
+import { inCompareArea } from '../../lib/areas';
 
 export async function getStaticPaths() {
   const all = (await getCollection('properties')).sort((a, b) => a.data.order - b.data.order);
@@ -104,9 +105,7 @@ const AREA_PAGE: Record<string, { slug: string; name: string }> = {
   penang: { slug: 'penang', name: 'Penang' },
 };
 // 地段有自己的对比页的(目前是 Bukit Jalil)优先连到那一页
-const localityPage = (await getCollection('areas')).find(
-  (a) => a.data.locality && d.location.toLowerCase().startsWith(a.data.locality.toLowerCase()),
-);
+const localityPage = (await getCollection('areas')).find((a) => inCompareArea(a.data, p));
 const areaPage = zh
   ? undefined
   : localityPage

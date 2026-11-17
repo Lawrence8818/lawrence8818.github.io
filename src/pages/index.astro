@@ -386,7 +386,7 @@ const marqueeItems = zh ? MARQUEE_SHORT_ZH :
       <SectionHeading title="Areas I Serve" sub="Coverage" />
       {/* 精简成一排入口:区域介绍在各自的区域页里,首页只负责带路。
  */}
-      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {[
           ...areas.map((a) => ({ name: a.data.name, to: url(`/areas/${a.id}/`), main: a.id === 'bukit-jalil' })),
         ].map((a) => (
