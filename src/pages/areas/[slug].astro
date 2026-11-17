@@ -8,6 +8,7 @@ import { breadcrumbSchema, itemListSchema } from '../../lib/schema';
 import { url } from '../../lib/url';
 import { waContextMessage } from '../../lib/whatsapp';
 import { instalmentDisplay, monthlyNumber } from '../../lib/property-facts';
+import { isComparePage, inCompareArea } from '../../lib/areas';
 
 export async function getStaticPaths() {
   const areas = await getCollection('areas');
@@ -27,11 +28,10 @@ const REGIONS_OF: Record<string, string[]> = {
   johor: ['johor'],
   penang: ['penang'],
 };
-const loc = area.data.locality;
+// 对比页用地段的名字来写句子;一般区域页这个值是空的
+const loc = isComparePage(area.data) ? area.data.name : undefined;
 const inArea = (p: { data: { location: string; region?: string } }) =>
-  loc
-    ? p.data.location.toLowerCase().startsWith(loc.toLowerCase())
-    : (REGIONS_OF[area.id] ?? []).includes(p.data.region ?? '');
+  loc ? inCompareArea(area.data, p) : (REGIONS_OF[area.id] ?? []).includes(p.data.region ?? '');
 const allInArea = (await getCollection('properties')).filter(inArea);
 // 已售完的项目不出现在这一页
 const areaProjects = allInArea
@@ -60,29 +60,43 @@ const lowest = withMonthly.length ? Math.min(...withMonthly.map((p) => monthlyNu
 const cheapest = withMonthly.filter((p) => monthlyNumber(p.data.monthly) === lowest);
 const freehold = areaProjects.filter((p) => /freehold/i.test(p.data.tenure));
 const leasehold = areaProjects.filter((p) => /lease/i.test(p.data.tenure));
-const soonest = [...areaProjects].sort((a, b) => whenNum(a.data.completion) - whenNum(b.data.completion))[0];
+const completed = areaProjects.filter((p) => /completed/i.test(p.data.completion));
+// 预计完工日期已经过了、但资料还没改成 Completed 的,不拿来回答「哪个最先完工」
+const today = new Date();
+const nowNum = today.getUTCFullYear() + today.getUTCMonth() / 12;
+const soonest = areaProjects
+  .filter((p) => !/completed/i.test(p.data.completion) && whenNum(p.data.completion) >= nowNum)
+  .sort((a, b) => whenNum(a.data.completion) - whenNum(b.data.completion))[0];
+const noFigure = areaProjects.length - withMonthly.length;
+// 同一页里地点不止一种写法时(例如 Bangsar 和 Bangsar South),表里多出一栏地点
+const mixedPlaces = new Set(areaProjects.map((p) => p.data.location)).size > 1;
 const largest = [...areaProjects].sort(
   (a, b) => Math.max(0, ...sizeNums(b.data.layoutSize)) - Math.max(0, ...sizeNums(a.data.layoutSize)),
 )[0];
 const autoFaqs = loc && areaProjects.length
   ? [
       {
-        question: `How many new-launch projects are there in ${loc}?`,
-        answer: `I currently cover ${areaProjects.length} new-launch projects in ${loc} that still have units available: ${list(areaProjects.map((p) => p.data.name))}.`,
+        question: `How many projects do you cover in ${loc}?`,
+        answer: `I currently cover ${areaProjects.length} projects in ${loc} that still have units available: ${list(areaProjects.map((p) => p.data.name))}.`,
       },
       ...(cheapest.length
         ? [{
-            question: `Which new launch in ${loc} has the lowest monthly instalment?`,
-            answer: `${list(cheapest.map((p) => p.data.name))} ${cheapest.length > 1 ? 'have' : 'has'} the lowest estimated monthly instalment among the projects I cover in ${loc}, from about ${cheapest[0].data.monthly} a month. Instalment figures are estimates and depend on your loan margin, tenure and interest rate.`,
+            question: `Which project in ${loc} has the lowest monthly instalment?`,
+            answer: `${list(cheapest.map((p) => p.data.name))} ${cheapest.length > 1 ? 'have' : 'has'} the lowest estimated monthly instalment among the projects I cover in ${loc}, from about ${cheapest[0].data.monthly} a month.${noFigure ? ` ${noFigure} of the ${areaProjects.length} projects do not have a published estimate yet, so ask me for those.` : ''} Instalment figures are estimates and depend on your loan margin, tenure and interest rate.`,
           }]
         : []),
       ...(freehold.length
         ? [{
-            question: `Which new launches in ${loc} are freehold?`,
+            question: `Which projects in ${loc} are freehold?`,
             answer: `${list(freehold.map((p) => p.data.name))} ${freehold.length > 1 ? 'are' : 'is'} freehold.${leasehold.length ? ` ${list(leasehold.map((p) => p.data.name))} ${leasehold.length > 1 ? 'are' : 'is'} leasehold.` : ''}`,
           }]
         : []),
-      ...(soonest
+      ...(completed.length
+        ? [{
+            question: `Which ${loc} projects are already completed?`,
+            answer: `${list(completed.map((p) => p.data.name))} ${completed.length > 1 ? 'are' : 'is'} already completed, so you can see the actual building before you decide.${soonest ? ` Among those still under construction, ${soonest.data.name} is expected first: ${soonest.data.completion}.` : ''}`,
+          }]
+        : soonest
         ? [{
             question: `Which ${loc} project will be completed first?`,
             answer: `${soonest.data.name} has the earliest expected completion among the projects I cover in ${loc}: ${soonest.data.completion}. Completion dates are the developers' estimates and can change.`,
@@ -97,8 +111,9 @@ const autoFaqs = loc && areaProjects.length
     ]
   : [];
 const pageFaqs = [...autoFaqs, ...(area.data.faqs ?? [])];
+const n = String(areaProjects.length);
 const pageTitle = loc
-  ? `${loc} New Launches: ${areaProjects.length} Projects Compared`
+  ? (area.data.compareTitle ?? `${loc} New Launches: {n} Projects Compared`).replace('{n}', n)
   : `Buying Property in ${area.data.name} — New-Launch Advice`;
 const guides = (await getCollection('guides', ({ data }) => !data.draft))
   .sort((a, b) => Number(b.data.featured) - Number(a.data.featured) || b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
@@ -149,7 +164,7 @@ const guides = (await getCollection('guides', ({ data }) => !data.draft))
         <span>{area.data.name}</span>
       </nav>
       <p class="font-display text-sm tracking-widest text-gold-500 uppercase">Coverage</p>
-      <h1 class="mt-1 text-3xl text-white sm:text-4xl">{loc ? `New Launches in ${loc}, Compared` : `Buying in ${area.data.name}? Talk to Lawrence`}</h1>
+      <h1 class="mt-1 text-3xl text-white sm:text-4xl">{loc ? (area.data.compareHeading ?? `New Launches in ${loc}, Compared`).replace('{n}', n) : `Buying in ${area.data.name}? Talk to Lawrence`}</h1>
       <p class="mt-4 max-w-2xl text-lg text-navy-100">{area.data.intro}</p>
       <ul class="mt-6 flex flex-wrap gap-2">
         {area.data.highlights.map((h) => (
@@ -177,7 +192,7 @@ const guides = (await getCollection('guides', ({ data }) => !data.draft))
                     <span class="flex-none font-semibold text-navy-900">{instalmentDisplay(p.data).text}</span>
                   </span>
                   <span class="mt-1 block text-sm text-ink/70">
-                    {[p.data.layoutSize, p.data.tenure, p.data.completion].filter(Boolean).join(' · ')}
+                    {[mixedPlaces ? p.data.location : '', p.data.layoutSize, p.data.tenure, p.data.completion].filter(Boolean).join(' · ')}
                   </span>
                 </a>
               </li>
@@ -201,6 +216,7 @@ const guides = (await getCollection('guides', ({ data }) => !data.draft))
                     <tr>
                       <th scope="row" class="px-4 py-3 font-semibold">
                         <a href={url(`/properties/${p.id}/`)} class="text-navy-900 underline decoration-gold-500 decoration-2 underline-offset-4 hover:text-gold-600">{p.data.name}</a>
+                        {mixedPlaces && <span class="mt-0.5 block text-[13px] font-normal text-ink/60">{p.data.location}</span>}
                       </th>
                       <td class="px-4 py-3 font-semibold whitespace-nowrap text-navy-900">{i.text}</td>
                       <td class="px-4 py-3 whitespace-nowrap">{p.data.layoutSize ?? '—'}</td>

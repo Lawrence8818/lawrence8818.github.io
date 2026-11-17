@@ -64,6 +64,11 @@ const areas = defineCollection({
     region: z.enum(['klang-valley', 'johor', 'penang']),
     /** 可选:按地段取项目(项目地点以这个名字开头),页面会出对比表。例如 "Bukit Jalil" */
     locality: z.string().optional(),
+    /** 可选:按筛选分组取项目(地点写法不统一的地段用这个)。例如 "klcc" */
+    matchRegion: z.string().optional(),
+    /** 可选:对比页的搜索标题和大标题;{n} 会换成在售项目数 */
+    compareTitle: z.string().optional(),
+    compareHeading: z.string().optional(),
     heroImage: z.string(),
     intro: z.string(),
     highlights: z.array(z.string()),
