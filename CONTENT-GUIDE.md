@@ -152,22 +152,10 @@
 
 ### 还没做完的
 
-- **📝 备忘:26 个在售项目还没有月供数字**(2026-11-17 Lawrence 说之后会补,请 Claude 提醒)。
-  目前这些项目显示 `Instalment on request`,在地段对比页里排在最后。
-  补法:在 Project-Info-Master 的 `monthly_from` 栏填上(例如 `RM 2,300`),每日同步后网站自动更新;
-  或者直接把数字发给 Claude。按地段对比页的需要排先后:
-  - **Bangsar & Bangsar South 页(7 个,最缺)**:Khaya Residences、Duo Tower、Laurel Residence、
-    Solarvest Tower、South Link Lifestyle Apartments、The Goodwood Residence、The Vertical Office
-  - **KLCC 页(6 个)**:Centrix The Station KLCC、Divine KLCC、Kyliez Suites、Oxley Towers KLCC、
-    Phoeniz Suites、Royal Lexis KLCC
-  - **Kwasa Damansara 页(2 个)**:RIA Sunsuria、Tujuh Residences
-  - **其他(11 个)**:Branniganz Suites、M Aurora、Pavilion Damansara Heights Phase 1、
-    Pavilion Damansara Heights Phase 2、River Park、SWNK Houze @ BBCC、The Stride Office Suite @ BBCC、
-    Mahogany Residences、Platinum Premium Suites、Senna Heights、Stellar Damansara
-- **📝 备忘:资料要更新的几处**(2026-11-17):
-  - Kingswoodz:Project-Info-Master 的 status 还是 `active`,请改成 `fully-sold`(网站这边已先标售完)。
-  - Orion(写着 Q2 2025)、Core Residence(写着 Q3 2025):预计完工日期已过,如果已建成请改成 `Completed`。
-  - Bangsar South 的 Duo Tower、Solarvest Tower 是不是办公楼,待确认(对比页目前只笼统写「清单里有住宅也有办公单位」)。
+- **待办事项不记在这份文件里。**这份文件放在公开的代码仓库,所以待补的月供数字、待更新的资料等
+  都记在 Lawrence 自己的待办清单(Claude 里的私人 artifact「网站待办事项」),不写在这里。
+- **部分在售项目还没有月供数字**,目前显示 `Instalment on request`。补法:在 Project-Info-Master 的
+  `monthly_from` 栏填上,或在待办清单里直接填。
 - **Google 商家资料(Google Business Profile)**:开通并请老客户去留评价。这是 AEO 第 5 项里
   最有用的一步,只有你能做。开通后把链接给 Claude,会加进网站的身份资料里。
 - **中文版第二批**:区域页、视频页、Buyer Guide、联系页、9 个落地页还只有英文。
