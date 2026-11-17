@@ -116,17 +116,26 @@ const ld = (data) =>
 const pages = readdirSync(SRC).filter((n) => n.endsWith('.html')).sort();
 let done = 0;
 
-for (const file of pages) {
+// 每个落地页先处理英文版;有中文版(dist/zh/<slug>/)的再处理中文版
+const jobs = pages.flatMap((file) => {
   const slug = file.replace(/\.html$/, '');
-  const path = DIST + slug + '/index.html';
+  const hasZh = existsSync(DIST + 'zh/' + slug + '/index.html');
+  return [{ slug, zh: false, hasZh }, ...(hasZh ? [{ slug, zh: true, hasZh }] : [])];
+});
+
+for (const { slug, zh, hasZh } of jobs) {
+  const rel = (zh ? 'zh/' : '') + slug + '/';
+  const path = DIST + rel + 'index.html';
   if (!existsSync(path)) {
-    console.error('缺少 dist/' + slug + '/index.html');
+    console.error('缺少 dist/' + rel + 'index.html');
     process.exit(1);
   }
   let html = readFileSync(path, 'utf8');
   if (html.includes(MARK)) continue; // 同一份 dist 跑两次也不会重复加
 
-  const pageUrl = siteRoot + slug + '/';
+  const pageUrl = siteRoot + rel;
+  const enUrl = siteRoot + slug + '/';
+  const zhUrl = siteRoot + 'zh/' + slug + '/';
 
   // 1) 旧网址 → 正式网址(只动属性值和 JSON 字符串里完整匹配的那几处)
   for (const old of ['https://lawrencelawproperty.com/' + slug, 'https://www.lawrencelawproperty.com/' + slug]) {
@@ -189,15 +198,15 @@ for (const file of pages) {
     url: pageUrl,
     name: title,
     ...(description ? { description } : {}),
-    inLanguage: 'en',
+    inLanguage: zh ? 'zh-Hans' : 'en',
     publisher: { '@id': agent['@id'] },
   });
   blocks.push({
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: siteRoot },
-      { '@type': 'ListItem', position: 2, name: 'Properties', item: siteRoot + 'allproperties/' },
+      { '@type': 'ListItem', position: 1, name: zh ? '首页' : 'Home', item: siteRoot + (zh ? 'zh/' : '') },
+      { '@type': 'ListItem', position: 2, name: zh ? '全部项目' : 'Properties', item: siteRoot + (zh ? 'zh/' : '') + 'allproperties/' },
       { '@type': 'ListItem', position: 3, name: shortName, item: pageUrl },
     ],
   });
@@ -207,10 +216,25 @@ for (const file of pages) {
     console.error(slug + ': 找不到 </head>');
     process.exit(1);
   }
-  html = html.replace(/<\/head>/i, MARK + '\n' + blocks.map(ld).join('\n') + '\n</head>');
+  // 两种语言互相指认(hreflang),并在页面角落放一个切换语言的小按钮
+  const alt = hasZh
+    ? '<link rel="alternate" hreflang="en" href="' + enUrl + '">\n' +
+      '<link rel="alternate" hreflang="zh-Hans" href="' + zhUrl + '">\n' +
+      '<link rel="alternate" hreflang="x-default" href="' + enUrl + '">\n'
+    : '';
+  html = html.replace(/<\/head>/i, MARK + '\n' + alt + blocks.map(ld).join('\n') + '\n</head>');
+  if (hasZh) {
+    const to = zh ? '/' + slug + '/' : '/zh/' + slug + '/';
+    const pill =
+      '<a href="' + to + '" hreflang="' + (zh ? 'en' : 'zh-Hans') + '" lang="' + (zh ? 'en' : 'zh-Hans') + '" data-track="language_switch" ' +
+      'style="position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2147483000;display:inline-flex;align-items:center;' +
+      'min-height:36px;padding:0 14px;border-radius:999px;background:rgba(10,37,64,.92);color:#fff;font:600 13px/1 system-ui,-apple-system,\'PingFang SC\',\'Microsoft YaHei\',sans-serif;' +
+      'letter-spacing:.02em;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">' + (zh ? 'English' : '中文') + '</a>';
+    html = html.replace(/<\/body>/i, pill + '\n</body>');
+  }
   writeFileSync(path, html);
   done++;
-  console.log('  /' + slug.padEnd(20) + added.join(' · '));
+  console.log('  /' + rel.replace(/\/$/, '').padEnd(20) + added.join(' · '));
 }
 
 if (unknownEntities.size) {

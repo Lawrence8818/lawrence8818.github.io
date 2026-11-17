@@ -11,8 +11,6 @@ npm-debug.log*
 .env.production
 # macOS
 .DS_Store
-
-# 构建时由 scripts/stage-landing-pages.mjs 生成,不是手写的
 /public/aldenzexsim/
 /public/clouthausklcc/
 /public/deviaexsim/
@@ -24,3 +22,5 @@ npm-debug.log*
 /public/vividzexsim/
 # 构建时生成的小尺寸 WebP(scripts/optimize-images.mjs)
 /public/images/opt/
+# 构建时生成的中文落地页(scripts/stage-landing-pages.mjs)
+/public/zh/

@@ -11,8 +11,11 @@ const OWN_HOSTS = new Set(['lawrencelawproperty.com', 'www.lawrencelawproperty.c
  *
  * 落地页下架后(theatera、kingswoodzexsim 就是这样),CSV 里的网址还在,
  * 卡片会一直指向 404。有了这层检查,卡片自动退回项目详情页。
+ *
+ * lang 是 'zh' 时找中文落地页(landing-pages/zh/<slug>.json 存在才有),
+ * 没有就返回 undefined,由调用的地方退回中文项目详情页。
  */
-export function landingHref(landingUrl?: string): string | undefined {
+export function landingHref(landingUrl?: string, lang: 'en' | 'zh' = 'en'): string | undefined {
   if (!landingUrl) return undefined;
   let parsed: URL;
   try {
@@ -21,9 +24,13 @@ export function landingHref(landingUrl?: string): string | undefined {
     return undefined;
   }
   // 别的网站的链接原样保留,不归这里管
-  if (!OWN_HOSTS.has(parsed.hostname)) return landingUrl;
+  if (!OWN_HOSTS.has(parsed.hostname)) return lang === 'zh' ? undefined : landingUrl;
 
   const slug = parsed.pathname.replace(/^\/+|\/+$/g, '');
   if (!/^[a-z0-9-]+$/.test(slug)) return undefined;
-  return existsSync(join(process.cwd(), 'landing-pages', `${slug}.html`)) ? url(`/${slug}/`) : undefined;
+  if (!existsSync(join(process.cwd(), 'landing-pages', `${slug}.html`))) return undefined;
+  if (lang === 'zh') {
+    return existsSync(join(process.cwd(), 'landing-pages', 'zh', `${slug}.json`)) ? url(`/zh/${slug}/`) : undefined;
+  }
+  return url(`/${slug}/`);
 }

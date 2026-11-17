@@ -1,5 +1,5 @@
 // @ts-check
-import { readdirSync } from 'node:fs';
+import { readdirSync, existsSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
@@ -15,7 +15,13 @@ const base = process.env.BASE_PATH ?? '/LLP-recruitment-website';
 const landingPages = readdirSync(new URL('./landing-pages/', import.meta.url))
   .filter((n) => n.endsWith('.html'))
   .sort()
-  .map((n) => `${site.replace(/\/+$/, '')}${base.replace(/\/+$/, '')}/${n.replace(/\.html$/, '')}/`);
+  .flatMap((n) => {
+    const slug = n.replace(/\.html$/, '');
+    const root = `${site.replace(/\/+$/, '')}${base.replace(/\/+$/, '')}`;
+    // 有译文对照表的落地页还有一个中文版
+    const hasZh = existsSync(new URL(`./landing-pages/zh/${slug}.json`, import.meta.url));
+    return [`${root}/${slug}/`, ...(hasZh ? [`${root}/zh/${slug}/`] : [])];
+  });
 
 export default defineConfig({
   site,
