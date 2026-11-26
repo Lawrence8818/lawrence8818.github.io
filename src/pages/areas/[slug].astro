@@ -28,7 +28,7 @@ const { Content } = await render(text);
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const waMsg = waContextMessage(pick(lang, `buying property in ${area.data.name}`, `在 ${area.data.name} 买房`), lang);
 // 项目资料在两种语言下的写法
-const inst = (d: { monthly?: string; soldOut?: boolean }) => (zh ? instalmentDisplayZh(d) : instalmentDisplay(d));
+const inst = (d: { monthly?: string; soldOut?: boolean; priceFrom?: string }) => (zh ? instalmentDisplayZh(d) : instalmentDisplay(d));
 const tenureOf = (t: string) => (zh ? tenureZh(t) : t);
 const doneOf = (c: string) => (zh ? completionZh(c) : c);
 const sizeOf = (x?: string) => (x ? (zh ? sizeZh(x) : x) : '—');
@@ -282,7 +282,7 @@ const guides = (await getCollection(zh ? 'guidesZh' : 'guides', ({ data }) => !d
             </table>
           </div>
           <p class="mt-3 text-[13px] text-ink/60">
-            {pick(lang, 'Instalments are estimates; sizes in square feet.', '月供为估算数字。')}
+            {pick(lang, 'Instalments are estimates; where no instalment is published, the SPA starting price is shown. Sizes in square feet.', '月供为估算数字；没有月供数字的项目显示 SPA 起价。')}
           </p>
         </div>
       )}

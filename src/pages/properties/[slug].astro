@@ -18,6 +18,7 @@ import {
   REGION_LABEL_ZH,
   instalmentDisplay,
   instalmentDisplayZh,
+  spaPrice,
   placeText,
   placeZh,
   propertyFaqs,
@@ -45,18 +46,18 @@ const d = p.data;
 const lang = langOf(Astro);
 const zh = lang === 'zh';
 
-// The site shows monthly instalments, never the selling price.
+// The headline is the monthly instalment; projects without one show the SPA price.
 const instalment = zh ? instalmentDisplayZh(d) : instalmentDisplay(d);
 const zhSpecs = specsZh(d);
 const descFacts = zh
   ? [
-      instalment.amount ? `预估月供约 ${instalment.text} 起` : '',
+      instalment.amount ? `预估月供约 ${instalment.text} 起` : spaPrice(d) ? instalment.text : '',
       ...zhSpecs.filter((x) => x.k !== '土地面积' && x.k !== '管理费').map((x) => (x.k === '地契' ? x.v : `${x.k} ${x.v}`)),
     ]
       .filter(Boolean)
       .join('，')
   : [
-      instalment.amount ? `Monthly instalment from about ${instalment.text}` : '',
+      instalment.amount ? `Monthly instalment from about ${instalment.text}` : spaPrice(d) ? instalment.text : '',
       d.layoutSize ? `layouts ${d.layoutSize}` : '',
       d.tenure,
       `completion ${d.completion}`,
@@ -229,6 +230,14 @@ const waMsg = zh
               <p class="text-[34px] leading-none font-extrabold text-white sm:text-[44px]">
                 {instalment.text}{zh && <span class="ml-2 text-[18px] font-semibold text-navy-100">起</span>}
               </p>
+            </>
+          ) : spaPrice(d) ? (
+            <>
+              <p class="text-[15px] text-navy-100">{pick(lang, 'SPA price from', 'SPA 售价，从')}</p>
+              <p class="text-[34px] leading-none font-extrabold text-white sm:text-[44px]">
+                {spaPrice(d)}{zh && <span class="ml-2 text-[18px] font-semibold text-navy-100">起</span>}
+              </p>
+              <p class="mt-2 text-[13px] text-navy-100/80">{pick(lang, 'Ask me for the monthly instalment on your own numbers.', '月供请问我，按你的情况估算。')}</p>
             </>
           ) : (
             <p class="text-[26px] leading-tight font-extrabold text-white sm:text-[32px]">

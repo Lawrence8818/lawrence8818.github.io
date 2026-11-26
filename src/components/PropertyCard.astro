@@ -9,7 +9,7 @@ import { langOf, pick, href } from '../i18n';
 interface Props {
   name: string;
   label?: string;
-  /** kept as data only — never rendered (the site shows instalments, not prices) */
+  /** 只在没有月供数字时显示(SPA 售价);有月供的项目不显示售价 */
   priceFrom?: string;
   location: string;
   type?: string;
@@ -33,6 +33,7 @@ interface Props {
 const {
   name,
   label,
+  priceFrom,
   location,
   type,
   tenure,
@@ -64,9 +65,9 @@ const specs =
         { k: 'Completion', v: completion },
       ];
 const contactMsg = waContextMessage(name, lang);
-// The headline figure is the monthly instalment — the site never shows the
-// selling price. Listings without one read "Instalment on request".
-const instalment = pick(lang, instalmentDisplay, instalmentDisplayZh)({ monthly, soldOut });
+// The headline figure is the monthly instalment. Listings without one show the
+// SPA price instead (if known), otherwise "Instalment on request".
+const instalment = pick(lang, instalmentDisplay, instalmentDisplayZh)({ monthly, soldOut, priceFrom });
 const priceLabel = instalment.amount
   ? pick(lang, `From ${instalment.text} / month`, `月供 ${instalment.text} 起`)
   : instalment.text;
