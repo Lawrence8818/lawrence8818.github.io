@@ -53,16 +53,28 @@ export function monthlyNumber(monthly?: string): number | undefined {
 }
 
 /**
+ * 没有月供数字、但有 SPA 售价的在售项目,改显示 SPA 售价(Lawrence 2026-11-26 决定)。
+ * 有月供的一律只显示月供;已售完、或两样都没有的,不显示金额。
+ */
+export function spaPrice(d: { monthly?: string; soldOut?: boolean; priceFrom?: string }): string | undefined {
+  if (d.soldOut || isRm(d.monthly)) return undefined;
+  return isRm(d.priceFrom) ? d.priceFrom : undefined;
+}
+
+/**
  * 卡片和页首那个大字金额。全站不显示售价,只讲月供:
- * 有月供 → "RM 2,060";已售完 → "Fully sold";没填月供 → "Instalment on request"。
+ * 有月供 → "RM 2,060";已售完 → "Fully sold";没有月供但有 SPA 售价 → "SPA from RM 747,255";
+ * 两样都没有 → "Instalment on request"。
  * amount 为 true 时前面可以接 "From"、后面可以接 "/ month"。
  */
-export function instalmentDisplay(d: { monthly?: string; soldOut?: boolean }): {
+export function instalmentDisplay(d: { monthly?: string; soldOut?: boolean; priceFrom?: string }): {
   text: string;
   amount: boolean;
 } {
   if (d.soldOut) return { text: 'Fully sold', amount: false };
   if (isRm(d.monthly)) return { text: d.monthly!, amount: true };
+  const spa = spaPrice(d);
+  if (spa) return { text: `SPA from ${spa}`, amount: false };
   return { text: 'Instalment on request', amount: false };
 }
 
@@ -102,8 +114,10 @@ function completionSentence(d: PropertyFacts): string {
 // 不写售价 —— Lawrence 要求对外只讲月供。月供数字来自 CSV 的 monthly_from,
 // 没填的项目就不提金额,不自己拿售价去推算。
 function instalmentSentence(d: PropertyFacts): string {
-  if (d.soldOut || !isRm(d.monthly)) return '';
-  return `The estimated monthly instalment for ${d.name} starts from about ${d.monthly}.`;
+  if (d.soldOut) return '';
+  if (isRm(d.monthly)) return `The estimated monthly instalment for ${d.name} starts from about ${d.monthly}.`;
+  const spa = spaPrice(d);
+  return spa ? `The SPA price for ${d.name} starts from ${spa}.` : '';
 }
 
 const hasMaintenance = (d: PropertyFacts) => isRm(d.maintenance);
@@ -136,8 +150,10 @@ export function propertyFaqs(d: PropertyFacts): { question: string; answer: stri
     d.soldOut
       ? { question: `Is ${d.name} still available?`, answer: `No — ${d.name} is fully sold.` }
       : {
-          question: `What is the monthly instalment for ${d.name}?`,
-          answer: instalment
+          question: spaPrice(d) ? `How much is ${d.name}?` : `What is the monthly instalment for ${d.name}?`,
+          answer: spaPrice(d)
+            ? `${instalment} The price depends on the unit, and the monthly instalment depends on your loan margin, interest rate and tenure. Message ${SITE.name} on WhatsApp (${phone}) for the current price list and an instalment estimate based on your own numbers.`
+            : instalment
             ? `${instalment} The actual figure depends on your loan margin, interest rate and tenure.`
             : `The instalment for ${d.name} depends on the unit you choose and on your loan margin, interest rate and tenure. Message ${SITE.name} on WhatsApp (${phone}) for an estimate based on your own numbers.`,
         },
@@ -202,7 +218,7 @@ export function propertySpecs(d: PropertyFacts): { name: string; value: string }
 export function propertyOneLine(d: PropertyFacts): string {
   return [
     placeText(d),
-    d.soldOut ? 'fully sold' : isRm(d.monthly) ? `monthly instalment from about ${d.monthly}` : '',
+    d.soldOut ? 'fully sold' : isRm(d.monthly) ? `monthly instalment from about ${d.monthly}` : spaPrice(d) ? `SPA price from ${spaPrice(d)}` : '',
     d.tenure,
     d.layoutSize ? sqft(d.layoutSize) : '',
     `completion: ${d.completion}`,
@@ -284,12 +300,14 @@ export function placeZh(d: PropertyFacts): string {
 const gap = (s: string) => (/[）)]$/.test(s) ? '' : ' ');
 
 /** 卡片和页首那个大字金额(中文) */
-export function instalmentDisplayZh(d: { monthly?: string; soldOut?: boolean }): {
+export function instalmentDisplayZh(d: { monthly?: string; soldOut?: boolean; priceFrom?: string }): {
   text: string;
   amount: boolean;
 } {
   if (d.soldOut) return { text: '已售完', amount: false };
   if (isRm(d.monthly)) return { text: d.monthly!, amount: true };
+  const spa = spaPrice(d);
+  if (spa) return { text: `SPA 售价 ${spa} 起`, amount: false };
   return { text: '月供请洽询', amount: false };
 }
 
@@ -314,8 +332,10 @@ function layoutSentenceZh(d: PropertyFacts, withName: boolean): string {
 }
 
 function instalmentSentenceZh(d: PropertyFacts): string {
-  if (d.soldOut || !isRm(d.monthly)) return '';
-  return `${d.name} 的预估月供从约 ${d.monthly} 起。`;
+  if (d.soldOut) return '';
+  if (isRm(d.monthly)) return `${d.name} 的预估月供从约 ${d.monthly} 起。`;
+  const spa = spaPrice(d);
+  return spa ? `${d.name} 的 SPA 售价从 ${spa} 起。` : '';
 }
 
 export function propertySummaryZh(d: PropertyFacts): string {
@@ -343,8 +363,10 @@ export function propertyFaqsZh(d: PropertyFacts): { question: string; answer: st
     d.soldOut
       ? { question: `${d.name} 还有单位吗？`, answer: `没有，${d.name} 已经售完。` }
       : {
-          question: `${d.name} 的月供大概多少？`,
-          answer: instalment
+          question: spaPrice(d) ? `${d.name} 的售价大概多少？` : `${d.name} 的月供大概多少？`,
+          answer: spaPrice(d)
+            ? `${instalment}实际售价要看你选的单位，月供则取决于你的贷款额、利率和年限。可以 WhatsApp ${SITE.name}（${phone}），拿最新的价目表，并按你的情况估算月供。`
+            : instalment
             ? `${instalment}实际数额取决于你的贷款额、利率和年限。`
             : `${d.name} 的月供要看你选的单位，以及你的贷款额、利率和年限。可以 WhatsApp ${SITE.name}（${phone}），按你的情况估算。`,
         },
